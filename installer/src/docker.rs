@@ -102,8 +102,8 @@ services:
     cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
     security_opt: ["no-new-privileges:true"]
     environment:
-      POSTGRES_USER: Hikari
-      POSTGRES_DB: Hikari
+      POSTGRES_USER: mikan
+      POSTGRES_DB: mikan
       POSTGRES_PASSWORD: ${MIKAN_POSTGRES_PASSWORD}
       POSTGRES_INITDB_ARGS: --auth-local=scram-sha-256 --auth-host=scram-sha-256
     command: ["postgres", "-c", "listen_addresses=", "-c", "unix_socket_directories=/run/postgresql", "-c", "unix_socket_permissions=0777", "-c", "max_connections=50"]
