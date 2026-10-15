@@ -4,26 +4,26 @@ import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
 import changelog from './integrations/changelog.mjs';
 
-// GitHub Pages serves the project at miroshka000.github.io/mikan/. Links inside the docs are
-// written with the base (/mikan/...), and the link validator checks them on every build.
+// GitHub Pages serves the fork at shelbyhell.github.io/Hikari/. Links inside the docs are
+// written with the base (/Hikari/...), and the link validator checks them on every build.
 export default defineConfig({
-	site: 'https://miroshka000.github.io',
-	base: '/mikan',
+	site: 'https://shelbyhell.github.io',
+	base: '/Hikari',
 	trailingSlash: 'always',
 	integrations: [
 		changelog(),
 		starlight({
-			title: 'mikan',
+			title: 'Hikari',
 			description:
-				'VPN-панель на ядре mihomo: установка одной командой, ноды и каскады, Telegram-бот с оплатой. Свободная, GPL-3.0.',
-			logo: { src: './src/assets/logo.webp', alt: '' },
+				'Hikari — неофициальный форк mikan: VPN-панель на ядре mihomo, установка одной командой, ноды и каскады, Telegram-бот с оплатой. Свободная, GPL-3.0.',
+			logo: { src: './src/assets/logo.svg', alt: '' },
 			favicon: '/favicon.png',
 			defaultLocale: 'root',
 			locales: {
 				root: { label: 'Русский', lang: 'ru' },
 				en: { label: 'English', lang: 'en' },
 			},
-			editLink: { baseUrl: 'https://github.com/Miroshka000/mikan/edit/dev/site/' },
+			editLink: { baseUrl: 'https://github.com/ShelbyHell/Hikari/edit/main/site/' },
 			lastUpdated: false,
 			credits: false,
 			customCss: [

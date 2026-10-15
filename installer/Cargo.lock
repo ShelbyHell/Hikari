@@ -1093,7 +1093,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mikan-installer"
+name = "hikari-installer"
 version = "0.0.0"
 dependencies = [
  "anyhow",

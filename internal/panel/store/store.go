@@ -56,7 +56,7 @@ func DatabaseURL() (string, error) {
 	return dsn, nil
 }
 
-var errNoDatabaseURL = errors.New("MIKAN_DATABASE_URL is required; run the current mikan installer to set up PostgreSQL")
+var errNoDatabaseURL = errors.New("MIKAN_DATABASE_URL is required; run the current Hikari installer to set up PostgreSQL")
 
 // ParseDatabaseURL parses a MIKAN_DATABASE_URL without echoing it: it holds the password.
 func ParseDatabaseURL(dsn string) (*pgx.ConnConfig, error) {

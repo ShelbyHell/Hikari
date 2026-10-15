@@ -1,4 +1,4 @@
-//! Backups and restore. A backup is a tar.gz of what mikan keeps in /opt/mikan: .env,
+//! Backups and restore. A backup is a tar.gz of what Hikari keeps in /opt/Hikari: .env,
 //! compose.yaml, a consistent copy of the panel's database, its certificates and the node's
 //! data. It holds every secret of the server, so it is born private: the directory is 0700
 //! and the archive is created 0600 before tar writes a byte into it.
@@ -23,7 +23,7 @@ use crate::ops::Install;
 use crate::panelfs::{self, Dir};
 use crate::{DIR, docker, setup, signals, system};
 
-/// The kinds of archive mikan makes on its own; the admin's are "mikan".
+/// The kinds of archive Hikari makes on its own; the admin's are "hikari".
 pub const PRE_UPDATE: &str = "pre-update";
 /// An update that moves SQLite to PostgreSQL: the archives with the original SQLite. A
 /// failed move leaves .env on PostgreSQL, so its retries are "pre-update" and can never
@@ -40,7 +40,7 @@ fn keep(kind: &str) -> Option<usize> {
     }
 }
 
-/// Where the panel's database lies below /opt/mikan: a backup's PostgreSQL dump or
+/// Where the panel's database lies below /opt/Hikari: a backup's PostgreSQL dump or
 /// SQLite copy, a restore's dump, and the SQLite file itself with its journal.
 const DUMP: &str = "data/panel/backup.dump";
 const SQLITE_COPY: &str = "data/panel/backup.db";
@@ -84,8 +84,8 @@ fn ensure_room(root: &Path, postgres: bool) -> Result<()> {
     Ok(())
 }
 
-/// What a restore may put back, below /opt/mikan: the settings, and the data of the panel
-/// and the node. Anything else in an archive is not a mikan backup.
+/// What a restore may put back, below /opt/Hikari: the settings, and the data of the panel
+/// and the node. Anything else in an archive is not a hikari backup.
 const TOP: [&str; 2] = [".env", "compose.yaml"];
 
 /// The backups' directory, private.
@@ -206,7 +206,7 @@ fn exists(root: &Path, rel: &str) -> bool {
 
 /// The backup the admin asks for.
 pub fn backup(say: &mut dyn FnMut(&str)) -> Result<PathBuf> {
-    backup_as("mikan", say)
+    backup_as("hikari", say)
 }
 
 /// A backup of the database (a consistent copy while the panel runs), certificates and
@@ -300,7 +300,7 @@ fn check_listing(names: &str, verbose: &str) -> Result<()> {
         bail!("the archive has an entry that is not a plain file or directory: {}", l.trim());
     }
     if let Some(n) = names.iter().find(|n| !allowed_name(n)) {
-        bail!("the archive has a path a mikan backup does not: {n}");
+        bail!("the archive has a path a hikari backup does not: {n}");
     }
     Ok(())
 }
@@ -375,7 +375,7 @@ fn verify_tree(dir: &Path, depth: usize) -> Result<()> {
 fn plan(stage: &Path) -> Result<Vec<(PathBuf, &'static str)>> {
     let items = plan_items(stage);
     if !items.iter().any(|(_, r)| *r == ".env") {
-        bail!("the archive has no .env: it is not a mikan backup");
+        bail!("the archive has no .env: it is not a hikari backup");
     }
     Ok(items)
 }
@@ -386,7 +386,7 @@ fn plan(stage: &Path) -> Result<Vec<(PathBuf, &'static str)>> {
 fn plan_database(stage: &Path) -> Result<Vec<(PathBuf, &'static str)>> {
     let items: Vec<_> = plan_items(stage).into_iter().filter(|(_, r)| *r == RESTORE_DUMP).collect();
     if items.is_empty() {
-        bail!("the archive has neither .env nor the panel's PostgreSQL dump: it is not a mikan backup");
+        bail!("the archive has neither .env nor the panel's PostgreSQL dump: it is not a hikari backup");
     }
     Ok(items)
 }
@@ -429,7 +429,7 @@ fn fit_to_panel(items: &mut Vec<(PathBuf, &'static str)>, archived: &mut EnvFile
     if current.get("MIKAN_DATABASE_URL").is_none() {
         items.retain(|(_, r)| *r != "compose.yaml");
         if items.iter().any(|(_, r)| *r == RESTORE_DUMP) {
-            bail!("this server still runs SQLite and the backup holds a PostgreSQL database: run mikan update first, then restore");
+            bail!("this server still runs SQLite and the backup holds a PostgreSQL database: run hikari update first, then restore");
         }
     }
     if !items.iter().any(|(_, r)| [SQLITE, RESTORE_DUMP].contains(r)) {
@@ -442,7 +442,7 @@ fn fit_to_panel(items: &mut Vec<(PathBuf, &'static str)>, archived: &mut EnvFile
         && !crate::release::moves_sqlite(version)
     {
         bail!(
-            "this backup is of mikan 0.4 (SQLite), and mikan {version} no longer moves SQLite to PostgreSQL: restore it on a server of mikan {}",
+            "this backup is of Hikari 0.4 (SQLite), and Hikari {version} no longer moves SQLite to PostgreSQL: restore it on a server of Hikari {}",
             crate::release::LAST_SQLITE_MOVE
         );
     }
@@ -604,7 +604,7 @@ pub fn restore(file: &Path, no_db_snapshot: bool, say: &mut dyn FnMut(&str)) -> 
     } else {
         if !postgres {
             bail!(
-                "the archive holds only a panel's PostgreSQL database; this server is a node or still runs SQLite (run mikan update first)"
+                "the archive holds only a panel's PostgreSQL database; this server is a node or still runs SQLite (run hikari update first)"
             );
         }
         let items = plan_database(&stage.0)?;
@@ -613,12 +613,12 @@ pub fn restore(file: &Path, no_db_snapshot: bool, say: &mut dyn FnMut(&str)) -> 
     };
 
     let _critical = signals::critical();
-    say("Stopping mikan");
+    say("Stopping Hikari");
     crate::addon::down();
     docker::compose_run(&["stop"])?;
     let again = |say: &mut dyn FnMut(&str)| {
         if let Err(e) = docker::compose_run(&["up", "-d"]) {
-            say(&format!("mikan did not start again: {e:#}"));
+            say(&format!("Hikari did not start again: {e:#}"));
         }
         if !install.node
             && let Err(e) = crate::addon::resume(say)
@@ -642,7 +642,7 @@ pub fn restore(file: &Path, no_db_snapshot: bool, say: &mut dyn FnMut(&str)) -> 
             again(say);
             let hint = if dump && postgres {
                 format!(
-                    ". If PostgreSQL itself is broken and its current data are not needed, save only the files first: mikan restore --no-db-snapshot {}",
+                    ". If PostgreSQL itself is broken and its current data are not needed, save only the files first: hikari restore --no-db-snapshot {}",
                     file.display()
                 )
             } else {
@@ -658,7 +658,7 @@ pub fn restore(file: &Path, no_db_snapshot: bool, say: &mut dyn FnMut(&str)) -> 
     }
     let started = (|| -> Result<()> {
         if postgres {
-            // The backup may carry the compose file of an older mikan: it gets the current one.
+            // The backup may carry the compose file of an older Hikari: it gets the current one.
             docker::ensure_compose(root, false)?;
             panelfs::layout(root, true)?;
             docker::postgres_ready()?;
@@ -685,7 +685,7 @@ pub fn restore(file: &Path, no_db_snapshot: bool, say: &mut dyn FnMut(&str)) -> 
     if let Err(e) = started {
         let _ = docker::compose_run(&["stop", "panel"]);
         return Err(e.context(format!(
-            "the backup is in place but mikan does not start; the data before it are in {}: mikan restore {}",
+            "the backup is in place but Hikari does not start; the data before it are in {}: hikari restore {}",
             snap.display(),
             snap.display()
         )));
@@ -752,12 +752,12 @@ mod tests {
         let a = pack(
             &root,
             &dir,
-            "mikan",
+            "hikari",
             &[".env".into(), "compose.yaml".into(), "data/panel/backup.db".into(), "data/node".into()],
             Squeeze::Normal,
         )
         .unwrap();
-        let b = pack(&root, &dir, "mikan", &[".env".into()], Squeeze::Fast).unwrap();
+        let b = pack(&root, &dir, "hikari", &[".env".into()], Squeeze::Fast).unwrap();
         assert_ne!(a, b, "two backups of one second must not share a name");
         assert_eq!(fs::metadata(&a).unwrap().permissions().mode() & 0o777, 0o600);
         // the archive is what restore accepts, the fast one too
@@ -765,7 +765,7 @@ mod tests {
         check_archive(&b).unwrap();
         // a failed tar leaves no file
         let before = fs::read_dir(&dir).unwrap().count();
-        assert!(pack(&root, &dir, "mikan", &["no-such-file".into()], Squeeze::Normal).is_err());
+        assert!(pack(&root, &dir, "hikari", &["no-such-file".into()], Squeeze::Normal).is_err());
         assert_eq!(fs::read_dir(&dir).unwrap().count(), before, "a broken archive stayed");
         fs::remove_dir_all(&root).unwrap();
     }
@@ -780,7 +780,7 @@ mod tests {
         file(&root, "data/node/update/status.json", r#"{"state":"running"}"#);
         file(&root, "data/node/update/request", r#"{"version":"0.5.0.2"}"#);
         let dir = backups_dir(&root).unwrap();
-        let a = pack(&root, &dir, "mikan", &[".env".into(), "data/node".into()], Squeeze::Normal).unwrap();
+        let a = pack(&root, &dir, "hikari", &[".env".into(), "data/node".into()], Squeeze::Normal).unwrap();
         let listing = Command::new("tar").arg("-tzf").arg(&a).output().unwrap();
         let names = String::from_utf8_lossy(&listing.stdout);
         assert!(names.contains("data/node/state.json"), "{names}");
@@ -794,18 +794,18 @@ mod tests {
         for n in 1..=8 {
             fs::write(dir.join(format!("pre-update-2026100{n}-000000.tar.gz")), "x").unwrap();
         }
-        fs::write(dir.join("mikan-20260101-000000.tar.gz"), "mine").unwrap();
+        fs::write(dir.join("hikari-20260101-000000.tar.gz"), "mine").unwrap();
         fs::write(dir.join("pre-restore-20260101-000000.tar.gz"), "snap").unwrap();
         // the original SQLite of the move to PostgreSQL, older than every retry after it
         fs::write(dir.join("pre-postgres-20260101-000000.tar.gz"), "sqlite").unwrap();
         prune(&dir, PRE_UPDATE);
-        prune(&dir, "mikan");
+        prune(&dir, "hikari");
         let mut left: Vec<String> = fs::read_dir(&dir).unwrap().map(|e| e.unwrap().file_name().into_string().unwrap()).collect();
         left.sort();
         assert_eq!(left.iter().filter(|n| n.starts_with("pre-update-")).count(), 5);
         assert!(left.contains(&"pre-update-20261008-000000.tar.gz".to_string()), "the newest stays");
         assert!(!left.contains(&"pre-update-20261001-000000.tar.gz".to_string()), "the oldest goes");
-        for kept in ["mikan-20260101-000000.tar.gz", "pre-restore-20260101-000000.tar.gz", "pre-postgres-20260101-000000.tar.gz"] {
+        for kept in ["hikari-20260101-000000.tar.gz", "pre-restore-20260101-000000.tar.gz", "pre-postgres-20260101-000000.tar.gz"] {
             assert!(left.contains(&kept.to_string()), "{kept}");
         }
         for n in 2..=5 {
@@ -825,7 +825,7 @@ mod tests {
     #[test]
     fn a_node_archive_keeps_the_image() {
         let mut archived = EnvFile::from_text("x", "MIKAN_MODE=node\nMIKAN_IMAGE=evil.example/x\nMIKAN_VERSION=9.9.9\nNODE_PORT=1\n");
-        let current = EnvFile::from_text("x", "MIKAN_MODE=node\nMIKAN_IMAGE=ghcr.io/miroshka000/mikan@sha256:aa\nMIKAN_VERSION=0.5.0.5\n");
+        let current = EnvFile::from_text("x", "MIKAN_MODE=node\nMIKAN_IMAGE=ghcr.io/shelbyhell/hikari@sha256:aa\nMIKAN_VERSION=0.5.0.5\n");
         fit_to_node(&mut archived, &current).unwrap();
         assert_eq!(archived.get("MIKAN_IMAGE"), current.get("MIKAN_IMAGE"));
         assert_eq!(archived.get("MIKAN_VERSION"), current.get("MIKAN_VERSION"));
@@ -861,7 +861,7 @@ mod tests {
         let sqlite = EnvFile::from_text("x", "MIKAN_IMAGE=old\nMIKAN_VERSION=0.4.4\nMIKAN_POSTGRES_PASSWORD=kept\n");
         let mut archived = EnvFile::load(d.join(".env")).unwrap();
         let err = fit_to_panel(&mut plan(&d).unwrap(), &mut archived, &sqlite).unwrap_err();
-        assert!(format!("{err}").contains("mikan update first"), "{err}");
+        assert!(format!("{err}").contains("hikari update first"), "{err}");
         fs::remove_file(d.join("data/panel/backup.dump")).unwrap();
         file(&d, "data/panel/backup.db", "sqlite copy");
         let mut items = plan(&d).unwrap();
@@ -904,7 +904,7 @@ mod tests {
     }
 
     #[test]
-    fn only_mikan_backups_pass_the_listing() {
+    fn only_hikari_backups_pass_the_listing() {
         let names = ".env\ncompose.yaml\ndata/\ndata/panel/\ndata/panel/backup.db\ndata/panel/tls/\ndata/panel/tls/panel.key\ndata/node/\ndata/node/state.json\n";
         let verbose: String = names
             .lines()

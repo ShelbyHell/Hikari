@@ -232,7 +232,7 @@ func Final(r Result) bool {
 }
 
 // File is hello.json in the node's data directory: the last hello and how it went, for the
-// installer and `mikan doctor` on the node's server.
+// installer and `hikari doctor` on the node's server.
 const File = "hello.json"
 
 // Status is what File holds.

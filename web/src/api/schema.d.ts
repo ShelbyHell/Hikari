@@ -647,7 +647,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Режим разработчика: подключить свой процесс на 127.0.0.1, без проверки mikan */
+        /** Режим разработчика: подключить свой процесс на 127.0.0.1, без проверки Hikari */
         post: operations["install-external-addon"];
         delete?: never;
         options?: never;
@@ -3241,7 +3241,7 @@ export interface components {
             wider: boolean;
         };
         MarketExternalInputBody: {
-            /** @description Админ подтвердил, что доверяет этому коду: mikan его не проверял */
+            /** @description Админ подтвердил, что доверяет этому коду: Hikari его не проверял */
             confirm: boolean;
             /** @description Имя аддона: a-z, 0-9 и дефис, не из каталога и не из источника */
             id: string;
@@ -3281,7 +3281,7 @@ export interface components {
             /** @description Источник, из которого поставлен аддон (custom) */
             origin?: components["schemas"]["MarketOrigin"];
             /**
-             * @description official — из подписанного каталога; custom — образ из источника или, у старых установок, свой образ админа; external — свой процесс админа; mikan неофициальные не проверял
+             * @description official — из подписанного каталога; custom — образ из источника или, у старых установок, свой образ админа; external — свой процесс админа; неофициальные Hikari не проверял
              * @enum {string}
              */
             source: "official" | "custom" | "external";
@@ -3304,7 +3304,7 @@ export interface components {
             catalog: components["schemas"]["MarketEntry"][];
             /** @description catalog_unavailable — каталог не загрузился */
             catalog_error?: string;
-            /** @description mikan на сервере умеет аддоны протокола 2; иначе сначала обновить сервер */
+            /** @description Hikari на сервере умеет аддоны протокола 2; иначе сначала обновить сервер */
             host_ready: boolean;
             installed: components["schemas"]["MarketInstalled"][];
             /** @description Как сервер выполнил последнюю заявку */
@@ -3370,7 +3370,7 @@ export interface components {
             address: string;
             /** @description Нода старее панели */
             behind: boolean;
-            /** @description Панель может обновить ноду сама: удалённая, отвечает, версия 0.5.0.2 или новее; старую обновляют один раз вручную командой mikan update на её сервере */
+            /** @description Панель может обновить ноду сама: удалённая, отвечает, версия 0.5.0.2 или новее; старую обновляют один раз вручную командой hikari update на её сервере */
             can_update: boolean;
             certificate?: components["schemas"]["NodeCertView"];
             /**
@@ -4186,7 +4186,7 @@ export interface components {
             port: number;
         };
         Preview: {
-            /** @description Пользователи, которых mikan не примет, с причиной */
+            /** @description Пользователи, которых Hikari не примет, с причиной */
             invalid: components["schemas"]["List"];
             /**
              * Format: int64
@@ -4197,13 +4197,13 @@ export interface components {
             no_link: components["schemas"]["List"];
             /**
              * Format: int64
-             * @description Пользователи «на паузе»: в mikan их срок пойдёт с момента импорта
+             * @description Пользователи «на паузе»: в Hikari их срок пойдёт с момента импорта
              */
             on_hold: number;
             statuses: {
                 [key: string]: number;
             };
-            /** @description Имена, которые уже есть в mikan */
+            /** @description Имена, которые уже есть в Hikari */
             taken: components["schemas"]["List"];
             /** Format: int64 */
             total: number;
@@ -4411,7 +4411,7 @@ export interface components {
             links: number;
             /** @description Перенесены без старой ссылки: её токен слишком короткий, чтобы быть секретом */
             no_link: components["schemas"]["List"];
-            /** @description Имена, которые уже есть в mikan: эти пользователи не перенесены */
+            /** @description Имена, которые уже есть в Hikari: эти пользователи не перенесены */
             skipped: components["schemas"]["List"];
         };
         ResetPathOutputBody: {

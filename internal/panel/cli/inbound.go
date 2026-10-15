@@ -42,11 +42,11 @@ func inboundCmd(ctx context.Context, st *store.Store, args []string, stdout, std
 		return tw.Flush()
 	case "add":
 		if len(args) < 2 || strings.HasPrefix(args[1], "-") {
-			return errors.New("name a preset: mikan admin inbound add PRESET [--port PORT] [--node NODE]\nPresets: " + presetIDs())
+			return errors.New("name a preset: hikari admin inbound add PRESET [--port PORT] [--node NODE]\nPresets: " + presetIDs())
 		}
 		fs := flag.NewFlagSet("inbound add", flag.ContinueOnError)
 		port := fs.String("port", "", "port or range (the preset's port by default)")
-		node := fs.Int64("node", 1, "node (1 is the panel's own, see mikan admin node list)")
+		node := fs.Int64("node", 1, "node (1 is the panel's own, see hikari admin node list)")
 		if err := fs.Parse(args[2:]); err != nil {
 			return err
 		}
@@ -77,11 +77,11 @@ func inboundCmd(ctx context.Context, st *store.Store, args []string, stdout, std
 		return openPort(ctx, st, row, stdout, stderr)
 	case "set":
 		if len(args) < 2 || strings.HasPrefix(args[1], "-") {
-			return errors.New("name an inbound: mikan admin inbound set NAME --port PORT [--node NODE]\nNames: mikan admin inbound list")
+			return errors.New("name an inbound: hikari admin inbound set NAME --port PORT [--node NODE]\nNames: hikari admin inbound list")
 		}
 		fs := flag.NewFlagSet("inbound set", flag.ContinueOnError)
 		port := fs.String("port", "", "new port or range")
-		node := fs.Int64("node", 1, "the inbound's node (see mikan admin inbound list)")
+		node := fs.Int64("node", 1, "the inbound's node (see hikari admin inbound list)")
 		if err := fs.Parse(args[2:]); err != nil {
 			return err
 		}
@@ -100,7 +100,7 @@ func inboundCmd(ctx context.Context, st *store.Store, args []string, stdout, std
 		case errors.Is(err, domain.ErrUnknownNode):
 			return fmt.Errorf("no node %d", *node)
 		case errors.Is(err, domain.ErrUnknownInbound):
-			return fmt.Errorf("node %d has no inbound %q: see mikan admin inbound list", *node, args[1])
+			return fmt.Errorf("node %d has no inbound %q: see hikari admin inbound list", *node, args[1])
 		case errors.Is(err, domain.ErrBadPort):
 			return fmt.Errorf("bad port %q", *port)
 		case errors.As(err, &busy):

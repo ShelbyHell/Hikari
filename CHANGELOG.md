@@ -3,6 +3,48 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+> **The fork is now called Hikari.** The name, the image and the server command change; the
+> panel, the data and the subscription links do not.
+>
+> - The image is **`ghcr.io/shelbyhell/hikari`** and the releases live in
+>   [ShelbyHell/Hikari](https://github.com/ShelbyHell/Hikari). Servers set up with earlier
+>   versions keep updating: GitHub redirects the old addresses, and the panel's own update
+>   channel moves with the image.
+> - The server command is **`hikari`** (`hikari update`, `hikari status`, …). A server
+>   installed before the rename keeps working: the compose files, host scripts and the old
+>   command name still find their binaries inside the image through symlinks.
+> - **An unofficial fork, said plainly.** The notice sits at the top of the README, in the
+>   panel (Settings → System → About) and in every release description: Hikari is not
+>   affiliated with or supported by the mikan project — its author supports it, and the
+>   original mikan stays at [Miroshka000/mikan](https://github.com/Miroshka000/mikan).
+> - **mikan's art is gone**: the fork's own placeholder banner and mark stand in for the
+>   mandarin until the new design arrives; the screenshots go with it.
+> - What intentionally keeps the old name because live servers depend on it: the
+>   `/opt/mikan` directory, the `MIKAN_*` environment variables, the compose project and
+>   its Docker volumes, the `mikan:` keys and `mikan.client` fields of listener templates,
+>   the `mikan-addon.json` manifest and the `mikan_*` metrics.
+>
+> **Теперь форк называется Hikari.** Меняются название, образ и команда на сервере;
+> панель, данные и ссылки подписок — нет.
+>
+> - Образ — **`ghcr.io/shelbyhell/hikari`**, релизы — в
+>   [ShelbyHell/Hikari](https://github.com/ShelbyHell/Hikari). Серверы, поставленные
+>   ранними версиями, продолжают обновляться: GitHub перенаправляет старые адреса, а
+>   канал обновлений панели переезжает вместе с образом.
+> - Команда на сервере — **`hikari`** (`hikari update`, `hikari status`, …). Сервер,
+>   установленный до переименования, продолжает работать: compose-файлы, host-скрипты и
+>   старое имя команды по-прежнему находят свои бинарники внутри образа.
+> - **Неофициальный форк — сказано прямо.** Пометка стоит в начале README, в самой панели
+>   («Настройки → Система → О программе») и в описании каждого релиза: Hikari не связан с
+>   проектом mikan и не поддерживается им — поддержка у автора форка, а сам mikan
+>   остаётся в [Miroshka000/mikan](https://github.com/Miroshka000/mikan).
+> - **Графика mikan убрана**: до нового дизайна её место занимают собственные баннер и знак
+>   форка, скриншоты удалены вместе с ней.
+> - Что намеренно осталось под старым именем, потому что от него зависят живые серверы:
+>   каталог `/opt/mikan`, переменные окружения `MIKAN_*`, compose-проект и его тома Docker,
+>   ключи `mikan:` и поля `mikan.client` в шаблонах листенеров, манифест `mikan-addon.json`
+>   и метрики `mikan_*`.
+
 ## 0.5.1.0
 ### en
 - **Addons beyond payments, on one page**: Addons now has two tabs, Installed (the bot, payment methods, pages and the built-in tools in rows) and Catalog (search and filters), and its catalog offers bots and pages as well as payment methods; payment methods are installed there too. Before an addon is installed the admin sees what it may do (its permissions) and approves exactly that; an update that asks for more waits for a new approval. Third-party addons install from **sources** (Addons → Sources): the link to an author's file or catalog, or github.com/owner/repo (its latest release). Their addons are marked unofficial, nobody at mikan has reviewed them, and they install with the same approval, the image pinned by its digest. A source signed by its author pins the key (shown as a fingerprint): a changed key or a dropped signature is refused until the admin accepts the new fingerprint. Developer mode (a process of one's own on the server) stays for authors; the form for typing an image by hand is gone. An addon with its own pages opens them inside the panel, in an isolated frame.

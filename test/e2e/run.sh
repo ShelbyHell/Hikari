@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Node e2e: builds mikan-node, starts real mihomo clients and runs the tests.
+# Node e2e: builds hikari-node, starts real mihomo clients and runs the tests.
 # KEEP=1 leaves the stack running for debugging.
 set -eu
 cd "$(dirname "$0")"

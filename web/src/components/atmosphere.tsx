@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
-import logo from "../assets/logo.webp";
+import logo from "../assets/logo.svg";
 
 /**
- * The backdrop behind the glass, "dawn": warm light from the left — mandarin, rose,
+ * The backdrop behind the glass, "dawn": warm light from the left — amber, rose,
  * honey — and cool from the right — lilac, sky. The two drift apart slowly; paper grain
  * on top. `calm` keeps it still (the subscription page, see .atmo.calm in app.css).
  */
@@ -59,7 +59,7 @@ function useIdle(): boolean {
   return idle;
 }
 
-/** The painted mandarin on a transparent ground: it reads the same in every theme. */
+/** The painted mark on a transparent ground: it reads the same in every theme. */
 export function Logo({ size = 32 }: { size?: number }) {
   return <img src={logo} width={size} height={size} alt="" aria-hidden decoding="async" draggable={false} className="shrink-0" />;
 }

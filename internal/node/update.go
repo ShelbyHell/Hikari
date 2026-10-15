@@ -13,7 +13,7 @@ import (
 )
 
 // The node meets the updater on its server through files in its data directory, which the
-// server sees as /opt/mikan/data/node/update (a path unit there starts `mikan update
+// server sees as /opt/mikan/data/node/update (a path unit there starts `hikari update
 // --requested` when the request appears):
 //
 //	update/request      the node writes {"version": "X"} for the panel's Update button; the

@@ -58,7 +58,7 @@ type NodeInfo struct {
 	Behind bool `json:"behind" doc:"Нода старее панели"`
 	// CanUpdate: the panel can update the node itself (a remote node that answers and has
 	// the update endpoint, version 0.5.0.2 or later). An older node is updated once by hand.
-	CanUpdate bool `json:"can_update" doc:"Панель может обновить ноду сама: удалённая, отвечает, версия 0.5.0.2 или новее; старую обновляют один раз вручную командой mikan update на её сервере"`
+	CanUpdate bool `json:"can_update" doc:"Панель может обновить ноду сама: удалённая, отвечает, версия 0.5.0.2 или новее; старую обновляют один раз вручную командой hikari update на её сервере"`
 	// Update is how the last update of the node goes or went.
 	Update *nodeapi.UpdateStatus `json:"update,omitempty" doc:"Как идёт или прошло обновление ноды"`
 	// Certificate is the node's own one for its protocols on the node's TLS; nil: the

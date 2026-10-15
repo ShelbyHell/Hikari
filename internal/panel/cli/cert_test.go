@@ -21,7 +21,7 @@ import (
 	"mikan/internal/panel/tlscert"
 )
 
-// `mikan cert set` pipes the chain and the key in one stream: the panel's certificate has
+// `hikari cert set` pipes the chain and the key in one stream: the panel's certificate has
 // to cover its address, a node's goes to that node, and show tells what is there.
 func TestCertCommand(t *testing.T) {
 	ctx := context.Background()

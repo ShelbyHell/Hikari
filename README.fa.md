@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/banner-en-dark.svg">
-  <img alt="mikan: پنل VPN روی هستهٔ mihomo" src=".github/assets/banner-en-light.svg" width="100%">
+  <img alt="Hikari: پنل VPN روی هستهٔ mihomo" src=".github/assets/banner-en-light.svg" width="100%">
 </picture>
 
 <br>
@@ -13,18 +13,19 @@
 
 </div>
 
-[![Release](https://img.shields.io/github/v/release/Miroshka000/mikan?color=f07a2e&label=release&style=flat-square)](https://github.com/Miroshka000/mikan/releases)
-[![Image](https://img.shields.io/badge/ghcr.io-miroshka000%2Fmikan-2b8c9e?style=flat-square&logo=docker&logoColor=white)](https://github.com/Miroshka000/mikan/pkgs/container/mikan)
+[![Release](https://img.shields.io/github/v/release/ShelbyHell/Hikari?color=f07a2e&label=release&style=flat-square)](https://github.com/ShelbyHell/Hikari/releases)
+[![Image](https://img.shields.io/badge/ghcr.io-shelbyhell%2Fhikari-2b8c9e?style=flat-square&logo=docker&logoColor=white)](https://github.com/ShelbyHell/Hikari/pkgs/container/hikari)
 [![License](https://img.shields.io/badge/license-GPL--3.0-2f9e6b?style=flat-square)](LICENSE)
 [![mihomo](https://img.shields.io/badge/core-mihomo%201.19.32-9e8eff?style=flat-square)](https://github.com/MetaCubeX/mihomo)
-[![Telegram](https://img.shields.io/badge/Telegram-channel-26a5e4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/mikanvpn)
-[![Telegram](https://img.shields.io/badge/Telegram-forum-26a5e4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/+I2JFR7DbPow1ZmQy)
 
 [English](README.md) · [Русский](README.ru.md) · [简体中文](README.zh-CN.md) · **فارسی** · [Türkçe](README.tr.md) · [Español](README.es.md)
 
 </div>
 
 ---
+
+> [!IMPORTANT]
+> **یک فورک غیررسمی.** Hikari وابسته به پروژهٔ mikan نیست و توسط آن پشتیبانی نمی‌شود. پشتیبانی تنها از سوی نویسندهٔ فورک است ([ShelbyHell/Hikari](https://github.com/ShelbyHell/Hikari)). mikan اصلی در [Miroshka000/mikan](https://github.com/Miroshka000/mikan) است.
 
 <div dir="rtl">
 
@@ -35,26 +36,26 @@
 </div>
 
 ```bash
-curl -fsSL https://github.com/Miroshka000/mikan/releases/latest/download/install.sh | sudo bash
+curl -fsSL https://github.com/ShelbyHell/Hikari/releases/latest/download/install.sh | sudo bash
 ```
 
 <div dir="rtl">
 
-نصب‌کننده زبان پنل و یک دامنهٔ اختیاری را می‌پرسد، بررسی می‌کند که دامنه به سرور اشاره کند، در صورت نیاز Docker را نصب می‌کند، نزدیک سرور شما سایت‌های استتار REALITY را انتخاب می‌کند و لینک مدیر شما را چاپ می‌کند. هر زمان `mikan` را دوباره اجرا کنید تا منوی مدیریت باز شود.
+نصب‌کننده زبان پنل و یک دامنهٔ اختیاری را می‌پرسد، بررسی می‌کند که دامنه به سرور اشاره کند، در صورت نیاز Docker را نصب می‌کند، نزدیک سرور شما سایت‌های استتار REALITY را انتخاب می‌کند و لینک مدیر شما را چاپ می‌کند. هر زمان `hikari` را دوباره اجرا کنید تا منوی مدیریت باز شود.
 
-برای افزودن نود به یک پنل موجود: صفحهٔ **نودها** در پنل (یا `mikan node add`) دستور را همراه با کلیدش می‌دهد:
+برای افزودن نود به یک پنل موجود: صفحهٔ **نودها** در پنل (یا `hikari node add`) دستور را همراه با کلیدش می‌دهد:
 
 </div>
 
 ```bash
-curl -fsSL https://github.com/Miroshka000/mikan/releases/latest/download/install.sh | sudo bash -s -- --join KEY
+curl -fsSL https://github.com/ShelbyHell/Hikari/releases/latest/download/install.sh | sudo bash -s -- --join KEY
 ```
 
 <div dir="rtl">
 
-بدون پرسش، برای اسکریپت‌ها: `… | sudo bash -s -- --yes --lang en --domain vpn.example.com --email you@example.com` (همهٔ پرچم‌ها: `mikan install --help`).
+بدون پرسش، برای اسکریپت‌ها: `… | sudo bash -s -- --yes --lang en --domain vpn.example.com --email you@example.com` (همهٔ پرچم‌ها: `hikari install --help`).
 
-## چرا mikan
+## چرا Hikari
 
 </div>
 
@@ -63,7 +64,7 @@ curl -fsSL https://github.com/Miroshka000/mikan/releases/latest/download/install
 <td width="50%" valign="top">
 
 ### 🛡️ خودش در برابر مسدودسازی دوام می‌آورد
-mikan بررسی می‌کند که کلاینت‌های واقعی هنوز به هر پروتکل می‌رسند یا نه. وقتی پورتی در مسیر مسدود شود، پروتکل را به یک پورت HTTPS آزاد منتقل می‌کند؛ وقتی یک سایت استتار REALITY از کار بیفتد، سایت جدیدی نزدیک سرور شما انتخاب می‌کند.
+Hikari بررسی می‌کند که کلاینت‌های واقعی هنوز به هر پروتکل می‌رسند یا نه. وقتی پورتی در مسیر مسدود شود، پروتکل را به یک پورت HTTPS آزاد منتقل می‌کند؛ وقتی یک سایت استتار REALITY از کار بیفتد، سایت جدیدی نزدیک سرور شما انتخاب می‌کند.
 
 </td>
 <td width="50%" valign="top">
@@ -90,7 +91,7 @@ mihomo به‌صورت کتابخانه تعبیه شده است، پس تراف
 <tr>
 <td valign="top">
 
-### 🪶 سبک مثل یک نارنگی
+### 🪶 سبک مثل یک پر
 Go و PostgreSQL، سه کانتینر کوچک. روی یک سرور فعال با کلاینت: حدود **14 MB** رم برای پنل، حدود **50 MB** برای پایگاه داده و حدود **40 MB** برای هستهٔ VPN.
 
 </td>
@@ -121,34 +122,11 @@ Go و PostgreSQL، سه کانتینر کوچک. روی یک سرور فعال �
 
 ## کدهای تبلیغاتی
 
-مدیران می‌توانند کدهای تخفیف و کدهای روز یا ترافیک هدیه بسازند. مشترکان کدها را در Telegram Mini App وارد می‌کنند که تاریخچهٔ استفاده از کدها را هم نشان می‌دهد. ترافیک هدیه می‌تواند به موجودی اصلی یا یک استخر انتخاب‌شده برود. فاکتورهای تخفیف‌دار فقط با روش‌های پرداختی ممکن‌اند که بازپرداخت را پشتیبانی می‌کنند: Telegram Stars و آداپتورهایی که پشتیبانی از بازپرداخت را اعلام می‌کنند. به این ترتیب اگر رزرو کد پیش از تأیید ارائه‌دهندهٔ پرداخت منقضی شود، Mikan می‌تواند پرداخت را برگرداند.
+مدیران می‌توانند کدهای تخفیف و کدهای روز یا ترافیک هدیه بسازند. مشترکان کدها را در Telegram Mini App وارد می‌کنند که تاریخچهٔ استفاده از کدها را هم نشان می‌دهد. ترافیک هدیه می‌تواند به موجودی اصلی یا یک استخر انتخاب‌شده برود. فاکتورهای تخفیف‌دار فقط با روش‌های پرداختی ممکن‌اند که بازپرداخت را پشتیبانی می‌کنند: Telegram Stars و آداپتورهایی که پشتیبانی از بازپرداخت را اعلام می‌کنند. به این ترتیب اگر رزرو کد پیش از تأیید ارائه‌دهندهٔ پرداخت منقضی شود، Hikari می‌تواند پرداخت را برگرداند.
 
 ## دسترسی پشتیبانی
 
-اگر به کمک نیاز دارید، خودتان دسترسی موقت را باز می‌کنید: تنظیمات ← پشتیبانی، برای ۲، ۶ یا ۲۴ ساعت، با سطح «مشاهده»، «تغییر» یا «ترمینال». بدون این دکمه هیچ‌کس، حتی توسعه‌دهندگان mikan، وارد پنل نمی‌شود: پروژه دسترسی دائمی به سرورهای شما ندارد و پنل خودش به جایی وصل نمی‌شود. هر کار اپراتور در گزارش ممیزی ثبت می‌شود، دسترسی با یک دکمه لغو می‌شود و ترمینال فقط با رمز عبور و 2FA باز می‌شود و ضبط می‌شود. برای خاموش کردن کامل این قابلیت، از کلید همان کارت استفاده کنید یا روی سرور <span dir="ltr">`mikan support-access off`</span> را اجرا کنید. قوانین پشتیبانی پولی: [در سایت](https://miroshka000.github.io/mikan/support/paid/).
-
-## تصاویر محیط
-
-</div>
-
-<table>
-<tr>
-<td width="50%"><img src=".github/assets/screens/en/dashboard.webp" alt="نمای کلی"></td>
-<td width="50%"><img src=".github/assets/screens/en/users.webp" alt="کاربران"></td>
-</tr>
-<tr>
-<td><img src=".github/assets/screens/en/inbounds.webp" alt="پروتکل‌ها"></td>
-<td><img src=".github/assets/screens/en/telegram.webp" alt="ربات Telegram"></td>
-</tr>
-</table>
-
-<p align="center">
-<img src=".github/assets/screens/en/phone-subscription.webp" alt="صفحهٔ اشتراک" width="260">
-&nbsp;&nbsp;
-<img src=".github/assets/screens/en/phone-dashboard.webp" alt="نمای کلی روی گوشی" width="260">
-</p>
-
-<div dir="rtl">
+اگر به کمک نیاز دارید، خودتان دسترسی موقت را باز می‌کنید: تنظیمات ← پشتیبانی، برای ۲، ۶ یا ۲۴ ساعت، با سطح «مشاهده»، «تغییر» یا «ترمینال». بدون این دکمه هیچ‌کس، حتی توسعه‌دهندگان Hikari، وارد پنل نمی‌شود: پروژه دسترسی دائمی به سرورهای شما ندارد و پنل خودش به جایی وصل نمی‌شود. هر کار اپراتور در گزارش ممیزی ثبت می‌شود، دسترسی با یک دکمه لغو می‌شود و ترمینال فقط با رمز عبور و 2FA باز می‌شود و ضبط می‌شود. برای خاموش کردن کامل این قابلیت، از کلید همان کارت استفاده کنید یا روی سرور <span dir="ltr">`hikari support-access off`</span> را اجرا کنید. قوانین پشتیبانی پولی: [در سایت](https://shelbyhell.github.io/Hikari/support/paid/).
 
 ## پروتکل‌ها
 
@@ -186,8 +164,8 @@ Go و PostgreSQL، سه کانتینر کوچک. روی یک سرور فعال �
 
 ```mermaid
 flowchart LR
-    A[Browser] -- HTTPS, secret link --> P[mikan panel<br>users · plans · subscriptions]
-    P -- unix socket / pinned TLS --> N1[mikan node<br>mihomo inside]
+    A[Browser] -- HTTPS, secret link --> P[Hikari panel<br>users · plans · subscriptions]
+    P -- unix socket / pinned TLS --> N1[hikari node<br>mihomo inside]
     P -- pinned TLS --> N2[remote node]
     C[VPN apps] -- REALITY · QUIC · … --> N1
     C --> N2
@@ -200,24 +178,24 @@ flowchart LR
 
 ## مدیریت سرور
 
-برای منو `mikan` را اجرا کنید، یا دستورها را مستقیم به کار ببرید:
+برای منو `hikari` را اجرا کنید، یا دستورها را مستقیم به کار ببرید:
 
 | دستور | کار |
 |---|---|
-| <span dir="ltr">`mikan status`</span> | کانتینرها، نسخه‌ها، وضعیت سلامت، به‌روزرسانی موجود |
-| <span dir="ltr">`mikan logs [panel\|node]`</span> | لاگ‌های زنده |
-| <span dir="ltr">`mikan url`</span> | لینک مدیر |
-| <span dir="ltr">`mikan reset-password` · `reset-path` · `disable-2fa`</span> | بازیابی دسترسی |
-| <span dir="ltr">`mikan update`</span> | به‌روزرسانی همین حالا (اول پشتیبان، بازگشت خودکار) |
-| <span dir="ltr">`mikan backup` · `restore FILE`</span> | پشتیبان‌ها در <span dir="ltr">`/opt/mikan/backups`</span> |
-| <span dir="ltr">`mikan node …` · `mikan inbound …`</span> | نودها و پروتکل‌ها |
-| <span dir="ltr">`mikan targets scan` · `apply`</span> | سایت‌های استتار REALITY نزدیک سرور |
-| <span dir="ltr">`mikan join KEY`</span> | روی یک نود: گرفتن کلید جدید از پنل |
-| <span dir="ltr">`mikan restart`</span> | راه‌اندازی مجدد کانتینرها |
-| <span dir="ltr">`mikan doctor`</span> | بررسی سرور: Docker، پورت‌ها، فایروال، ساعت، DNS، دیسک |
-| <span dir="ltr">`mikan support CODE`</span> | ارسال عیب‌یابی به تیکت پشتیبانی وقتی پنل در دسترس نیست |
-| <span dir="ltr">`mikan support-access on\|off`</span> | اجازه یا منع دسترسی پشتیبانی روی این سرور |
-| <span dir="ltr">`mikan uninstall`</span> | توقف و حذف دستور، داده‌ها می‌مانند |
+| <span dir="ltr">`hikari status`</span> | کانتینرها، نسخه‌ها، وضعیت سلامت، به‌روزرسانی موجود |
+| <span dir="ltr">`hikari logs [panel\|node]`</span> | لاگ‌های زنده |
+| <span dir="ltr">`hikari url`</span> | لینک مدیر |
+| <span dir="ltr">`hikari reset-password` · `reset-path` · `disable-2fa`</span> | بازیابی دسترسی |
+| <span dir="ltr">`hikari update`</span> | به‌روزرسانی همین حالا (اول پشتیبان، بازگشت خودکار) |
+| <span dir="ltr">`hikari backup` · `restore FILE`</span> | پشتیبان‌ها در <span dir="ltr">`/opt/mikan/backups`</span> |
+| <span dir="ltr">`hikari node …` · `hikari inbound …`</span> | نودها و پروتکل‌ها |
+| <span dir="ltr">`hikari targets scan` · `apply`</span> | سایت‌های استتار REALITY نزدیک سرور |
+| <span dir="ltr">`hikari join KEY`</span> | روی یک نود: گرفتن کلید جدید از پنل |
+| <span dir="ltr">`hikari restart`</span> | راه‌اندازی مجدد کانتینرها |
+| <span dir="ltr">`hikari doctor`</span> | بررسی سرور: Docker، پورت‌ها، فایروال، ساعت، DNS، دیسک |
+| <span dir="ltr">`hikari support CODE`</span> | ارسال عیب‌یابی به تیکت پشتیبانی وقتی پنل در دسترس نیست |
+| <span dir="ltr">`hikari support-access on\|off`</span> | اجازه یا منع دسترسی پشتیبانی روی این سرور |
+| <span dir="ltr">`hikari uninstall`</span> | توقف و حذف دستور، داده‌ها می‌مانند |
 
 ## به‌روزرسانی‌ها
 
@@ -230,7 +208,7 @@ flowchart LR
 </div>
 
 ```bash
-docker buildx build -t mikan:dev .            # panel + node image
+docker buildx build -t Hikari:dev .            # panel + node image
 cd web && pnpm install && pnpm dev            # admin UI with hot reload
 MIKAN_TEST_DATABASE_URL=postgres://… go test ./...   # Go 1.27, a test PostgreSQL 18 and pg_dump
 cd installer && cargo test                    # the installer (Rust)
@@ -257,10 +235,10 @@ cd installer && cargo test                    # the installer (Rust)
 
 ## مجوز
 
-mikan نرم‌افزار آزاد تحت [GNU GPL v3](LICENSE) با شرایط تکمیلی [NOTICE.md](NOTICE.md) است: حفظ نام سازنده، معرفی نکردن نسخه تغییریافته به‌عنوان نسخه اصلی، و عدم اعطای حق بر نام و لوگو. Copyright (C) 2026 Miroshka and Mikan. [mihomo](https://github.com/MetaCubeX/mihomo) (GPL-3.0) در آن تعبیه شده و بخش‌هایی از [3x-ui](https://github.com/MHSanaei/3x-ui) (GPL-3.0) در آن اقتباس شده است. فونت‌ها: Unbounded، Onest، JetBrains Mono (SIL OFL 1.1).
+Hikari فورکی از mikan است، نرم‌افزار آزاد تحت [GNU GPL v3](LICENSE) با شرایط تکمیلی [NOTICE.md](NOTICE.md) است: حفظ نام سازنده، معرفی نکردن نسخه تغییریافته به‌عنوان نسخه اصلی، و عدم اعطای حق بر نام و لوگو. Copyright (C) 2026 Miroshka and Mikan. [mihomo](https://github.com/MetaCubeX/mihomo) (GPL-3.0) در آن تعبیه شده و بخش‌هایی از [3x-ui](https://github.com/MHSanaei/3x-ui) (GPL-3.0) در آن اقتباس شده است. فونت‌ها: Unbounded، Onest، JetBrains Mono (SIL OFL 1.1).
 
 </div>
 
 <div align="center">
-<sub>ساخته‌شده با 🍊</sub>
+<sub>Hikari — یک فورک غیررسمی از mikan</sub>
 </div>

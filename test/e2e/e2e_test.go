@@ -1,6 +1,6 @@
 //go:build e2e
 
-// Node end-to-end tests: real mihomo clients talk to mikan-node through every preset.
+// Node end-to-end tests: real mihomo clients talk to hikari-node through every preset.
 // Run with test/e2e/run.sh.
 package e2e
 

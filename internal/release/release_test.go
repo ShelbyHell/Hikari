@@ -15,8 +15,8 @@ func manifest(t *testing.T) []byte {
 	t.Helper()
 	data, err := json.Marshal(Manifest{
 		Version: "0.3.9", Published: time.Unix(1_800_000_000, 0).UTC(),
-		Image: "ghcr.io/miroshka000/mikan", Digest: "sha256:" + strings.Repeat("ab", 32),
-		Installer: map[string]Asset{"x86_64": {URL: "https://example.com/mikan-x86_64", SHA256: strings.Repeat("cd", 32)}},
+		Image: "ghcr.io/shelbyhell/hikari", Digest: "sha256:" + strings.Repeat("ab", 32),
+		Installer: map[string]Asset{"x86_64": {URL: "https://example.com/hikari-x86_64", SHA256: strings.Repeat("cd", 32)}},
 		Notes:     map[string]string{"en": "- faster", "ru": "- быстрее"},
 	})
 	if err != nil {
@@ -34,7 +34,7 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if m.Ref() != "ghcr.io/miroshka000/mikan@sha256:"+strings.Repeat("ab", 32) || m.Notes["ru"] != "- быстрее" {
+	if m.Ref() != "ghcr.io/shelbyhell/hikari@sha256:"+strings.Repeat("ab", 32) || m.Notes["ru"] != "- быстрее" {
 		t.Fatalf("manifest: %+v", m)
 	}
 
@@ -86,18 +86,18 @@ func TestParseImageAndInstallers(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, image := range []string{
-		"ghcr.io/miroshka000/mikan-node", "ghcr.io/miroshka000/tools/mikan_x.1",
+		"ghcr.io/shelbyhell/hikari-node", "ghcr.io/shelbyhell/tools/hikari_x.1",
 	} {
-		if err := accept([]byte(strings.Replace(good, "ghcr.io/miroshka000/mikan", image, 1))); err != nil {
+		if err := accept([]byte(strings.Replace(good, "ghcr.io/shelbyhell/hikari", image, 1))); err != nil {
 			t.Errorf("%s: %v", image, err)
 		}
 	}
 	for _, image := range []string{
-		"docker.io/miroshka000/mikan", "ghcr.io/someone-else/mikan", "ghcr.io/Miroshka000/mikan", "ghcr.io/miroshka000/",
-		"ghcr.io/miroshka000/../x", "ghcr.io/miroshka000/Mikan", "ghcr.io/miroshka000/mi kan", "ghcr.io/miroshka000/m$x",
-		`ghcr.io/miroshka000/m\nx`, "ghcr.io/miroshka0001/mikan", "ghcr.io/mikan",
+		"docker.io/shelbyhell/hikari", "ghcr.io/someone-else/hikari", "ghcr.io/ShelbyHell/hikari", "ghcr.io/shelbyhell/",
+		"ghcr.io/shelbyhell/../x", "ghcr.io/shelbyhell/Hikari", "ghcr.io/shelbyhell/hi kari", "ghcr.io/shelbyhell/h$x",
+		`ghcr.io/shelbyhell/h\nx`, "ghcr.io/shelbyhell1/hikari", "ghcr.io/hikari",
 	} {
-		if accept([]byte(strings.Replace(good, "ghcr.io/miroshka000/mikan", image, 1))) == nil {
+		if accept([]byte(strings.Replace(good, "ghcr.io/shelbyhell/hikari", image, 1))) == nil {
 			t.Errorf("image %q accepted", image)
 		}
 	}
@@ -106,7 +106,7 @@ func TestParseImageAndInstallers(t *testing.T) {
 		"uppercase hash": strings.Replace(good, strings.Repeat("cd", 32), strings.Repeat("CD", 32), 1),
 		"not hex":        strings.Replace(good, strings.Repeat("cd", 32), strings.Repeat("zz", 32), 1),
 		"plain http":     strings.Replace(good, "https://example.com", "http://example.com", 1),
-		"no url":         strings.Replace(good, "https://example.com/mikan-x86_64", "", 1),
+		"no url":         strings.Replace(good, "https://example.com/hikari-x86_64", "", 1),
 	} {
 		if accept([]byte(bad)) == nil {
 			t.Errorf("%s accepted", name)

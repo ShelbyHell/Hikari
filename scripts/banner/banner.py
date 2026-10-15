@@ -2,7 +2,7 @@
 
 The wordmark and the captions are real glyph outlines of the panel's fonts (Unbounded,
 Onest), shaped by HarfBuzz, so GitHub shows them the same everywhere without fonts.
-The light is the panel's "dawn"; it drifts slowly, the mandarin floats.
+The light is the panel's "dawn"; it drifts slowly.
 
     docker run --rm -v "$PWD:/src" -w /src python:3.13-slim sh -c \
       "pip install -q fonttools brotli uharfbuzz && python scripts/banner/banner.py"
@@ -136,7 +136,7 @@ COPY = {
 
 def banner(lang, theme, display, ui, ui_bold):
     t, c = THEMES[theme], COPY[lang]
-    word, word_w = display.run("mikan", 150, tracking=-0.05)
+    word, word_w = display.run("Hikari", 150, tracking=-0.05)
     tag, _ = ui.run(c["tagline"], 36)
     x0 = 380
     pills, px = [], x0
@@ -158,12 +158,10 @@ def banner(lang, theme, display, ui, ui_bold):
         f'<circle cx="20" cy="20" r="5" fill="#f07a2e"/><path transform="translate(34 28)" d="{p}" fill="{t["pillInk"]}"/></g>'
         for x, w, p in pills
     )
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="mikan — {c['tagline']}">
-<title>mikan — {c['tagline']}</title>
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="Hikari — {c['tagline']}">
+<title>Hikari — {c['tagline']}</title>
 <defs>
 {glows}
-<radialGradient id="fruit" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="#ffc58f"/><stop offset=".45" stop-color="#f7883a"/><stop offset="1" stop-color="#d45a16"/></radialGradient>
-<radialGradient id="hi" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
 <clipPath id="card"><rect width="{W}" height="{H}" rx="32"/></clipPath>
 </defs>
 <style>
@@ -185,13 +183,6 @@ def banner(lang, theme, display, ui, ui_bold):
 {circles}
 </g>
 <rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="31.5" fill="none" stroke="{t['edge']}"/>
-<ellipse class="shade" cx="236" cy="296" rx="80" ry="11" fill="{t['shadow']}"/>
-<g class="float"><g transform="translate(116 44) scale(7.5)">
-<circle cx="16" cy="18" r="12" fill="url(#fruit)"/>
-<ellipse cx="12" cy="13.4" rx="4.2" ry="2.7" fill="url(#hi)" transform="rotate(-28 12 13.4)"/>
-<path d="M16 6.2v3" stroke="#1f7650" stroke-width="1.6" stroke-linecap="round"/>
-<path class="leaf" d="M16 7.5c.3-2.6 2.4-4.4 5.6-4.4-.2 2.9-2.4 4.7-5.6 4.4Z" fill="#2f9e6b"/>
-</g></g>
 <path transform="translate({x0 - 6} 196)" d="{word}" fill="{t['ink']}"/>
 <path transform="translate({x0} 252)" d="{tag}" fill="{t['sub']}"/>
 {pill_svg}

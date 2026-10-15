@@ -162,7 +162,7 @@ func fillGroup(g map[string]any, nodes []Node, ps []proxy, providers bool) error
 	drop, ok2 := re("exclude-filter")
 	if !ok1 || !ok2 {
 		// A pattern Go cannot read (mihomo's regexp2 knows more): mihomo applies it itself,
-		// but then it cannot know which nodes "mikan" picked, and the group would take every
+		// but then it cannot know which nodes "Hikari" picked, and the group would take every
 		// server of the user.
 		if ext != nil {
 			return templateErr("template_filter", str(g["name"]))

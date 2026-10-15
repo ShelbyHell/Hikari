@@ -36,7 +36,7 @@ func TestReportText(t *testing.T) {
 		{ID: "link", Status: "fail", Code: "timeout", Params: map[string]string{"port": "31234", "host": "203.0.113.5"}, Detail: "dial tcp 203.0.113.5:31234: i/o timeout"},
 		{ID: "port", Status: "ok", Params: map[string]string{"port": "443", "name": "vless-reality"}},
 	}
-	got := reportText("mikan node check", "panel v0.5.0.6, node v0.5.0.4", time.Date(2026, 10, 10, 9, 0, 0, 0, time.UTC), items, []string{"203.0.113.5", "31234"})
+	got := reportText("hikari node check", "panel v0.5.0.6, node v0.5.0.4", time.Date(2026, 10, 10, 9, 0, 0, 0, time.UTC), items, []string{"203.0.113.5", "31234"})
 	for _, leak := range []string{"203.0.113.5", "31234"} {
 		if strings.Contains(got, leak) {
 			t.Fatalf("%s leaks:\n%s", leak, got)

@@ -9,7 +9,7 @@ x-client: &client
 services:
   node:
     build: {context: ../.., dockerfile: test/e2e/Dockerfile}
-    command: ["mikan-node"]
+    command: ["hikari-node"]
     environment:
       MIKAN_DATA_DIR: /data
       MIKAN_NODE_SOCKET: /run/mikan/node.sock

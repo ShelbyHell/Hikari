@@ -8,8 +8,8 @@
 // The file is a tar.gz with data/panel/backup.dump inside (pg_dump, custom format, as the
 // host's own backups have it), encrypted with age (scrypt):
 //
-//	age -d -o mikan.tar.gz mikan-….tar.gz.age
-//	mikan restore mikan.tar.gz
+//	age -d -o hikari.tar.gz hikari-….tar.gz.age
+//	hikari restore hikari.tar.gz
 //
 // Nothing is held in memory: the dump and the encrypted file are written next to the
 // panel's data, in a private directory removed when the file is sent (or left by a crash
@@ -324,8 +324,8 @@ func (s *Service) send(ctx context.Context, now time.Time) (int64, error) {
 	}
 	defer f.Close()
 	host := safeName(s.name(ctx))
-	name := "mikan-" + host + "-" + now.Format("20060102-1504") + ".tar.gz.age"
-	caption := fmt.Sprintf("mikan · %s · %s UTC · %s\n\nage -d -o mikan.tar.gz %s\nmikan restore mikan.tar.gz",
+	name := "hikari-" + host + "-" + now.Format("20060102-1504") + ".tar.gz.age"
+	caption := fmt.Sprintf("hikari · %s · %s UTC · %s\n\nage -d -o hikari.tar.gz %s\nhikari restore hikari.tar.gz",
 		host, now.Format("2006-01-02 15:04"), sizeText(size), name)
 	if _, err := client.SendDocument(ctx, chat, name, f, size, caption); err != nil {
 		return 0, err
@@ -342,7 +342,7 @@ var workFactor int
 const packOverhead = 1 << 20
 
 // Make dumps the database into dir (a private directory of the caller's), packs the dump
-// as data/panel/backup.dump (where `mikan restore` looks for it) and encrypts the archive
+// as data/panel/backup.dump (where `hikari restore` looks for it) and encrypts the archive
 // into dir/backup.tar.gz.age, streaming from file to file. A dump too big for a bot is
 // refused before it is packed.
 func Make(ctx context.Context, dump Dumper, dir, password string, now time.Time) (path string, size int64, err error) {

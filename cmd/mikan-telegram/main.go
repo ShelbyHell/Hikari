@@ -1,4 +1,4 @@
-// Command mikan-telegram is the official bot addon of mikan (getmikan/marketplace, id
+// Command mikan-telegram is the bot addon of Hikari (getmikan/marketplace, id
 // telegram): the subscribers' bot, with the menu, the shop and the notices. It runs next to
 // the panel as an addon of protocol 2 in client mode and sees the panel only through what
 // the host hands it:
@@ -39,10 +39,10 @@ func main() {
 	botURL, botToken := env("MIKAN_BOT_API_URL"), env("MIKAN_BOT_TOKEN")
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	log.Info("mikan-telegram starting", "version", version)
+	log.Info("hikari-telegram starting", "version", version)
 	a := newAddon(panelURL, panelToken, botURL, botToken, log)
 	a.Run(ctx)
-	log.Info("mikan-telegram stopped")
+	log.Info("hikari-telegram stopped")
 }
 
 // addon is the bot's screens on the panel's data and the Bot API proxy.

@@ -1,7 +1,7 @@
 // Package proto describes inbounds as mihomo listener templates. A template is a mihomo
-// listener config without the fields mikan manages: the node fills in name, port,
+// listener config without the fields Hikari manages: the node fills in name, port,
 // listen, users and the certificate, and subscriptions derive client configs from the
-// same template. mikan's own settings live under the "mikan" key and never reach mihomo.
+// same template. Hikari's own settings live under the "mikan" key and never reach mihomo.
 package proto
 
 import (
@@ -57,10 +57,10 @@ func (e *Error) Error() string {
 func fail(code, field string) error { return &Error{Code: code, Field: field} }
 
 type rule struct {
-	keys    []string // allowed top-level keys besides type and mikan
+	keys    []string // allowed top-level keys besides type and Hikari's own
 	network string   // tcp | udp
 	cert    bool     // always runs on the node certificate
-	secured bool     // needs reality-config or mikan.tls: node
+	secured bool     // needs reality-config or the mikan.tls setting: node
 	shared  bool     // one key for everyone: no per-user accounting or limits (see extra.go)
 }
 
@@ -206,7 +206,7 @@ func (t Template) str(key string) string {
 	return s
 }
 
-// Validate checks a template against the per-type allow list and mikan's rules. The node
+// Validate checks a template against the per-type allow list and Hikari's rules. The node
 // still parses it with mihomo before applying (see node.Validate).
 func Validate(t Template, o Options) error {
 	typ := t.Type()
@@ -317,7 +317,7 @@ func transport(t Template) string {
 }
 
 // Marshal renders a template as YAML with a stable, readable key order: type first, the
-// transport and security next, mikan's section last.
+// transport and security next, Hikari's section last.
 func Marshal(t Template) string {
 	order := func(k string) int {
 		switch k {

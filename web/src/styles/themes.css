@@ -57,7 +57,7 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.3, 1.3, 0.6, 1);
 
-  /* "Dawn": mandarin, rose and honey from the left, lilac and sky from the right. */
+  /* "Dawn": amber, rose and honey from the left, lilac and sky from the right. */
   --glow-a: rgba(255, 138, 72, 0.72);
   --glow-b: rgba(255, 122, 150, 0.42);
   --glow-c: rgba(255, 196, 100, 0.55);
@@ -244,7 +244,7 @@
 
 /* ---------- dark ---------- */
 
-/* Blue-black with the mandarin: the dawn turned down. */
+/* Blue-black with the warm accent: the dawn turned down. */
 [data-theme="midnight"] {
   --bg: #0d1118;
   --ink-900: #f4f7fb; --ink-800: #e3e8ef; --ink-700: #c4ccd7; --ink-600: #a8b2c0;

@@ -113,7 +113,7 @@ func EnsureRelay(ctx context.Context, q *db.Queries, node db.Node, now time.Time
 
 // MoveRelay moves node's relay from port from to port to, the way another program that
 // holds from calls for. It is ErrRelayChanged when the relay is no longer on from, and a
-// *PortInUseError when something of mikan's holds to. Sources of the relay follow with the
+// *PortInUseError when something of Hikari's holds to. Sources of the relay follow with the
 // next sync of the nodes: they read the port from the row.
 func MoveRelay(ctx context.Context, st *store.Store, node db.Node, from, to string) error {
 	return st.Tx(ctx, func(q *db.Queries) error {

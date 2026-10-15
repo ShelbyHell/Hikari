@@ -442,7 +442,7 @@ func editTemplate(config string, p InboundPatch) (string, error) {
 	return config, nil
 }
 
-// CheckTemplate parses and checks a template for an inbound of node on port: mikan's
+// CheckTemplate parses and checks a template for an inbound of node on port: Hikari's
 // rules first, then mihomo's own parser on the node, so a broken template never replaces
 // a working listener. A node that cannot be reached does not stop it: the node checks
 // again when it applies the template.

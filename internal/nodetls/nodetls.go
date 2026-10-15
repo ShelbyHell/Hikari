@@ -145,7 +145,7 @@ func DecodeKey(s string) (Key, error) {
 	var k Key
 	body, ok := strings.CutPrefix(strings.TrimSpace(s), keyPrefix)
 	if !ok {
-		return k, errors.New("not a mikan node key")
+		return k, errors.New("not a hikari node key")
 	}
 	raw, err := base64.RawURLEncoding.DecodeString(body)
 	if err != nil {

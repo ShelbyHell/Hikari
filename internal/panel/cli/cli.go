@@ -29,7 +29,7 @@ import (
 	"mikan/internal/panel/store/db"
 )
 
-const usage = `mikan — VPN panel on the mihomo core
+const usage = `Hikari — VPN panel on the mihomo core
 
 Commands:
   serve                         run the panel
@@ -210,7 +210,7 @@ func bootstrap(ctx context.Context, st *store.Store, set *settings.Settings, arg
 	if n, err := st.Q.CountAdmins(ctx); err != nil {
 		return err
 	} else if n > 0 {
-		return errors.New("the panel is already set up; for a new password run `mikan admin reset-password`")
+		return errors.New("the panel is already set up; for a new password run `hikari admin reset-password`")
 	}
 	password, generated, err := readOrGeneratePassword(*passwordStdin, stdin)
 	if err != nil {
@@ -388,8 +388,8 @@ func readOrGeneratePassword(fromStdin bool, r io.Reader) (string, bool, error) {
 	return pw, false, nil
 }
 
-// printURL: stdout carries only the link, because the host `mikan` script of every
-// installed version parses it (`mikan update` waits for the panel with it); the login goes
+// printURL: stdout carries only the link, because the host `hikari` script of every
+// installed version parses it (`hikari update` waits for the panel with it); the login goes
 // to stderr, which still shows in a terminal.
 func printURL(stdout, stderr io.Writer, url, login string) {
 	fmt.Fprintln(stdout, url)
@@ -455,7 +455,7 @@ func panelURL(ctx context.Context, set *settings.Settings) (string, error) {
 		return "", err
 	}
 	if ep.URL() == "" || p.Admin == "" {
-		return "", errors.New("the panel is not set up: run `mikan admin bootstrap`")
+		return "", errors.New("the panel is not set up: run `hikari admin bootstrap`")
 	}
 	return ep.URL() + "/" + p.Admin + "/", nil
 }

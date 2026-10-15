@@ -1,7 +1,11 @@
 ---
 title: Paid support
-description: How paid help with mikan works. What is included, the price, what the operator sees and how to revoke access.
+description: How paid help with Hikari works. What is included, the price, what the operator sees and how to revoke access.
 ---
+
+:::caution[Hikari is an unofficial fork]
+The paid support and its bot below are a service of the mikan project, not of Hikari. The fork does not provide it: Hikari's support comes only from the fork's author, through [GitHub Issues](https://github.com/ShelbyHell/Hikari/issues). The bot and forum links point at the mikan project and are kept as they are.
+:::
 
 import { Steps } from '@astrojs/starlight/components';
 
@@ -15,7 +19,7 @@ This page is the full set of rules. Before you pay, the bot asks you to press "A
 
 1. Tell the bot what happened. The AI answers first, from the knowledge base. Often that is enough and you pay nothing.
 
-2. The answer did not help: press "Need an operator", describe the problem in one message and, if you can, send the output of `mikan doctor` or the "Check node" report.
+2. The answer did not help: press "Need an operator", describe the problem in one message and, if you can, send the output of `hikari doctor` or the "Check node" report.
 
 3. Read the rules, press "Accept the rules" and choose a plan. The bot sends a payment button: a card, SBP or Wallet through Tribute, or crypto through @CryptoBot.
 
@@ -29,7 +33,7 @@ This page is the full set of rules. Before you pay, the bot asks you to press "A
 
 ## What is included
 
-Help with mikan itself:
+Help with Hikari itself:
 
 - installing and updating the panel and nodes;
 - setting up protocols, cascades, WARP, certificates and the domain;
@@ -44,11 +48,11 @@ This does not mean we will not point you in the right direction. But looking int
 - the hosting provider and its network: an unreachable server, a bad route, ports closed on the provider's side;
 - blocking by ISPs and in particular networks;
 - client apps: Happ, v2RayTun, Clash and others. We check what the panel serves, but we do not set up the apps themselves;
-- other services and programs on the server besides mikan;
-- code changes and new features, for those there are the [project goals](/mikan/en/support/);
+- other services and programs on the server besides Hikari;
+- code changes and new features, for those there are the [project goals](/Hikari/en/support/);
 - forks and unofficial builds.
 
-If it turns out the cause is outside mikan, the operator will say so plainly. The ticket still counts as used: the time went into the diagnosis.
+If it turns out the cause is outside Hikari, the operator will say so plainly. The ticket still counts as used: the time went into the diagnosis.
 
 ## Plans
 
@@ -76,7 +80,7 @@ You can check whether this kind of help fits you for free: the AI in the bot ans
 
 ## Access to the panel
 
-The operator needs access to the panel, and you open and close it yourself: **Settings → Support**. How it works in detail: [Support access](/mikan/en/operations/support-access/).
+The operator needs access to the panel, and you open and close it yourself: **Settings → Support**. How it works in detail: [Support access](/Hikari/en/operations/support-access/).
 
 - Choose the duration: 2, 6 or 24 hours. You can revoke access earlier with one button.
 - Choose the level. **View** is read-only: the operator sees nodes, logs and diagnostics but changes nothing. **Change** also lets them edit nodes, certificates and addons, start updates and restarts. If the fix needs no changes, leave it on view.
@@ -87,7 +91,7 @@ The operator needs access to the panel, and you open and close it yourself: **Se
 
 Access covers all nodes of your panel, so there is no need to set up each one separately.
 
-Nobody gets into the panel without your button: the project has no standing access to your servers, and the panel reaches the support bot only when you open the access. If you do not need the feature at all, turn off the "Allow support access" switch on the same card or run `mikan support-access off` on the server: then no access can be opened even from the panel, and no support terminal is installed on the server.
+Nobody gets into the panel without your button: the project has no standing access to your servers, and the panel reaches the support bot only when you open the access. If you do not need the feature at all, turn off the "Allow support access" switch on the same card or run `hikari support-access off` on the server: then no access can be opened even from the panel, and no support terminal is installed on the server.
 
 ### What the operator can never do
 
@@ -111,7 +115,7 @@ Even at the "Change" level these stay closed:
 
 ## A server without SSH
 
-Work on the server goes through the panel: logs of the panel and nodes, running `mikan doctor` and restarts. We never ask for the server password or an SSH key.
+Work on the server goes through the panel: logs of the panel and nodes, running `hikari doctor` and restarts. We never ask for the server password or an SSH key.
 
 ### Terminal
 
@@ -132,10 +136,10 @@ The terminal is rarely needed. We will not ask you to turn it on if the task can
 If the panel is down or a node is unreachable, access cannot be opened. Then the bot gives you a ticket code, and you run one command on the server:
 
 ```bash
-mikan support <code>
+hikari support <code>
 ```
 
-It collects the output of `mikan doctor`, `mikan status` and the tail of the logs with secrets cut out, and sends it to your ticket. The code is single-use, tied to the ticket and lives for 24 hours.
+It collects the output of `hikari doctor`, `hikari status` and the tail of the logs with secrets cut out, and sends it to your ticket. The code is single-use, tied to the ticket and lives for 24 hours.
 
 ## What data is kept
 

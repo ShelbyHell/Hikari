@@ -382,7 +382,7 @@ func inboundError(err error, dest bool) error {
 	return configError(portError(cascadeError(err, "exit_node_id")))
 }
 
-// configError maps a template's refusal, mikan's own or the node's mihomo's, to the
+// configError maps a template's refusal, Hikari's own or the node's mihomo's, to the
 // API's code; other errors pass through.
 func configError(err error) error {
 	var pe *proto.Error

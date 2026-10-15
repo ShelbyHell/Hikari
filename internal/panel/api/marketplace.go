@@ -53,7 +53,7 @@ type MarketInstalled struct {
 	Version string        `json:"version" doc:"Одобренная версия у аддона из источника; пусто у аддона админа без источника: версию знает только каталог"`
 	Kind    string        `json:"kind" enum:"bot,ui,generic"`
 	Mode    string        `json:"mode" enum:"http,client"`
-	Source  string        `json:"source" enum:"official,custom,external" doc:"official — из подписанного каталога; custom — образ из источника или, у старых установок, свой образ админа; external — свой процесс админа; mikan неофициальные не проверял"`
+	Source  string        `json:"source" enum:"official,custom,external" doc:"official — из подписанного каталога; custom — образ из источника или, у старых установок, свой образ админа; external — свой процесс админа; неофициальные Hikari не проверял"`
 	Origin  *MarketOrigin `json:"origin,omitempty" doc:"Источник, из которого поставлен аддон (custom)"`
 	Image   string        `json:"image,omitempty" doc:"Образ неофициального аддона (custom)"`
 	Digest  string        `json:"digest,omitempty" doc:"Дайджест образа неофициального аддона (custom)"`
@@ -70,7 +70,7 @@ type MarketView struct {
 	Queue        []AddonRequest    `json:"queue,omitempty" doc:"Все заявки, которые сервер ещё не взял, по порядку"`
 	Last         *AddonResult      `json:"last,omitempty" doc:"Как сервер выполнил последнюю заявку"`
 	Supported    bool              `json:"supported" doc:"Панель видит каталог данных сервера; иначе ставить аддоны нельзя"`
-	HostReady    bool              `json:"host_ready" doc:"mikan на сервере умеет аддоны протокола 2; иначе сначала обновить сервер"`
+	HostReady    bool              `json:"host_ready" doc:"Hikari на сервере умеет аддоны протокола 2; иначе сначала обновить сервер"`
 }
 
 type marketOutput struct{ Body MarketView }
@@ -83,7 +83,7 @@ type marketExternalInput struct {
 		Kind        string   `json:"kind" enum:"bot,ui,generic"`
 		Mode        string   `json:"mode" enum:"http,client" doc:"http — аддон отвечает панели на /v2/*; client — только сам ходит в панель"`
 		Permissions []string `json:"permissions" maxItems:"16" doc:"Права, которые админ даёт аддону"`
-		Confirm     bool     `json:"confirm" doc:"Админ подтвердил, что доверяет этому коду: mikan его не проверял"`
+		Confirm     bool     `json:"confirm" doc:"Админ подтвердил, что доверяет этому коду: Hikari его не проверял"`
 	}
 }
 
@@ -98,7 +98,7 @@ func (h *handlers) registerMarketplace() {
 	op := sessionOps("addons")
 	huma.Register(h.api, op("list-marketplace", http.MethodGet, "/api/v1/marketplace", "Маркетплейс аддонов: боты, страницы и прочее", 0), h.listMarketplace)
 	huma.Register(h.api, op("install-marketplace", http.MethodPost, "/api/v1/marketplace/{id}/install", "Одобрить права и установить или обновить аддон каталога или источника: заявка серверу", http.StatusAccepted), h.installMarketplace)
-	huma.Register(h.api, op("install-external-addon", http.MethodPost, "/api/v1/marketplace/external", "Режим разработчика: подключить свой процесс на 127.0.0.1, без проверки mikan", http.StatusAccepted), h.installExternal)
+	huma.Register(h.api, op("install-external-addon", http.MethodPost, "/api/v1/marketplace/external", "Режим разработчика: подключить свой процесс на 127.0.0.1, без проверки Hikari", http.StatusAccepted), h.installExternal)
 	huma.Register(h.api, op("remove-marketplace", http.MethodPost, "/api/v1/marketplace/{id}/remove", "Удалить аддон и отозвать его права: заявка серверу", http.StatusAccepted), h.removeMarketplace)
 }
 
@@ -247,7 +247,7 @@ func (h *handlers) installMarketplace(ctx context.Context, in *marketInstallInpu
 	if !addons.SamePermissions(in.Body.Permissions, e.Permissions) {
 		return nil, huma.Error409Conflict("permissions_changed")
 	}
-	// A permission the host does not know yet would make it drop the addon: mikan update first.
+	// A permission the host does not know yet would make it drop the addon: hikari update first.
 	if !addons.HostTakes(st.HostVersion, e.Permissions) {
 		return nil, huma.Error409Conflict("host_outdated")
 	}

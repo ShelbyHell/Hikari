@@ -4,14 +4,14 @@ name: mikan-screens
 
 services:
   node:
-    image: ${MIKAN_IMAGE:-mikan:dev}
-    entrypoint: ["/usr/local/bin/mikan-node"]
+    image: ${MIKAN_IMAGE:-hikari:dev}
+    entrypoint: ["/usr/local/bin/hikari-node"]
     environment:
       MIKAN_DATA_DIR: /data/node
     volumes: ["data:/data", "run:/run/mikan"]
 
   panel:
-    image: ${MIKAN_IMAGE:-mikan:dev}
+    image: ${MIKAN_IMAGE:-hikari:dev}
     depends_on:
       node: {condition: service_started}
       postgres: {condition: service_healthy}

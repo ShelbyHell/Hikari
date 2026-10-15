@@ -5,7 +5,7 @@ set -eu
 [ "${MIKAN_INSTALLER_TEST:-}" = 1 ] || { echo 'Set MIKAN_INSTALLER_TEST=1 inside a disposable container' >&2; exit 1; }
 [ ! -e /opt/mikan ] || { echo '/opt/mikan already exists; refusing to touch it' >&2; exit 1; }
 [ "$(id -u)" = 0 ] || { echo "Run as root: the updater takes its lock in /run" >&2; exit 1; }
-bin=$(realpath "${1:-target/debug/mikan}")
+bin=$(realpath "${1:-target/debug/hikari}")
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp" /opt/mikan' EXIT INT TERM
 mkdir -p "$tmp/bin"
@@ -48,7 +48,7 @@ shift 3
 new() { grep -q "^MIKAN_IMAGE=new-image" /opt/mikan/.env; }
 db='run --rm --no-deps -T --name mikan-database-'
 case "$*" in
-  'exec -T panel mikan admin backup /data/panel/backup.db')
+  'exec -T panel hikari admin backup /data/panel/backup.db')
     cp /opt/mikan/data/panel/mikan.db /opt/mikan/data/panel/backup.db ;;
   "$db"*' panel database backup /data/panel/backup.dump')
     [ ! -f "$TEST_STATE/dump-fail" ] || { echo 'pg_dump: relation is corrupt' >&2; exit 1; }
@@ -69,7 +69,7 @@ case "$*" in
     if [ -f "$TEST_STATE/start-fail-old" ] && ! new; then echo "old panel refuses the schema" >&2; exit 1; fi
     touch "$TEST_STATE/healthy" ;;
   'up -d panel') touch "$TEST_STATE/healthy" ;;
-  'exec -T panel mikan health')
+  'exec -T panel hikari health')
     [ -f "$TEST_STATE/healthy" ] ;;
   'stop panel' | 'stop') rm -f "$TEST_STATE/healthy" ;;
   'stop postgres') ;;
@@ -115,7 +115,7 @@ last() { grep -n -- "$1" "$tmp/trace" | tail -1 | cut -d: -f1; }
 # 0.5.1.0 and later no longer move SQLite: named by hand, it is refused before anything stops.
 fixture
 if "$bin" update next-image >"$tmp/output" 2>&1; then echo 'a move by a release that cannot make it must fail' >&2; exit 1; fi
-grep -q 'update to mikan 0.5.0.4 first' "$tmp/output"
+grep -q 'update to Hikari 0.5.0.4 first' "$tmp/output"
 grep -q 'MIKAN_IMAGE=old-image' /opt/mikan/.env
 grep -q 'original users' /opt/mikan/data/panel/mikan.db
 if grep -q 'stop\|admin backup' "$tmp/trace"; then echo 'unexpected: the refused move changed something' >&2; exit 1; fi
@@ -227,7 +227,7 @@ grep -q 'No automatic database rollback is safe' "$tmp/output"
 # A restore puts the dump into PostgreSQL and leaves no copy of it in data/panel.
 pg_fixture
 "$bin" backup >"$tmp/output" 2>&1
-archive=$(ls /opt/mikan/backups/mikan-*.tar.gz)
+archive=$(ls /opt/mikan/backups/hikari-*.tar.gz)
 echo 'changed after the backup' >"$tmp/pg"
 "$bin" restore -y "$archive" >"$tmp/output" 2>&1
 grep -q 'live users, payment77' "$tmp/pg"
@@ -237,7 +237,7 @@ tar -tzf /opt/mikan/backups/pre-restore-*.tar.gz | grep -qx 'data/panel/backup.d
 # ...also when PostgreSQL does not take it.
 touch "$tmp/restore-fail"
 if "$bin" restore -y "$archive" >"$tmp/output" 2>&1; then echo 'restore fault must fail' >&2; exit 1; fi
-grep -q 'mikan does not start' "$tmp/output"
+grep -q 'Hikari does not start' "$tmp/output"
 [ ! -e /opt/mikan/data/panel/restore.dump ]
 rm "$tmp/restore-fail"
 # A database that cannot be dumped stops the restore, which names the way past it.
@@ -269,7 +269,7 @@ tar -tzf /opt/mikan/backups/pre-restore-*.tar.gz | grep -qx 'data/panel/backup.d
 # A server that went back to SQLite restores an SQLite archive and keeps its compose file.
 fixture
 "$bin" backup >"$tmp/output" 2>&1
-archive=$(ls /opt/mikan/backups/mikan-*.tar.gz)
+archive=$(ls /opt/mikan/backups/hikari-*.tar.gz)
 printf 'MIKAN_IMAGE=old-image\nMIKAN_VERSION=0.4.4\nPANEL_PORT=21355\nMIKAN_POSTGRES_PASSWORD=kept\n' >/opt/mikan/.env
 echo 'written after the backup' >/opt/mikan/data/panel/mikan.db
 "$bin" restore -y "$archive" >"$tmp/output" 2>&1

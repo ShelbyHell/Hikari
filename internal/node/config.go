@@ -131,7 +131,7 @@ func sharedListeners(st nodeapi.DesiredState) []string {
 	return out
 }
 
-// template reads the inbound's listener template; states saved by mikan ≤ 0.1.2 carry
+// template reads the inbound's listener template; states saved by Hikari ≤ 0.1.2 carry
 // a preset with its settings instead.
 func template(in nodeapi.Inbound) (proto.Template, error) {
 	if len(in.Config) > 0 {

@@ -284,7 +284,7 @@ func mustJSON(v any) []byte {
 // release key the clients carry.
 func legacyCheckFile(args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: mikan-release legacy-check manifest.json")
+		return errors.New("usage: hikari-release legacy-check manifest.json")
 	}
 	data, err := os.ReadFile(args[0])
 	if err != nil {
@@ -299,8 +299,8 @@ func legacyCheckFile(args []string) error {
 		return err
 	}
 	if err := legacyCheck(data, string(sig), pub); err != nil {
-		return fmt.Errorf("%s would not be read by mikan 0.4.5 and 0.5.0.0, which read the latest release: %w", args[0], err)
+		return fmt.Errorf("%s would not be read by Hikari 0.4.5 and 0.5.0.0, which read the latest release: %w", args[0], err)
 	}
-	fmt.Println("ok: mikan 0.4.5 and 0.5.0.0 read this manifest")
+	fmt.Println("ok: Hikari 0.4.5 and 0.5.0.0 read this manifest")
 	return nil
 }

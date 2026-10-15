@@ -190,7 +190,7 @@ func TestUpdatingNodesFromThePanel(t *testing.T) {
 	for id, want := range map[int64]nodeView{
 		1: {Behind: false, CanUpdate: false}, // the panel's own node updates with the panel
 		2: {Behind: true, CanUpdate: true},
-		3: {Behind: true, CanUpdate: false}, // 0.5.0.1 has no endpoint: the admin runs mikan update there once
+		3: {Behind: true, CanUpdate: false}, // 0.5.0.1 has no endpoint: the admin runs hikari update there once
 		4: {Behind: false, CanUpdate: true},
 	} {
 		if v := r.nodes(nil)[id]; v.Behind != want.Behind || v.CanUpdate != want.CanUpdate || v.Version != r.fakes[id].version {

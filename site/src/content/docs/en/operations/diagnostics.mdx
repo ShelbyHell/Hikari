@@ -11,16 +11,16 @@ The last 2000 lines of the panel's log and of each node's. Tokens, keys, passwor
 
 ## Check
 
-**Run the check** runs `mikan doctor` on the server itself, not in a container: Docker and the containers, ports, ufw rules, port 80, the clock, DNS, access to GitHub and GHCR, disk and memory. Every line has a hint on what to do. Waiting for the report takes up to a minute.
+**Run the check** runs `hikari doctor` on the server itself, not in a container: Docker and the containers, ports, ufw rules, port 80, the clock, DNS, access to GitHub and GHCR, disk and memory. Every line has a hint on what to do. Waiting for the report takes up to a minute.
 
 **Restart** restarts the containers of the panel's server or of a node. The panel or the node is unreachable for a couple of seconds.
 
-How it works: the panel writes a request file into its data directory and a systemd unit on the server runs the command and returns the result. For a node the request goes over the node API. A server installed before 0.5.1.1 needs one `mikan update` for this; until then the check answers "the server did not answer".
+How it works: the panel writes a request file into its data directory and a systemd unit on the server runs the command and returns the result. For a node the request goes over the node API. A server installed before 0.5.1.1 needs one `hikari update` for this; until then the check answers "the server did not answer".
 
 ## Terminal
 
-The tab appears for an operator with "Terminal" level access and only for the servers you ticked for it. Details and limits are in [Support access](/mikan/en/operations/support-access/#terminal).
+The tab appears for an operator with "Terminal" level access and only for the servers you ticked for it. Details and limits are in [Support access](/Hikari/en/operations/support-access/#terminal).
 
 ## When the panel does not open
 
-Then the page is out of reach. Run `mikan doctor` on the server: the same report in the terminal. For a support ticket there is `mikan support <code>`, see [The mikan command](/mikan/en/operations/cli/).
+Then the page is out of reach. Run `hikari doctor` on the server: the same report in the terminal. For a support ticket there is `hikari support <code>`, see [The Hikari command](/Hikari/en/operations/cli/).

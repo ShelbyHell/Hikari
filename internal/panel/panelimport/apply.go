@@ -32,7 +32,7 @@ var (
 	maxExpire = time.Date(2200, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
-// Normalize checks a user the old panel gave against mikan's limits: names, contacts and
+// Normalize checks a user the old panel gave against Hikari's limits: names, contacts and
 // notes as POST /users takes them, numbers in range. What cannot be taken is an error, and
 // the user is left out with it.
 func Normalize(u User) (User, error) {
@@ -94,7 +94,7 @@ func newList() List { return List{Names: []string{}} }
 // Report is what an import did.
 type Report struct {
 	Created int  `json:"created"`
-	Skipped List `json:"skipped" doc:"Имена, которые уже есть в mikan: эти пользователи не перенесены"`
+	Skipped List `json:"skipped" doc:"Имена, которые уже есть в Hikari: эти пользователи не перенесены"`
 	Links   int  `json:"links" doc:"Старые ссылки и ключи, заведённые этим импортом"`
 	NoLink  List `json:"no_link" doc:"Перенесены без старой ссылки: её токен слишком короткий, чтобы быть секретом"`
 	Failed  List `json:"failed" doc:"Имя и причина для тех, кого не удалось создать"`
@@ -108,14 +108,14 @@ func newReport() Report {
 type Preview struct {
 	Total    int            `json:"total"`
 	New      int            `json:"new" doc:"Будут созданы"`
-	Taken    List           `json:"taken" doc:"Имена, которые уже есть в mikan"`
-	Invalid  List           `json:"invalid" doc:"Пользователи, которых mikan не примет, с причиной"`
+	Taken    List           `json:"taken" doc:"Имена, которые уже есть в Hikari"`
+	Invalid  List           `json:"invalid" doc:"Пользователи, которых Hikari не примет, с причиной"`
 	NoLink   List           `json:"no_link" doc:"Будут перенесены без старой ссылки"`
 	Statuses map[string]int `json:"statuses"`
-	OnHold   int            `json:"on_hold" doc:"Пользователи «на паузе»: в mikan их срок пойдёт с момента импорта"`
+	OnHold   int            `json:"on_hold" doc:"Пользователи «на паузе»: в Hikari их срок пойдёт с момента импорта"`
 }
 
-// takenNames asks the database once per thousand names which of them mikan has.
+// takenNames asks the database once per thousand names which of them Hikari has.
 func takenNames(ctx context.Context, q *db.Queries, names []string) (map[string]bool, error) {
 	taken := map[string]bool{}
 	for start := 0; start < len(names); start += 1000 {
@@ -168,7 +168,7 @@ func Check(ctx context.Context, q *db.Queries, list []User) (Preview, error) {
 	return p, nil
 }
 
-// errTaken: the name is in mikan already.
+// errTaken: the name is in Hikari already.
 var errTaken = errors.New("taken")
 
 // afterCreate runs inside a user's transaction once the user is made; tests use it to
@@ -179,7 +179,7 @@ var afterCreate func(name string) error
 // used and device limit, and files the keys their old links resolve to: Remnawave's
 // short UUID, or for Marzban and PasarGuard the name and id their signed tokens carry
 // (Verifier). Each user is one transaction, so a failure leaves nothing half made; a
-// name mikan already has is skipped, never merged into someone else. progress, when not
+// name Hikari already has is skipped, never merged into someone else. progress, when not
 // nil, is told after each user. The nodes are told once, at the end.
 func Apply(ctx context.Context, st *store.Store, users *domain.Users, now time.Time, kind Kind, tariffID int64, list []User, progress func(done int)) (Report, error) {
 	r := newReport()
@@ -189,7 +189,7 @@ func Apply(ctx context.Context, st *store.Store, users *domain.Users, now time.T
 		return r, err
 	}
 	// Slots for everyone who will be made, at once: one refill, one word to the nodes.
-	// Users mikan refuses or already has take none.
+	// Users Hikari refuses or already has take none.
 	plan, err := Check(ctx, st.Q, list)
 	if err != nil {
 		return r, err
@@ -249,7 +249,7 @@ func applyOne(ctx context.Context, st *store.Store, users *domain.Users, now tim
 	case !in.Expires.IsZero():
 		p.ExpiresAt = &in.Expires
 	case in.Status == StatusOnHold && in.OnHold > 0:
-		// mikan has no term that waits for the first connection: it starts now.
+		// Hikari has no term that waits for the first connection: it starts now.
 		exp := now.Add(in.OnHold)
 		p.ExpiresAt = &exp
 	default:

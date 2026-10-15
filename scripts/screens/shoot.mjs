@@ -2,7 +2,7 @@
 // a month of traffic, the main pages in English and Russian, on a desktop and a phone.
 //
 //   cd scripts/screens && npm install
-//   MIKAN_IMAGE=mikan:0.3.8 CHROME=/path/to/chrome node shoot.mjs
+//   MIKAN_IMAGE=hikari:0.3.8 CHROME=/path/to/chrome node shoot.mjs
 //
 // Writes .github/assets/screens/{en,ru}/*.webp and deletes the demo stack afterwards.
 import puppeteer from "puppeteer-core";
@@ -21,7 +21,7 @@ const SUB = "demosubs0000";
 const BASE = `https://127.0.0.1:2090/${ADMIN}/`;
 // The demo stack lives for a minute on 127.0.0.1; its admin password is thrown away.
 const PASS = crypto.randomBytes(18).toString("base64url");
-const env = { ...process.env, MIKAN_IMAGE: process.env.MIKAN_IMAGE || "mikan:dev", MIKAN_TEST_POSTGRES_PASSWORD: crypto.randomBytes(32).toString("hex") };
+const env = { ...process.env, MIKAN_IMAGE: process.env.MIKAN_IMAGE || "hikari:dev", MIKAN_TEST_POSTGRES_PASSWORD: crypto.randomBytes(32).toString("hex") };
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // the demo panel's certificate is self-signed
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const compose = (args, input) =>
@@ -102,7 +102,7 @@ function seed(ids, now) {
   });
   lines.push(`UPDATE users SET status = 'disabled' WHERE id = ${ids[12]};`);
   lines.push(`UPDATE users SET used_down = traffic_limit WHERE id = ${ids[4]} AND traffic_limit IS NOT NULL;`);
-  lines.push(`INSERT INTO settings (key, value) VALUES ('brand', '"mikan"') ON CONFLICT(key) DO UPDATE SET value=excluded.value;`);
+  lines.push(`INSERT INTO settings (key, value) VALUES ('brand', '"Hikari"') ON CONFLICT(key) DO UPDATE SET value=excluded.value;`);
   lines.push("COMMIT;");
   return lines.join("\n");
 }

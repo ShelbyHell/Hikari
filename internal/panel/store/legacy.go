@@ -24,7 +24,7 @@ import (
 const MigrationMarker = "postgres-migration.json"
 
 // ErrSQLiteData: the server's data are still in SQLite; this release cannot move them.
-var ErrSQLiteData = errors.New("this server's data are still in SQLite (mikan 0.4): update through mikan 0.5.0.4 first, it moves them to PostgreSQL")
+var ErrSQLiteData = errors.New("this server's data are still in SQLite (Hikari 0.4): update through Hikari 0.5.0.4 first, it moves them to PostgreSQL")
 
 // importRecord is the proof an import (or an explicit PostgreSQL restore) left behind.
 type importRecord struct {

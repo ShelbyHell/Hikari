@@ -24,7 +24,7 @@ type Page struct {
 }
 
 // Palettes are the page's themes, the panel's: the first four follow Mode, the others are
-// light or dark by themselves (web/src/lib/themes.ts, styles/themes.css). Midnight is Mikan
+// light or dark by themselves (web/src/lib/themes.ts, styles/themes.css). Midnight is the dark one.
 // in the dark mode.
 var Palettes = []string{"mikan", "ocean", "sakura", "forest", "latte", "snow", "dawn", "dune", "graphite", "abyss", "ember", "plum", "moss", "terminal", "nord", "mocha", "tokyo", "dracula", "aurora", "cosmos"}
 

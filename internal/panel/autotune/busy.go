@@ -30,7 +30,7 @@ const ReasonBusy = "busy"
 const (
 	BusyStale  = "stale"   // the inbound moved since its listener failed: the node is catching up
 	BusyOff    = "off"     // automatic moves are off for it, or its port is not one to move
-	BusyMikan  = "mikan"   // the port is mikan's own: another inbound, the relay, the panel
+	BusyMikan  = "mikan"   // the port is Hikari's own: another inbound, the relay, the panel
 	BusyNoPort = "no_port" // every port of the pool is taken or was left lately
 )
 

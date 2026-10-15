@@ -49,8 +49,8 @@ func newDatabase(t *testing.T, label string) string {
 }
 
 // The whole way of a Telegram backup: made on one server by the panel (pg_dump through
-// `mikan database backup`), packed and encrypted, then on a freshly installed server
-// decrypted, unpacked and restored by `mikan database restore` (pg_restore and the
+// `hikari database backup`), packed and encrypted, then on a freshly installed server
+// decrypted, unpacked and restored by `hikari database restore` (pg_restore and the
 // migrations), and the new server's panel starts on the old data.
 func TestTelegramBackupRestoresOnANewServer(t *testing.T) {
 	if _, err := exec.LookPath("pg_dump"); err != nil {
@@ -79,7 +79,7 @@ func TestTelegramBackupRestoresOnANewServer(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// age -d -o mikan.tar.gz …, then what mikan restore unpacks.
+	// age -d -o mikan.tar.gz …, then what hikari restore unpacks.
 	file, _ := os.ReadFile(path)
 	id, _ := age.NewScryptIdentity(pass)
 	plain, err := age.Decrypt(bytes.NewReader(file), id)

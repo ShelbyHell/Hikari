@@ -153,9 +153,9 @@ func NodePorts(ctx context.Context, q *db.Queries, node db.Node) (PortMap, error
 	return m, nil
 }
 
-// WithHost adds what the node's server reports as listening, mikan's own listeners among
+// WithHost adds what the node's server reports as listening, Hikari's own listeners among
 // it. Only Free looks at it: a port another program holds is not one to pick, but
-// Busy, which refuses the admin's choice, names holders by what mikan knows of them, so
+// Busy, which refuses the admin's choice, names holders by what Hikari knows of them, so
 // an inbound keeps its own port while it is listening on it.
 func (m PortMap) WithHost(h *nodeapi.HostPorts) PortMap {
 	m.host = h

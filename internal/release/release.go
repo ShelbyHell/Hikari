@@ -1,4 +1,4 @@
-// Package release is the manifest every mikan release publishes next to its files: the
+// Package release is the manifest every Hikari release publishes next to its files: the
 // version, the image digest in GitHub Packages, the installer checksums and what changed.
 // The panel and the installer trust a manifest only with a valid signature from the
 // release key, whose public half is PublicKey.
@@ -18,13 +18,14 @@ import (
 
 // PublicKey is the public half of the release signing key (raw Ed25519, base64). The
 // private half lives only in the RELEASE_SIGNING_KEY secret of the release workflow and
-// with the maintainer.
-const PublicKey = "Z3wSIPBSaJxh5CsGO8eINI0aM0kyrQ46EcJSNeH85W8="
+// with the maintainer. It is this fork's own key: releases of ShelbyHell/Hikari are
+// signed with it, and a manifest signed with the upstream key is refused here.
+const PublicKey = "vsFZSTqFm9CoL68mA4XY8GYIMmq+VO6/gA8fcp5S90s="
 
-// Repo is where releases are published.
-const Repo = "Miroshka000/mikan"
+// Repo is where this fork publishes its releases.
+const Repo = "ShelbyHell/Hikari"
 
-// InstallCommand installs mikan from the latest release; run on the server.
+// InstallCommand installs Hikari from the latest release; run on the server.
 const InstallCommand = "curl -fsSL https://github.com/" + Repo + "/releases/latest/download/install.sh | sudo bash"
 
 // JoinCommand installs a node of an existing panel with the join key the panel issued.
@@ -37,7 +38,7 @@ type Manifest struct {
 	Version      string            `json:"version"`
 	MinInstaller string            `json:"min_installer,omitempty"`
 	Published    time.Time         `json:"published"`
-	Image        string            `json:"image" doc:"Образ в GitHub Packages, например ghcr.io/miroshka000/mikan"`
+	Image        string            `json:"image" doc:"Образ в GitHub Packages, например ghcr.io/shelbyhell/hikari"`
 	Digest       string            `json:"digest" doc:"sha256 multi-arch образа"`
 	Installer    map[string]Asset  `json:"installer" doc:"Установщик по архитектуре: x86_64, aarch64"`
 	Notes        map[string]string `json:"notes" doc:"Что изменилось, markdown по языкам: en, ru"`

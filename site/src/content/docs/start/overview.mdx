@@ -1,5 +1,5 @@
 ---
-title: Что такое mikan
+title: Что такое Hikari
 description: VPN-панель на ядре mihomo для своего VPN-сервиса. Из чего она состоит и как работает.
 ---
 
@@ -18,10 +18,10 @@ mikan: панель для своего VPN-сервиса на ядре [mihomo
 Панель и нода работают отдельно, поэтому обновление или перезапуск панели не роняет VPN. На сервере панели всегда есть своя нода, а удалённые ноды на других серверах подключаются по ключу.
 
 ```text
-Браузер ── HTTPS, секретная ссылка ──▶ панель mikan
+Браузер ── HTTPS, секретная ссылка ──▶ панель Hikari
                                         │  unix-сокет / TLS с пиннингом
                                         ▼
-VPN-приложения ── REALITY, QUIC… ──▶ ноды mikan (mihomo внутри)
+VPN-приложения ── REALITY, QUIC… ──▶ ноды Hikari (mihomo внутри)
        └──────── подписка ──────────▶ панель
 ```
 
@@ -44,6 +44,6 @@ VPN-приложения ── REALITY, QUIC… ──▶ ноды mikan (mihom
 ## С чего начать
 
 <CardGrid>
-	<LinkCard title="Установка" description="Одна команда на чистом сервере с Ubuntu или Debian." href="/mikan/start/install/" />
-	<LinkCard title="Первые шаги" description="Вход в панель, первый пользователь и подключения." href="/mikan/start/first-steps/" />
+	<LinkCard title="Установка" description="Одна команда на чистом сервере с Ubuntu или Debian." href="/Hikari/start/install/" />
+	<LinkCard title="Первые шаги" description="Вход в панель, первый пользователь и подключения." href="/Hikari/start/first-steps/" />
 </CardGrid>

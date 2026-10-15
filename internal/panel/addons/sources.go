@@ -217,7 +217,7 @@ func (n *sourceNet) get(ctx context.Context, rawURL string, limit int64, accept 
 	if err != nil {
 		return nil, 0, fmt.Errorf("%w: %v", ErrSourceURL, err)
 	}
-	req.Header.Set("User-Agent", "mikan-panel")
+	req.Header.Set("User-Agent", "hikari-panel")
 	if accept != "" {
 		req.Header.Set("Accept", accept)
 	}

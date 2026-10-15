@@ -1,15 +1,15 @@
-// mikan-release makes the signed manifest of a release and the signed release index (used
+// hikari-release makes the signed manifest of a release and the signed release index (used
 // by .github/workflows/release.yml), checks a manifest against what the clients in the
 // field read (legacy.go), and makes the release signing key.
 //
-//	mikan-release keygen -out release-signing.pem
-//	RELEASE_SIGNING_KEY="$(cat key.pem)" mikan-release manifest -version 0.3.9 \
-//	    -image ghcr.io/miroshka000/mikan -digest sha256:… \
-//	    -asset x86_64=dist/mikan-x86_64 -asset aarch64=dist/mikan-aarch64 \
+//	hikari-release keygen -out release-signing.pem
+//	RELEASE_SIGNING_KEY="$(cat key.pem)" hikari-release manifest -version 0.3.9 \
+//	    -image ghcr.io/shelbyhell/hikari -digest sha256:… \
+//	    -asset x86_64=dist/hikari-x86_64 -asset aarch64=dist/hikari-aarch64 \
 //	    -min-installer-file .github/min-installer -out dist
-//	mikan-release verify dist/manifest.json
-//	mikan-release legacy-check dist/manifest.json
-//	RELEASE_SIGNING_KEY="$(cat key.pem)" mikan-release index -version 0.5.0.1 \
+//	hikari-release verify dist/manifest.json
+//	hikari-release legacy-check dist/manifest.json
+//	RELEASE_SIGNING_KEY="$(cat key.pem)" hikari-release index -version 0.5.0.1 \
 //	    -from-file .github/upgrade-from -in updates/index.json -out dist
 package main
 
@@ -37,14 +37,14 @@ import (
 
 func main() {
 	if err := run(os.Args[1:]); err != nil {
-		fmt.Fprintln(os.Stderr, "mikan-release:", err)
+		fmt.Fprintln(os.Stderr, "hikari-release:", err)
 		os.Exit(1)
 	}
 }
 
 func run(args []string) error {
 	if len(args) == 0 {
-		return errors.New("usage: mikan-release keygen|manifest|verify|legacy-check|index|goals …")
+		return errors.New("usage: hikari-release keygen|manifest|verify|legacy-check|index|goals …")
 	}
 	switch args[0] {
 	case "keygen":
@@ -99,6 +99,14 @@ var (
 	languages     = []string{"en", "ru"}
 )
 
+// forkNotice opens every release description: what this product is and is not. The
+// upstream notice terms (NOTICE.md, section 7(c)) want a modified version marked as
+// changed and as different from the original wherever it presents itself.
+const forkNotice = "> **Hikari** — неофициальный форк [mikan](https://github.com/Miroshka000/mikan). " +
+	"Не связан с проектом mikan и не поддерживается им. Поддержка — только у автора форка.\n>\n" +
+	"> **Hikari** is an unofficial fork of [mikan](https://github.com/Miroshka000/mikan). " +
+	"Not affiliated with or supported by the mikan project. Support comes only from the fork's author."
+
 // readVersionFile reads a version from a file the release workflow passes on every
 // release (the minimum installer, the lowest version to update from): absent or holding
 // only comments, it says none.
@@ -134,7 +142,7 @@ func makeManifest(args []string) error {
 	version := fs.String("version", "", "release version, e.g. 0.5.0.1")
 	minInstaller := fs.String("min-installer", "", "minimum host installer version, only for a release that cannot run with an older one")
 	minInstallerFile := fs.String("min-installer-file", "", "file with the minimum installer version (# comments allowed); a missing file asks for none")
-	image := fs.String("image", "", "image repository, e.g. ghcr.io/miroshka000/mikan")
+	image := fs.String("image", "", "image repository, e.g. ghcr.io/shelbyhell/hikari")
 	digest := fs.String("digest", "", "sha256 digest of the pushed multi-arch image")
 	changelog := fs.String("changelog", "CHANGELOG.md", "where the release notes are")
 	out := fs.String("out", "dist", "output directory")
@@ -214,7 +222,8 @@ func makeManifest(args []string) error {
 	if err := os.MkdirAll(*out, 0o755); err != nil {
 		return err
 	}
-	notes := m.Notes["en"]
+	// Every release description says what this build is: an unofficial fork, on its own.
+	notes := forkNotice + "\n\n" + m.Notes["en"]
 	if ru := m.Notes["ru"]; ru != "" {
 		notes += "\n\n<details><summary>Русский</summary>\n\n" + ru + "\n\n</details>"
 	}
@@ -229,7 +238,7 @@ func makeManifest(args []string) error {
 
 func verify(args []string) error {
 	if len(args) != 1 {
-		return errors.New("usage: mikan-release verify manifest.json")
+		return errors.New("usage: hikari-release verify manifest.json")
 	}
 	data, err := os.ReadFile(args[0])
 	if err != nil {

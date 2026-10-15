@@ -73,7 +73,7 @@ type Inbound struct {
 	Listen string          `json:"listen"`
 	Port   string          `json:"port"`             // "443" or a range "20000-20100"
 	Config json.RawMessage `json:"config,omitempty"` // proto.Template as JSON
-	// Preset and Settings are the format of mikan ≤ 0.1.2; the node still reads them
+	// Preset and Settings are the format of Hikari ≤ 0.1.2; the node still reads them
 	// from a saved state, the panel no longer sends them.
 	Preset   string          `json:"preset,omitempty"`
 	Settings json.RawMessage `json:"settings,omitempty"`

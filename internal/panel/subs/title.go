@@ -188,7 +188,7 @@ func fileName(title string) string {
 		return r
 	}, title))
 	if name == "" {
-		return "mikan"
+		return "Hikari"
 	}
 	return name
 }

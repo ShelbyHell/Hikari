@@ -230,7 +230,7 @@ func domainText(e *domain.DomainError) string {
 
 func nodeID(args []string) (int64, error) {
 	if len(args) < 2 {
-		return 0, errors.New("name the node by its ID: mikan admin node list")
+		return 0, errors.New("name the node by its ID: hikari admin node list")
 	}
 	id, err := strconv.ParseInt(args[1], 10, 64)
 	if err != nil || id < 1 {

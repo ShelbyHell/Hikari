@@ -63,7 +63,7 @@ x-hardening: &hardening
 services:
   node:
     <<: *hardening
-    entrypoint: ["/usr/local/bin/mikan-node"]
+    entrypoint: ["/usr/local/bin/hikari-node"]
     environment:
       MIKAN_DATA_DIR: /data/node
       MIKAN_NODE_SOCKET: /run/mikan/node.sock
@@ -87,7 +87,7 @@ services:
     pids_limit: 512
     stop_grace_period: 45s
     healthcheck:
-      test: ["CMD", "/usr/local/bin/mikan", "health"]
+      test: ["CMD", "/usr/local/bin/hikari", "health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -102,8 +102,8 @@ services:
     cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
     security_opt: ["no-new-privileges:true"]
     environment:
-      POSTGRES_USER: mikan
-      POSTGRES_DB: mikan
+      POSTGRES_USER: Hikari
+      POSTGRES_DB: Hikari
       POSTGRES_PASSWORD: ${MIKAN_POSTGRES_PASSWORD}
       POSTGRES_INITDB_ARGS: --auth-local=scram-sha-256 --auth-host=scram-sha-256
     command: ["postgres", "-c", "listen_addresses=", "-c", "unix_socket_directories=/run/postgresql", "-c", "unix_socket_permissions=0777", "-c", "max_connections=50"]
@@ -149,7 +149,7 @@ services:
     logging:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
-    entrypoint: ["/usr/local/bin/mikan-node"]
+    entrypoint: ["/usr/local/bin/hikari-node"]
     environment:
       MIKAN_DATA_DIR: /data/node
       MIKAN_NODE_SOCKET: /run/mikan/node.sock
@@ -168,7 +168,7 @@ pub fn compose_text(node: bool) -> &'static str {
 }
 
 /// Makes compose.yaml the one this installer writes: it has been written once, at install,
-/// so a server installed by an older mikan keeps that one (the whole ./data mounted in both
+/// so a server installed by an older Hikari keeps that one (the whole ./data mounted in both
 /// containers, no limits) until this runs. Returns the text it replaced, for the caller to
 /// put back if the new one does not start; the old file also stays as compose.yaml.old.
 pub fn ensure_compose(root: &Path, node: bool) -> Result<Option<String>> {
@@ -194,7 +194,7 @@ pub fn put_compose(root: &Path, text: &str) -> Result<()> {
 }
 
 /// How long a question to the engine may take (a version, the containers, a health check):
-/// a wedged dockerd must not hang `mikan doctor`, the menu's status or a wait for the panel.
+/// a wedged dockerd must not hang `hikari doctor`, the menu's status or a wait for the panel.
 const ASK_LIMIT: Duration = Duration::from_secs(20);
 
 /// Runs a short docker command for up to limit; None when it failed to start, failed, or
@@ -303,7 +303,7 @@ fn forward(r: impl Read + Send + 'static, tx: mpsc::Sender<String>) -> thread::J
 const DISTRO_PACKAGES: [&str; 7] =
     ["docker.io", "docker-compose", "docker-compose-v2", "docker-doc", "podman-docker", "containerd", "runc"];
 
-/// Replaces a Docker that cannot run mikan (no compose v2) with Docker CE from
+/// Replaces a Docker that cannot run Hikari (no compose v2) with Docker CE from
 /// get.docker.com. The packages are removed, not purged: images, volumes and containers
 /// stay in /var/lib/docker and come back with the new engine.
 pub fn replace(mut line: impl FnMut(&str)) -> Result<()> {
@@ -420,14 +420,14 @@ pub fn compose_run(args: &[&str]) -> Result<Output> {
     Ok(out)
 }
 
-/// `mikan admin …` in the running panel. stdin is fed to the command when given.
+/// `hikari admin …` in the running panel. stdin is fed to the command when given.
 pub fn admin(args: &[&str], stdin: Option<&str>) -> Result<Output> {
-    let mut full = vec!["exec", "-T", "panel", "mikan", "admin"];
+    let mut full = vec!["exec", "-T", "panel", "hikari", "admin"];
     full.extend_from_slice(args);
     with_stdin(compose(&full), stdin)
 }
 
-/// `mikan admin …` in a one-off panel container, before the panel runs (bootstrap).
+/// `hikari admin …` in a one-off panel container, before the panel runs (bootstrap).
 pub fn admin_once(args: &[&str], stdin: Option<&str>) -> Result<Output> {
     let mut full = vec!["run", "--rm", "--no-deps", "-T", "panel", "admin"];
     full.extend_from_slice(args);
@@ -527,7 +527,7 @@ pub fn check(out: Output) -> Result<Output> {
         return Ok(out);
     }
     let err = String::from_utf8_lossy(&out.stderr);
-    let msg = err.lines().rev().find(|l| !l.trim().is_empty()).unwrap_or("failed").trim().trim_start_matches("mikan: ");
+    let msg = err.lines().rev().find(|l| !l.trim().is_empty()).unwrap_or("failed").trim().trim_start_matches("Hikari: ");
     bail!("{msg}")
 }
 
@@ -538,7 +538,7 @@ pub fn panel_healthy() -> bool {
 
 /// panel_healthy, given up after limit.
 pub fn panel_healthy_within(limit: Duration) -> bool {
-    ask(compose(&["exec", "-T", "panel", "mikan", "health"]), limit).is_some_and(|o| o.status.success())
+    ask(compose(&["exec", "-T", "panel", "hikari", "health"]), limit).is_some_and(|o| o.status.success())
 }
 
 #[derive(Deserialize, Debug, Clone, Default)]

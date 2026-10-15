@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Hikari">
+  <rect width="256" height="256" rx="56" fill="#171c24"/>
+  <rect x="72" y="64" width="34" height="128" rx="8" fill="#f2f5f7"/>
+  <rect x="150" y="64" width="34" height="128" rx="8" fill="#f2f5f7"/>
+  <rect x="72" y="111" width="112" height="34" fill="#f2f5f7"/>
+  <rect x="88" y="206" width="80" height="16" rx="8" fill="#4ba3b0"/>
+</svg>

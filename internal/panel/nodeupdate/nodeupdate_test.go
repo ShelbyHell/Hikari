@@ -219,7 +219,7 @@ func TestRequestRefusals(t *testing.T) {
 			t.Errorf("a node on %s: %v", v, err)
 		}
 	}
-	// no endpoint before 0.5.0.2: the admin runs `mikan update` on that server once
+	// no endpoint before 0.5.0.2: the admin runs `hikari update` on that server once
 	for _, v := range []string{"0.5.0.1", "0.5.0", "0.4.5", "dev"} {
 		r.nodes.up(4, v)
 		if err := r.svc.Request(r.ctx, r.node(4)); !errors.Is(err, ErrUnsupported) {

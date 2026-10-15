@@ -46,7 +46,7 @@ func helloLoop(ctx context.Context, key nodetls.Key, dataDir string, log *slog.L
 	}
 }
 
-// helloOnce is `mikan-node hello`: one hello now (mikan doctor runs it), its answer saved
+// helloOnce is `hikari-node hello`: one hello now (hikari doctor runs it), its answer saved
 // and printed as JSON. It never fails: the answer says what went wrong.
 func helloOnce() {
 	now := time.Now().UTC()
@@ -61,7 +61,7 @@ func helloOnce() {
 	}
 	s.At, s.Started, s.Attempt, s.Final = time.Now().UTC(), now, 1, true
 	if err := nodehello.Write(envOr("MIKAN_DATA_DIR", config.DefaultDataDir), s); err != nil {
-		fmt.Fprintln(os.Stderr, "mikan-node: save the answer:", err)
+		fmt.Fprintln(os.Stderr, "hikari-node: save the answer:", err)
 	}
 	raw, _ := json.Marshal(s)
 	fmt.Println(string(raw))

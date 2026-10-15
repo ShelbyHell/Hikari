@@ -15,7 +15,7 @@ use sha2::{Digest, Sha256};
 /// The public half of the release signing key, the same as internal/release.PublicKey.
 pub const PUBLIC_KEY: &str = "Z3wSIPBSaJxh5CsGO8eINI0aM0kyrQ46EcJSNeH85W8=";
 
-pub const REPO: &str = "Miroshka000/mikan";
+pub const REPO: &str = "ShelbyHell/Hikari";
 
 /// The project's own namespace on GitHub Packages: ghcr.io/<owner of REPO in lowercase>/,
 /// as internal/release checks it.
@@ -262,7 +262,7 @@ pub fn find_upto_with(current: &str, channel: Channel, upto: &str, key: &Verifyi
             let manifest = latest_with(key, fetch).with_context(|| format!("the release index is unavailable ({why})"))?;
             if newer(&manifest.version, upto) || newer(upto, &manifest.version) {
                 bail!(
-                    "the release index is unavailable ({why}) and the latest release is mikan {}, not the mikan {upto} that was asked for",
+                    "the release index is unavailable ({why}) and the latest release is Hikari {}, not the Hikari {upto} that was asked for",
                     manifest.version
                 );
             }
@@ -295,7 +295,7 @@ fn from_index(current: &str, channel: Channel, upto: Option<&str>, key: &Verifyi
     if let Some(upto) = upto {
         // Never a release the index does not list for the channel, and never past it.
         if !entries.iter().any(|e| (beta || e.channel != "beta") && !newer(&e.version, upto) && !newer(upto, &e.version)) {
-            return Err(Refused(format!("mikan {upto} is not a release of this server's channel in the signed release index")).into());
+            return Err(Refused(format!("Hikari {upto} is not a release of this server's channel in the signed release index")).into());
         }
         entries.retain(|e| !newer(&e.version, upto));
     }
@@ -509,7 +509,7 @@ mod tests {
 
     fn manifest(version: &str, image: &str) -> Vec<u8> {
         format!(
-            r#"{{"version":"{version}","published":"2026-09-29T10:00:00Z","image":"{image}","digest":"sha256:{}","installer":{{"x86_64":{{"url":"https://github.com/Miroshka000/mikan/releases/download/v{version}/mikan-x86_64","sha256":"{}"}}}},"notes":{{"en":"- x"}}}}"#,
+            r#"{{"version":"{version}","published":"2026-09-29T10:00:00Z","image":"{image}","digest":"sha256:{}","installer":{{"x86_64":{{"url":"https://github.com/ShelbyHell/Hikari/releases/download/v{version}/hikari-x86_64","sha256":"{}"}}}},"notes":{{"en":"- x"}}}}"#,
             "a".repeat(64),
             "b".repeat(64)
         )
@@ -520,10 +520,10 @@ mod tests {
     fn signed_manifests_only() {
         let signer = SigningKey::from_bytes(&[7; 32]);
         let key = signer.verifying_key();
-        let data = manifest("0.3.9", "ghcr.io/miroshka000/mikan");
+        let data = manifest("0.3.9", "ghcr.io/shelbyhell/hikari");
         let sig = STANDARD.encode(signer.sign(&data).to_bytes());
         let m = parse(&data, &format!("{sig}\n"), &key).unwrap();
-        assert_eq!(m.reference(), format!("ghcr.io/miroshka000/mikan@sha256:{}", "a".repeat(64)));
+        assert_eq!(m.reference(), format!("ghcr.io/shelbyhell/hikari@sha256:{}", "a".repeat(64)));
         assert_eq!(m.installer["x86_64"].sha256, "b".repeat(64));
 
         let mut tampered = data.clone();
@@ -533,7 +533,7 @@ mod tests {
         assert!(parse(&data, &sig, &other).is_err());
         assert!(parse(&data, "not base64!", &key).is_err());
 
-        let docker_hub = manifest("0.3.9", "docker.io/someone/mikan");
+        let docker_hub = manifest("0.3.9", "docker.io/someone/hikari");
         let sig = STANDARD.encode(signer.sign(&docker_hub).to_bytes());
         assert!(parse(&docker_hub, &sig, &key).is_err());
     }
@@ -544,7 +544,7 @@ mod tests {
     fn new_fields_do_not_break_old_installers() {
         let signer = SigningKey::from_bytes(&[7; 32]);
         let key = signer.verifying_key();
-        let text = String::from_utf8(manifest("0.4.4", "ghcr.io/miroshka000/mikan")).unwrap();
+        let text = String::from_utf8(manifest("0.4.4", "ghcr.io/shelbyhell/hikari")).unwrap();
         let extended = text.replacen("{\"version\"", "{\"min_installer\":\"0.4.4\",\"channel\":\"stable\",\"version\"", 1).replacen(
             "\"sha256\":",
             "\"size\":123,\"sha256\":",
@@ -569,9 +569,9 @@ mod tests {
         let signer = SigningKey::from_bytes(&[7; 32]);
         let key = signer.verifying_key();
         let accept = |data: &[u8]| parse(data, &STANDARD.encode(signer.sign(data).to_bytes()), &key).is_ok();
-        assert!(accept(&manifest("0.4.4", "ghcr.io/miroshka000/mikan")));
+        assert!(accept(&manifest("0.4.4", "ghcr.io/shelbyhell/hikari")));
         for bad in [
-            "ghcr.io/someone-else/mikan",
+            "ghcr.io/someone-else/hikari",
             "ghcr.io/miroshka000/../x",
             "ghcr.io/miroshka000/Mi kan",
             "ghcr.io/miroshka000/",
@@ -579,9 +579,9 @@ mod tests {
         ] {
             assert!(!accept(&manifest("0.4.4", bad)), "{bad}");
         }
-        let short_hash = String::from_utf8(manifest("0.4.4", "ghcr.io/miroshka000/mikan")).unwrap().replace(&"b".repeat(64), "bb");
+        let short_hash = String::from_utf8(manifest("0.4.4", "ghcr.io/shelbyhell/hikari")).unwrap().replace(&"b".repeat(64), "bb");
         assert!(!accept(short_hash.as_bytes()));
-        let plain_http = String::from_utf8(manifest("0.4.4", "ghcr.io/miroshka000/mikan")).unwrap().replace("https://", "http://");
+        let plain_http = String::from_utf8(manifest("0.4.4", "ghcr.io/shelbyhell/hikari")).unwrap().replace("https://", "http://");
         assert!(!accept(plain_http.as_bytes()));
     }
 
@@ -736,7 +736,7 @@ mod tests {
         }
         fn release(&self, version: &str) -> String {
             let url = format!("https://github.com/{REPO}/releases/download/v{version}/manifest.json");
-            self.put(&url, manifest(version, "ghcr.io/miroshka000/mikan"));
+            self.put(&url, manifest(version, "ghcr.io/shelbyhell/hikari"));
             url
         }
         /// An index of "version channel from" entries.
@@ -763,7 +763,7 @@ mod tests {
         for v in ["0.4.5", "0.5.0.0", "0.5.0.1", "0.5.0.2-rc.1", "0.6.0.0"] {
             f.release(v);
         }
-        let latest = manifest("0.5.0.0", "ghcr.io/miroshka000/mikan");
+        let latest = manifest("0.5.0.0", "ghcr.io/shelbyhell/hikari");
         f.put(&latest_url(), latest);
         f.index(&[
             "0.4.5 stable 0.4.0",
@@ -804,7 +804,7 @@ mod tests {
         f.index(&["0.5.0.1 stable 0.4.5"]);
         f.put(
             &format!("https://github.com/{REPO}/releases/download/v0.5.0.1/manifest.json"),
-            manifest("0.5.0.2", "ghcr.io/miroshka000/mikan"),
+            manifest("0.5.0.2", "ghcr.io/shelbyhell/hikari"),
         );
         fallback("a manifest of another version");
         f.files.borrow_mut().clear();

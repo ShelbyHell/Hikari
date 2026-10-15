@@ -33,7 +33,7 @@ createServer((req, res) => {
     };
     switch (method) {
       case "getMe":
-        return ok({ id: 123456789, is_bot: true, first_name: "Mikan VPN", username: "mikan_dev_bot" });
+        return ok({ id: 123456789, is_bot: true, first_name: "Hikari VPN", username: "mikan_dev_bot" });
       case "getUpdates": {
         // Long polling: whatever was pushed, or nothing after a while.
         const started = Date.now();

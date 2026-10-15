@@ -1,4 +1,4 @@
-// mikan-node runs the VPN data plane: mihomo embedded as a library, controlled by the
+// hikari-node runs the VPN data plane: mihomo embedded as a library, controlled by the
 // panel over a unix socket, or over pinned TLS when the node runs on another server.
 // It links mihomo and is therefore distributed under GPL-3.0.
 package main
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 	if err := run(); err != nil {
-		fmt.Fprintln(os.Stderr, "mikan-node:", err)
+		fmt.Fprintln(os.Stderr, "hikari-node:", err)
 		os.Exit(1)
 	}
 }
@@ -141,7 +141,7 @@ func envOr(key, def string) string {
 func printJoinKey(field string) {
 	key, err := nodetls.DecodeKey(os.Getenv("MIKAN_NODE_JOIN"))
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "mikan-node:", err)
+		fmt.Fprintln(os.Stderr, "hikari-node:", err)
 		os.Exit(1)
 	}
 	if field == "key-port" {

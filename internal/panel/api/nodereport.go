@@ -14,7 +14,7 @@ import (
 // addresses, names and API port are masked, and so is anything that looks like an
 // address, a domain or a key in the raw errors.
 
-// publicNames are names everybody's report may show: the places every mikan reaches.
+// publicNames are names everybody's report may show: the places every Hikari reaches.
 var publicNames = []string{"github.com", "ghcr.io", "check-host.net", "api.telegram.org", "cloudflare.com"}
 
 var (
