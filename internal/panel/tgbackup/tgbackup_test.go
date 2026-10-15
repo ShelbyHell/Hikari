@@ -245,7 +245,7 @@ func TestSendGoesToTheAdminChat(t *testing.T) {
 		t.Fatal(err)
 	}
 	g := got()
-	if len(g) != 1 || g[0].chat != "42" || g[0].name != "mikan-vpn.example.com-20261003-0330.tar.gz.age" {
+	if len(g) != 1 || g[0].chat != "42" || g[0].name != "hikari-vpn.example.com-20261003-0330.tar.gz.age" {
 		t.Fatalf("sent: %+v", g)
 	}
 	if !strings.Contains(g[0].caption, "hikari restore") || string(unpack(t, g[0].file, password)["data/panel/backup.dump"]) != "PGDMP-test" {
