@@ -19,7 +19,7 @@ pub const REPO: &str = "ShelbyHell/Hikari";
 
 /// The project's own namespace on GitHub Packages: ghcr.io/<owner of REPO in lowercase>/,
 /// as internal/release checks it.
-const IMAGE_PREFIX: &str = "ghcr.io/miroshka000/";
+const IMAGE_PREFIX: &str = "ghcr.io/shelbyhell/";
 
 /// Installs a node of an existing panel on a fresh server (internal/release.JoinCommand).
 pub fn join_command(key: &str) -> String {
@@ -572,10 +572,10 @@ mod tests {
         assert!(accept(&manifest("0.4.4", "ghcr.io/shelbyhell/hikari")));
         for bad in [
             "ghcr.io/someone-else/hikari",
-            "ghcr.io/miroshka000/../x",
-            "ghcr.io/miroshka000/Mi kan",
-            "ghcr.io/miroshka000/",
-            "ghcr.io/miroshka000/m$x",
+            "ghcr.io/shelbyhell/../x",
+            "ghcr.io/shelbyhell/Mi kan",
+            "ghcr.io/shelbyhell/",
+            "ghcr.io/shelbyhell/m$x",
         ] {
             assert!(!accept(&manifest("0.4.4", bad)), "{bad}");
         }
