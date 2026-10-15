@@ -11,6 +11,7 @@ the signed manifest, and the panel shows the one in its language.
 - **An unofficial fork, said plainly.** The notice sits at the top of the README, in the panel (Settings → System → About) and in every release description: Hikari is not affiliated with or supported by the mikan project — its author supports it, and the original mikan stays at [Miroshka000/mikan](https://github.com/Miroshka000/mikan).
 - **mikan's art is gone**: the fork's own placeholder banner and mark stand in for the mandarin until the new design arrives; the screenshots go with it.
 - What intentionally keeps the old name because live servers depend on it: the `/opt/mikan` directory, the `MIKAN_*` environment variables, the compose project and its Docker volumes, the `mikan:` keys and `mikan.client` fields of listener templates, the `mikan-addon.json` manifest and the `mikan_*` metrics.
+- **The admin login can be changed** (Settings → Security → Change admin username). The current password confirms it, so a hijacked session cannot rename the admin and lock the owner out. The new login follows the same rule as at install (3–32 of a-z, 0-9, dots, dashes and underscores), a taken one is refused, and the change goes to the journal.
 ### ru
 **Теперь форк называется Hikari.** Меняются название, образ и команда на сервере; панель, данные и ссылки подписок — нет.
 - Образ — **`ghcr.io/shelbyhell/hikari`**, релизы — в [ShelbyHell/Hikari](https://github.com/ShelbyHell/Hikari). Серверы, поставленные ранними версиями, продолжают обновляться: GitHub перенаправляет старые адреса, а канал обновлений панели переезжает вместе с образом.
@@ -18,6 +19,7 @@ the signed manifest, and the panel shows the one in its language.
 - **Неофициальный форк — сказано прямо.** Пометка стоит в начале README, в самой панели («Настройки → Система → О программе») и в описании каждого релиза: Hikari не связан с проектом mikan и не поддерживается им — поддержка у автора форка, а сам mikan остаётся в [Miroshka000/mikan](https://github.com/Miroshka000/mikan).
 - **Графика mikan убрана**: до нового дизайна её место занимают собственные баннер и знак форка, скриншоты удалены вместе с ней.
 - Что намеренно осталось под старым именем, потому что от него зависят живые серверы: каталог `/opt/mikan`, переменные окружения `MIKAN_*`, compose-проект и его тома Docker, ключи `mikan:` и поля `mikan.client` в шаблонах листенеров, манифест `mikan-addon.json` и метрики `mikan_*`.
+- **Логин админа можно сменить** («Настройки → Безопасность → Сменить логин админа»). Смена подтверждается текущим паролем, так что угнанная сессия не переименует админа и не запрёт владельца. Новый логин — по тому же правилу, что при установке (3–32 символа из a-z, 0-9, точек, дефисов и подчёркиваний), занятый отклоняется, а смена попадает в журнал.
 
 ## 0.5.1.0
 ### en
