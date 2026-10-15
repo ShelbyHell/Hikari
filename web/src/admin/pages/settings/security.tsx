@@ -494,3 +494,49 @@ export function ApiCard() {
     </section>
   );
 }
+
+/** The admin's own login. The current password is always asked, so a stolen session cannot
+ * rename the admin and lock the owner out. */
+export function AdminUsernameCard() {
+  const me = useQuery(meQuery);
+  const qc = useQueryClient();
+  const toast = useToast();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const change = useMutation({
+    mutationFn: () => unwrap(api.POST("/api/v1/auth/username", { body: { username, password } })),
+    onSuccess: () => {
+      setUsername("");
+      setPassword("");
+      toast.ok(t("settings.usernameChangeSuccess"));
+      void qc.invalidateQueries({ queryKey: qk.me });
+    },
+    onError: (e) => toast.error(errorText(e)),
+  });
+  const errors = fieldErrors(change.error);
+  return (
+    <section className="card glass reveal" style={{ "--i": 6 } as React.CSSProperties}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          change.mutate();
+        }}
+        noValidate
+      >
+        <div className="card-head">
+          <h2 className="card-title">{t("settings.usernameChange")}</h2>
+          <div className="card-sub">
+            {t("settings.usernameChangeHint")}: <span className="mono">{me.data?.admin.username}</span>
+          </div>
+        </div>
+        <Field label={t("settings.usernameChangeNew")} htmlFor="u-name" error={errors.username}>
+          <input id="u-name" className="input" autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} />
+        </Field>
+        <Field label={t("settings.currentPassword")} htmlFor="u-pw" error={errors.password}>
+          <input id="u-pw" type="password" className="input" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </Field>
+        <FormActions saving={change.isPending} disabled={!username || !password} label={t("settings.changeUsername")} />
+      </form>
+    </section>
+  );
+}

@@ -24,6 +24,9 @@ RETURNING *;
 -- name: SetAdminPassword :exec
 UPDATE admins SET password_hash = $1 WHERE id = $2;
 
+-- name: SetAdminUsername :exec
+UPDATE admins SET username = $1 WHERE id = $2;
+
 -- name: SetAdminTOTP :exec
 UPDATE admins SET totp_secret = $1, recovery_codes = $2 WHERE id = $3;
 

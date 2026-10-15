@@ -13,7 +13,7 @@ import { ServerCheckCard } from "../node-check";
 import { GoalsCard } from "./goals";
 import { ImportCard, LegacyLinksCard } from "./import";
 import { RoutingSection } from "./routing";
-import { AccessCard, ApiCard, CertificateCard, PasswordCard, SessionsCard, TwoFactorCard } from "./security";
+import { AccessCard, AdminUsernameCard, ApiCard, CertificateCard, PasswordCard, SessionsCard, TwoFactorCard } from "./security";
 import { AppsCard, DevicesCard, SubPortCard, SubscriptionCard } from "./subscription";
 import { HappCard } from "./happ";
 import { SubPageSettings, type SubPagePart } from "./sub-page";
@@ -93,6 +93,7 @@ export function SettingsPage() {
                   <AccessCard s={s} />
                   <CertificateCard s={s} />
                   <ApiCard />
+                  <AdminUsernameCard />
                 </>
               ) : tab === "system" ? (
                 <>

@@ -372,6 +372,20 @@ func (q *Queries) SetAdminPassword(ctx context.Context, arg SetAdminPasswordPara
 	return err
 }
 
+const setAdminUsername = `-- name: SetAdminUsername :exec
+UPDATE admins SET username = $1 WHERE id = $2
+`
+
+type SetAdminUsernameParams struct {
+	Username string
+	ID       int64
+}
+
+func (q *Queries) SetAdminUsername(ctx context.Context, arg SetAdminUsernameParams) error {
+	_, err := q.db.ExecContext(ctx, setAdminUsername, arg.Username, arg.ID)
+	return err
+}
+
 const setAdminTOTP = `-- name: SetAdminTOTP :exec
 UPDATE admins SET totp_secret = $1, recovery_codes = $2 WHERE id = $3
 `

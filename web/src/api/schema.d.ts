@@ -381,6 +381,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/username": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Сменить логин админа */
+        post: operations["change-username"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/filters": {
         parameters: {
             query?: never;
@@ -5347,6 +5364,12 @@ export interface components {
             /** Format: int64 */
             used_up: number;
         };
+        UsernameInputBody: {
+            /** @description Текущий пароль: подтверждает смену логина */
+            password: string;
+            /** @description Новый логин: 3–32 символа из a-z, 0-9, точек, дефисов и подчёркиваний */
+            username: string;
+        };
         ValidateInboundInputBody: {
             config: string;
             /** Format: int64 */
@@ -6250,6 +6273,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TotpSetupOutputBody"];
                 };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "change-username": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsernameInputBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Error */
             default: {

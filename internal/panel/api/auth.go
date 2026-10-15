@@ -67,6 +67,15 @@ type passwordInput struct {
 	}
 }
 
+// usernameInput changes the admin's own login. The current password is always asked, so a
+// stolen session cannot rename the admin on its own and lock the owner out.
+type usernameInput struct {
+	Body struct {
+		Username string `json:"username" minLength:"1" maxLength:"64" doc:"Новый логин: 3–32 символа из a-z, 0-9, точек, дефисов и подчёркиваний"`
+		Password string `json:"password" minLength:"1" maxLength:"256" doc:"Текущий пароль: подтверждает смену логина"`
+	}
+}
+
 type totpSetupInput struct {
 	Body struct {
 		Password string `json:"password" minLength:"1" maxLength:"256" doc:"Пароль: без него украденная сессия включила бы 2FA на себя и закрыла вход владельцу"`
@@ -127,6 +136,7 @@ func (h *handlers) registerAuth() {
 	huma.Register(h.api, huma.Operation{OperationID: "logout", Method: http.MethodPost, Path: "/api/v1/auth/logout", Summary: "Выход", Tags: []string{"auth"}, DefaultStatus: http.StatusNoContent}, h.logout)
 	huma.Register(h.api, huma.Operation{OperationID: "me", Method: http.MethodGet, Path: "/api/v1/auth/me", Summary: "Текущий админ", Tags: []string{"auth"}}, h.me)
 	huma.Register(h.api, huma.Operation{OperationID: "change-password", Method: http.MethodPost, Path: "/api/v1/auth/password", Summary: "Сменить пароль", Tags: []string{"auth"}, DefaultStatus: http.StatusNoContent}, h.changePassword)
+	huma.Register(h.api, huma.Operation{OperationID: "change-username", Method: http.MethodPost, Path: "/api/v1/auth/username", Summary: "Сменить логин админа", Tags: []string{"auth"}, DefaultStatus: http.StatusNoContent}, h.changeUsername)
 	huma.Register(h.api, huma.Operation{OperationID: "totp-setup", Method: http.MethodPost, Path: "/api/v1/auth/totp/setup", Summary: "Начать настройку 2FA", Tags: []string{"auth"}}, h.totpSetup)
 	huma.Register(h.api, huma.Operation{OperationID: "totp-enable", Method: http.MethodPost, Path: "/api/v1/auth/totp/enable", Summary: "Включить 2FA", Tags: []string{"auth"}}, h.totpEnable)
 	huma.Register(h.api, huma.Operation{OperationID: "totp-disable", Method: http.MethodPost, Path: "/api/v1/auth/totp/disable", Summary: "Выключить 2FA", Tags: []string{"auth"}, DefaultStatus: http.StatusNoContent}, h.totpDisable)
@@ -348,6 +358,59 @@ func (h *handlers) changePassword(ctx context.Context, in *passwordInput) (*stru
 		return nil, err
 	}
 	h.audit(ctx, admin.ID, "auth.password_changed", "admin", admin.Username, map[string]any{"keys_revoked": keys})
+	return nil, nil
+}
+
+// validAdminLogin mirrors the installer's rule for a login: lowercase a-z, digits, dots,
+// dashes and underscores, 3 to 32 characters. Usernames are stored lowercase (login
+// lowercases what is typed), so the check runs after lowering.
+func validAdminLogin(s string) bool {
+	if len(s) < 3 || len(s) > 32 {
+		return false
+	}
+	for _, r := range s {
+		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '.' || r == '_' || r == '-') {
+			return false
+		}
+	}
+	return true
+}
+
+func (h *handlers) changeUsername(ctx context.Context, in *usernameInput) (*struct{}, error) {
+	sess := sessionOf(ctx)
+	admin, err := h.d.Store.Q.GetAdmin(ctx, sess.AdminID)
+	if err != nil {
+		return nil, err
+	}
+	name := strings.ToLower(strings.TrimSpace(in.Body.Username))
+	if !validAdminLogin(name) {
+		return nil, fieldErr("body.username", "invalid_username")
+	}
+	if name != admin.Username {
+		if _, err := h.d.Store.Q.GetAdminByUsername(ctx, name); err == nil {
+			return nil, huma.Error409Conflict("username_taken", &huma.ErrorDetail{Location: "body.username", Message: "username_taken"})
+		} else if !errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+	}
+	// The current password is always asked: naming a session as renamed would otherwise let
+	// a hijacked session change the login and lock the owner out of it.
+	if in.Body.Password == "" {
+		return nil, fieldErr("body.password", "password_required")
+	}
+	if err := h.guarded(admin, func(time.Time) error {
+		ok, err := h.verifyPassword(ctx, in.Body.Password, admin.PasswordHash)
+		if err == nil && !ok {
+			err = huma.Error422UnprocessableEntity("wrong_password", &huma.ErrorDetail{Location: "body.password", Message: "wrong_password"})
+		}
+		return err
+	}); err != nil {
+		return nil, err
+	}
+	if err := h.d.Store.Q.SetAdminUsername(ctx, db.SetAdminUsernameParams{Username: name, ID: admin.ID}); err != nil {
+		return nil, err
+	}
+	h.audit(ctx, admin.ID, "auth.username_changed", "admin", admin.Username, map[string]any{"new_username": name})
 	return nil, nil
 }
 

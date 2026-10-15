@@ -8643,6 +8643,28 @@
         ],
         "type": "object"
       },
+      "UsernameInputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "password": {
+            "description": "Текущий пароль: подтверждает смену логина",
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+          },
+          "username": {
+            "description": "Новый логин: 3–32 символа из a-z, 0-9, точек, дефисов и подчёркиваний",
+            "maxLength": 64,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object"
+      },
       "ValidateInboundInputBody": {
         "additionalProperties": false,
         "properties": {
@@ -10010,6 +10032,40 @@
           }
         },
         "summary": "Начать настройку 2FA",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/username": {
+      "post": {
+        "operationId": "change-username",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsernameInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Сменить логин админа",
         "tags": [
           "auth"
         ]
