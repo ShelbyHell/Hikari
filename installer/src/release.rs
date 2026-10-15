@@ -13,7 +13,7 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
 /// The public half of the release signing key, the same as internal/release.PublicKey.
-pub const PUBLIC_KEY: &str = "Z3wSIPBSaJxh5CsGO8eINI0aM0kyrQ46EcJSNeH85W8=";
+pub const PUBLIC_KEY: &str = "vsFZSTqFm9CoL68mA4XY8GYIMmq+VO6/gA8fcp5S90s=";
 
 pub const REPO: &str = "ShelbyHell/Hikari";
 
