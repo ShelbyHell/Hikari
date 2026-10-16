@@ -40,7 +40,7 @@ import (
 )
 
 // CatalogURL is where the signed catalog is published, next to its .sig.
-const CatalogURL = "https://github.com/getmikan/marketplace/releases/latest/download/index.json"
+const CatalogURL = "https://github.com/ShelbyHell/hikari-marketplace/releases/latest/download/index.json"
 
 // Protocol is the payment adapters' protocol; Protocol2 that of every other kind.
 const (
