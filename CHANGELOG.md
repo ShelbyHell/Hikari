@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.3
+### en
+- **Addon image validation updated**: official addons now validated against `ghcr.io/shelbyhell/` instead of `ghcr.io/getmikan/`.
+### ru
+- **Обновлена валидация образов аддонов**: официальные аддоны теперь проверяются на соответствие префиксу `ghcr.io/shelbyhell/` вместо `ghcr.io/getmikan/`.
+
 ## 0.5.1.2-rc.2
 ### en
 - **Marketplace catalog URL changed**: Addons system now fetches the signed catalog from `ShelbyHell/hikari-marketplace` instead of `getmikan/marketplace`. Both the panel API and the host (`hikari addon`) use the new URL.

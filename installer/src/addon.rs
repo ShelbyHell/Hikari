@@ -258,7 +258,7 @@ fn valid_digest(d: &str) -> bool {
 
 /// Where the marketplace's adapters live. A signed catalog could name another registry, but
 /// what root runs from a state the panel once wrote must come from this organization.
-const IMAGE_PREFIX: &str = "ghcr.io/getmikan/";
+const IMAGE_PREFIX: &str = "ghcr.io/shelbyhell/";
 
 fn valid_image(i: &str) -> bool {
     i.strip_prefix(IMAGE_PREFIX).is_some_and(|r| {
