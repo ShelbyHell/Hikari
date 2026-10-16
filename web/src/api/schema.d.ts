@@ -398,6 +398,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/external-subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Внешние подписки */
+        get: operations["list-external-subscriptions"];
+        put?: never;
+        /** Добавить внешнюю подписку */
+        post: operations["create-external-subscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-subscriptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Удалить внешнюю подписку */
+        delete: operations["delete-external-subscription"];
+        options?: never;
+        head?: never;
+        /** Изменить внешнюю подписку */
+        patch: operations["update-external-subscription"];
+        trace?: never;
+    };
+    "/api/v1/external-subscriptions/{id}/fetch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Обновить внешнюю подписку сейчас */
+        post: operations["fetch-external-subscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-subscriptions/{id}/servers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Серверы внешней подписки */
+        get: operations["list-external-servers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-subscriptions/{id}/servers/enable-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Включить или выключить все серверы внешней подписки */
+        post: operations["enable-external-servers"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/external-subscriptions/{id}/servers/{server_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Включить или выключить сервер внешней подписки */
+        patch: operations["update-external-server"];
+        trace?: never;
+    };
     "/api/v1/filters": {
         parameters: {
             query?: never;
@@ -2749,6 +2853,19 @@ export interface components {
             /** @enum {string} */
             scope: "read" | "full";
         };
+        CreateExternalSubInputBody: {
+            /** @description Включена ли подписка; по умолчанию да */
+            enabled?: boolean;
+            /** @description Группа в подписке клиента */
+            name: string;
+            /**
+             * Format: int64
+             * @description Тариф, к которому относится внешняя подписка
+             */
+            tariff_id: number;
+            /** @description Ссылка на чужую подписку (https) */
+            url: string;
+        };
         CreateFolderInputBody: {
             /**
              * @description Не задан — gray
@@ -2844,6 +2961,10 @@ export interface components {
         "Enable-promocodeRequest": {
             enabled: boolean;
         };
+        EnableExternalServersInputBody: {
+            /** @description true — включить все серверы, false — выключить */
+            enabled: boolean;
+        };
         ErrorDetail: {
             /** @description Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id' */
             location?: string;
@@ -2915,6 +3036,43 @@ export interface components {
              * @description Месяцами: до дня оплаты или того же числа
              */
             months?: number;
+        };
+        ExternalServerView: {
+            /** Format: date-time */
+            created_at: string;
+            enabled: boolean;
+            host: string;
+            /** Format: int64 */
+            id: number;
+            link?: string;
+            name: string;
+            proto: string;
+        };
+        ExternalSubView: {
+            /** Format: date-time */
+            created_at: string;
+            enabled: boolean;
+            /** Format: int64 */
+            id: number;
+            /**
+             * Format: int64
+             * @description Интервал автообновления, секунды; 0 — час по умолчанию, минимум 300 сек
+             */
+            interval_sec: number;
+            /** Format: int64 */
+            last_count: number;
+            last_error?: string;
+            /** Format: date-time */
+            last_fetch?: string;
+            name: string;
+            /**
+             * Format: int64
+             * @description Тариф, подписчикам которого раздаются серверы этой подписки
+             */
+            tariff_id: number;
+            /** Format: date-time */
+            updated_at: string;
+            url: string;
         };
         FiltersView: {
             egress: components["schemas"]["EgressFilter"];
@@ -3815,6 +3973,19 @@ export interface components {
             hour?: number;
             /** @description Пароль, которым шифруется файл: от 20 символов. Файл остаётся в истории чата навсегда; без пароля его не открыть */
             password?: string;
+        };
+        PatchExternalServerInputBody: {
+            enabled?: boolean;
+        };
+        PatchExternalSubInputBody: {
+            enabled?: boolean;
+            /**
+             * Format: int64
+             * @description Как часто обновлять подписку, секунды; 0 — час по умолчанию
+             */
+            interval_sec?: number;
+            name?: string;
+            url?: string;
         };
         PatchFiltersInputBody: {
             /** @description Весь исходящий фильтр */
@@ -6295,6 +6466,261 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UsernameInputBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "list-external-subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalSubView"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "create-external-subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateExternalSubInputBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalSubView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "delete-external-subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "update-external-subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchExternalSubInputBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalSubView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "fetch-external-subscription": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalSubView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "list-external-servers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExternalServerView"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "enable-external-servers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnableExternalServersInputBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "update-external-server": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                server_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchExternalServerInputBody"];
             };
         };
         responses: {

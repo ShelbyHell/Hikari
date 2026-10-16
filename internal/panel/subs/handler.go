@@ -442,6 +442,21 @@ func (h *Handler) profile(ctx context.Context, u db.User, cfg Config, slot db.Sl
 		}
 		prof.Inbounds = append(prof.Inbounds, in)
 	}
+	// The external subscriptions attached to the user's tariff ride along after the panel's
+	// own nodes; a server the core cannot parse was dropped when it was stored.
+	if u.TariffID.Valid {
+		ext, err := h.st.Q.ListExternalServersForTariff(ctx, u.TariffID.Int64)
+		if err != nil {
+			return prof, err
+		}
+		for _, s := range ext {
+			var m map[string]any
+			if json.Unmarshal([]byte(s.Mihomo), &m) != nil || len(m) == 0 {
+				continue
+			}
+			prof.External = append(prof.External, ExternalServer{Group: s.GroupName, Name: s.Name, Link: s.Link, Mihomo: m})
+		}
+	}
 	return prof, nil
 }
 

@@ -33,6 +33,17 @@ type Node struct {
 	Endpoint Endpoint
 }
 
+// ExternalServer is one server of an external subscription the admin attached to a tariff:
+// the panel re-serves it under its own name. Group is the subscription's name (the Clash
+// group its servers show in), Mihomo the mihomo proxy map the feed gave, Link the share
+// link for Xray-family apps ("" when the feed gave none).
+type ExternalServer struct {
+	Group  string
+	Name   string
+	Link   string
+	Mihomo map[string]any
+}
+
 // Groups are the proxy-group names Clash-family apps show; the admin can rename them.
 type Groups struct {
 	Main string // selector, "VPN" by default
@@ -131,7 +142,10 @@ type Profile struct {
 	Slot     db.Slot
 	Inbounds []db.Inbound // enabled and allowed for this user, in display order
 	Nodes    []Node       // enabled nodes in display order; inbounds of other nodes are skipped
-	Direct   []string     // hosts that bypass the tunnel: the panel and every node
+	// External are the servers of the external subscriptions of the user's tariff, after
+	// the panel's own; each carries the group (subscription) it belongs to.
+	External []ExternalServer
+	Direct   []string // hosts that bypass the tunnel: the panel and every node
 	// Fingerprint is the panel's default uTLS profile (proto.ClientInput.Fingerprint).
 	Fingerprint string
 	// Rules are the admin's own Clash rules (ServedRules), before the built-in routing.
@@ -146,6 +160,7 @@ type Profile struct {
 type proxy struct {
 	name string
 	node int64
+	ext  string // the external subscription group, "" for the panel's own nodes
 	uri  string
 	yaml map[string]any
 }
@@ -203,6 +218,26 @@ func build(p Profile) ([]proxy, error) {
 			used[name] = true
 			out = append(out, proxy{name: name, node: n.ID, uri: c.URI, yaml: c.Mihomo})
 		}
+	}
+	// The external subscriptions of the tariff come after the panel's own, each in the
+	// group of its subscription. A server the core cannot run was dropped when it was
+	// stored; here only the name it takes in the profile matters.
+	for _, es := range p.External {
+		if es.Mihomo == nil {
+			continue
+		}
+		base := strings.TrimSpace(es.Name)
+		if base == "" {
+			base = es.Group
+		}
+		name := base
+		for i := 2; used[name]; i++ {
+			name = base + " " + strconv.Itoa(i)
+		}
+		used[name] = true
+		yaml := es.Mihomo
+		yaml["name"] = name
+		out = append(out, proxy{name: name, ext: es.Group, uri: es.Link, yaml: yaml})
 	}
 	return out, nil
 }
@@ -279,8 +314,12 @@ func mihomoConfigOf(p Profile, g Groups, r Routing, ps []proxy) map[string]any {
 	if !p.Routes.Servers.NoCountries {
 		countries = countryGroups(p.Nodes, ps, g, names)
 	}
+	extGroups := externalGroups(ps)
 	selector := []string{g.Auto}
 	for _, c := range countries {
+		selector = append(selector, c["name"].(string))
+	}
+	for _, c := range extGroups {
 		selector = append(selector, c["name"].(string))
 	}
 	auto := urlTest(g.Auto, names)
@@ -293,6 +332,7 @@ func mihomoConfigOf(p Profile, g Groups, r Routing, ps []proxy) map[string]any {
 		auto,
 	}
 	groups = append(groups, countries...)
+	groups = append(groups, extGroups...)
 	if n := p.Routes.Servers.Interval; n > 0 {
 		for _, gr := range groups[1:] {
 			gr["interval"] = n
@@ -303,6 +343,9 @@ func mihomoConfigOf(p Profile, g Groups, r Routing, ps []proxy) map[string]any {
 		taken[strings.ToLower(n)] = true
 	}
 	for _, c := range countries {
+		taken[strings.ToLower(c["name"].(string))] = true
+	}
+	for _, c := range extGroups {
 		taken[strings.ToLower(c["name"].(string))] = true
 	}
 	if !p.routable() && r == RoutingBlocked {
@@ -404,6 +447,31 @@ func countryGroups(nodes []Node, ps []proxy, g Groups, names []string) []map[str
 		}
 		taken[key] = true
 		out = append(out, urlTest(n.Name, own))
+	}
+	return out
+}
+
+// externalGroups makes one url-test group per external subscription, named after it, so
+// Clash-family apps show the re-served feeds apart from the panel's own nodes. A name the
+// profile cannot use (mihomo reserved, or too odd) leaves its servers ungrouped.
+func externalGroups(ps []proxy) []map[string]any {
+	order := []string{}
+	own := map[string][]string{}
+	for _, x := range ps {
+		if x.ext == "" {
+			continue
+		}
+		if _, ok := own[x.ext]; !ok {
+			order = append(order, x.ext)
+		}
+		own[x.ext] = append(own[x.ext], x.name)
+	}
+	var out []map[string]any
+	for _, grp := range order {
+		if ValidName(grp) != nil {
+			continue
+		}
+		out = append(out, urlTest(grp, own[grp]))
 	}
 	return out
 }

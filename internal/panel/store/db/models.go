@@ -148,6 +148,30 @@ type DeviceUnbind struct {
 	At     int64
 }
 
+type ExternalServer struct {
+	ID            int64
+	ExternalSubID int64
+	Name          string
+	Link          string
+	Enabled       bool
+	Mihomo        string
+	CreatedAt     int64
+}
+
+type ExternalSubscription struct {
+	ID          int64
+	TariffID    int64
+	Name        string
+	Url         string
+	Enabled     bool
+	IntervalSec int64
+	LastFetch   int64
+	LastError   string
+	LastCount   int64
+	CreatedAt   int64
+	UpdatedAt   int64
+}
+
 type FreePlan struct {
 	TgID      int64
 	UserID    sql.NullInt64

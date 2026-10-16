@@ -265,6 +265,7 @@ func New(d Deps) (http.Handler, huma.API, error) {
 	h.registerUpdates()
 	h.registerNodes()
 	h.registerNodeChecks()
+	h.registerExternalSubscriptions()
 	h.registerTorrent()
 	h.registerFilters()
 	h.registerSpeedTests()

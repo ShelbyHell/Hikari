@@ -36,6 +36,8 @@ export const qk = {
   pools: ["pools"] as const,
   userPools: (id: number) => ["users", "pools", id] as const,
   packages: ["packages"] as const,
+  externalSubs: ["external-subs"] as const,
+  externalServers: (id: number) => ["external-subs", id, "servers"] as const,
   promocodes: ["promocodes"] as const,
   promocodeRedemptions: ["promocodes", "redemptions"] as const,
   userGrants: (id: number) => ["users", "grants", id] as const,
@@ -351,6 +353,14 @@ export function usePools() {
 
 export function usePackages() {
   return useQuery({ queryKey: qk.packages, queryFn: ({ signal }) => unwrap(api.GET("/api/v1/packages", { signal })) });
+}
+
+export function useExternalSubs() {
+  return useQuery({ queryKey: qk.externalSubs, queryFn: ({ signal }) => unwrap(api.GET("/api/v1/external-subscriptions", { signal })) });
+}
+
+export function useExternalServers(id: number) {
+  return useQuery({ queryKey: qk.externalServers(id), queryFn: ({ signal }) => unwrap(api.GET("/api/v1/external-subscriptions/{id}/servers", { params: { path: { id } }, signal })) });
 }
 
 export function useUserGrants(id: number) {

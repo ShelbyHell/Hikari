@@ -1616,6 +1616,37 @@
         ],
         "type": "object"
       },
+      "CreateExternalSubInputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "description": "Включена ли подписка; по умолчанию да",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Группа в подписке клиента",
+            "maxLength": 200,
+            "type": "string"
+          },
+          "tariff_id": {
+            "description": "Тариф, к которому относится внешняя подписка",
+            "format": "int64",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "url": {
+            "description": "Ссылка на чужую подписку (https)",
+            "maxLength": 1000,
+            "type": "string"
+          }
+        },
+        "required": [
+          "tariff_id",
+          "name",
+          "url"
+        ],
+        "type": "object"
+      },
       "CreateFolderInputBody": {
         "additionalProperties": false,
         "properties": {
@@ -1942,6 +1973,19 @@
         ],
         "type": "object"
       },
+      "EnableExternalServersInputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "description": "true — включить все серверы, false — выключить",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "type": "object"
+      },
       "ErrorDetail": {
         "additionalProperties": false,
         "properties": {
@@ -2105,6 +2149,102 @@
             "type": "integer"
           }
         },
+        "type": "object"
+      },
+      "ExternalServerView": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "host": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "link": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "proto": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "enabled",
+          "proto",
+          "host",
+          "created_at"
+        ],
+        "type": "object"
+      },
+      "ExternalSubView": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "interval_sec": {
+            "description": "Интервал автообновления, секунды; 0 — час по умолчанию, минимум 300 сек",
+            "format": "int64",
+            "type": "integer"
+          },
+          "last_count": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "last_error": {
+            "type": "string"
+          },
+          "last_fetch": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "tariff_id": {
+            "description": "Тариф, подписчикам которого раздаются серверы этой подписки",
+            "format": "int64",
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tariff_id",
+          "name",
+          "url",
+          "enabled",
+          "interval_sec",
+          "last_count",
+          "created_at",
+          "updated_at"
+        ],
         "type": "object"
       },
       "FiltersView": {
@@ -4634,6 +4774,39 @@
           "password": {
             "description": "Пароль, которым шифруется файл: от 20 символов. Файл остаётся в истории чата навсегда; без пароля его не открыть",
             "maxLength": 256,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PatchExternalServerInputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "PatchExternalSubInputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "interval_sec": {
+            "description": "Как часто обновлять подписку, секунды; 0 — час по умолчанию",
+            "format": "int64",
+            "maximum": 604800,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "name": {
+            "maxLength": 200,
+            "type": "string"
+          },
+          "url": {
+            "maxLength": 1000,
             "type": "string"
           }
         },
@@ -10069,6 +10242,363 @@
         "tags": [
           "auth"
         ]
+      }
+    },
+    "/api/v1/external-subscriptions": {
+      "get": {
+        "operationId": "list-external-subscriptions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExternalSubView"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Внешние подписки",
+        "tags": [
+          "external"
+        ]
+      },
+      "post": {
+        "operationId": "create-external-subscription",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExternalSubInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalSubView"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Добавить внешнюю подписку",
+        "tags": [
+          "external"
+        ],
+        "x-session-only": true
+      }
+    },
+    "/api/v1/external-subscriptions/{id}": {
+      "delete": {
+        "operationId": "delete-external-subscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Удалить внешнюю подписку",
+        "tags": [
+          "external"
+        ],
+        "x-session-only": true
+      },
+      "patch": {
+        "operationId": "update-external-subscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchExternalSubInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalSubView"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Изменить внешнюю подписку",
+        "tags": [
+          "external"
+        ],
+        "x-session-only": true
+      }
+    },
+    "/api/v1/external-subscriptions/{id}/fetch": {
+      "post": {
+        "operationId": "fetch-external-subscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalSubView"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Обновить внешнюю подписку сейчас",
+        "tags": [
+          "external"
+        ],
+        "x-session-only": true
+      }
+    },
+    "/api/v1/external-subscriptions/{id}/servers": {
+      "get": {
+        "operationId": "list-external-servers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExternalServerView"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Серверы внешней подписки",
+        "tags": [
+          "external"
+        ]
+      }
+    },
+    "/api/v1/external-subscriptions/{id}/servers/enable-all": {
+      "post": {
+        "operationId": "enable-external-servers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnableExternalServersInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Включить или выключить все серверы внешней подписки",
+        "tags": [
+          "external"
+        ],
+        "x-session-only": true
+      }
+    },
+    "/api/v1/external-subscriptions/{id}/servers/{server_id}": {
+      "patch": {
+        "operationId": "update-external-server",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server_id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchExternalServerInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Включить или выключить сервер внешней подписки",
+        "tags": [
+          "external"
+        ],
+        "x-session-only": true
       }
     },
     "/api/v1/filters": {

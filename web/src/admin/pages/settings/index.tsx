@@ -12,6 +12,7 @@ import { AutoCard, LanguageCard, ServiceCard, UpdatesCard } from "./general";
 import { ServerCheckCard } from "../node-check";
 import { GoalsCard } from "./goals";
 import { ImportCard, LegacyLinksCard } from "./import";
+import { ExternalSubsCard } from "../external-subs";
 import { RoutingSection } from "./routing";
 import { AccessCard, AdminUsernameCard, ApiCard, CertificateCard, PasswordCard, SessionsCard, TwoFactorCard } from "./security";
 import { AppsCard, DevicesCard, SubPortCard, SubscriptionCard } from "./subscription";
@@ -101,6 +102,7 @@ export function SettingsPage() {
                   <AboutCard />
                   <ServerCheckCard />
                   <GoalsCard />
+                  <ExternalSubsCard />
                   <AutoCard s={s} />
                 </>
               ) : (
