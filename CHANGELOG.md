@@ -3,11 +3,17 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.2
+### en
+- **Marketplace catalog URL changed**: Addons system now fetches the signed catalog from `ShelbyHell/hikari-marketplace` instead of `getmikan/marketplace`. Both the panel API and the host (`hikari addon`) use the new URL.
+### ru
+- **URL каталога маркетплейса изменен**: Система аддонов теперь загружает подписанный каталог из `ShelbyHell/hikari-marketplace` вместо `getmikan/marketplace`. И панель API, и хост (`hikari addon`) используют новый URL.
+
 ## 0.5.1.2-rc.1
 ### en
 - **REALITY servers of an external subscription connect in mihomo clients.** A mihomo client dials REALITY through uTLS and breaks the connection without a fingerprint it knows, while Xray apps fall back to chrome on their own — so the feed's servers without `fp` (or with one mihomo cannot dial REALITY with, like `fp=none`) get the panel's default fingerprint, and a `short-id` the feed wrote as a number goes to clients as text, which older cores require.
 ### ru
-- **Серверы REALITY из внешней подписки подключаются в mihomo-клиентах.** mihomo-клиент набирает REALITY через uTLS и без известного ему отпечатка рвёт соединение, а приложения на Xray сами отступают к chrome — поэтому серверам подписки без `fp` (или с таким, с которым mihomo REALITY не набирает, например `fp=none`) достаётся отпечаток по умолчанию панели, а `short-id`, записанный подпиской числом, уходит клиентам текстом, как требуют старые ядра.
+- **Серверы REALITY из внешней подписки подключаются в mihomo-клиентах.** mihomo-клиент набирает REALITY через uTLS и без Known ему отпечатка рвёт соединение, а приложения на Xray сами отступают к chrome — поэтому серверам подписки без `fp` (или с таким, с которым mihomo REALITY не набирает, например `fp=none`) достаётся отпечаток по умолчанию панели, а `short-id`, записанный подпиской числом, уходит клиентам текстом, как требуют старые ядра.
 
 ## 0.5.1.1
 ### en
