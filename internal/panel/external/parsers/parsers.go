@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	"go.yaml.in/yaml/v3"
+
+	"mikan/internal/proto"
 )
 
 // Server is one server of a feed: Name as the feed named it, Link the share link for
@@ -81,9 +83,35 @@ func clashProxies(body []byte) ([]Server, bool) {
 		if name == "" || typ == "" || m["server"] == nil || m["port"] == nil {
 			continue // a proxy without the minimum is not a server; the rest still go
 		}
-		out = append(out, Server{Name: name, Enabled: true, Mihomo: m})
+		out = append(out, Server{Name: name, Enabled: true, Mihomo: realityFixup(m)})
 	}
 	return out, len(out) > 0
+}
+
+// realityFixup makes a feed's REALITY proxy dialable by mihomo clients: a proxy with
+// reality-opts connects only through uTLS, so one without a fingerprint mihomo knows
+// gets the panel's default, and a short-id YAML read as a number (they are all digits
+// as often as not) goes back to text, which older client cores require.
+func realityFixup(m map[string]any) map[string]any {
+	reality, ok := m["reality-opts"].(map[string]any)
+	if !ok || len(reality) == 0 {
+		return m
+	}
+	switch sid := reality["short-id"].(type) {
+	case string:
+	case int:
+		reality["short-id"] = strconv.Itoa(sid)
+	case int64:
+		reality["short-id"] = strconv.FormatInt(sid, 10)
+	case uint64:
+		reality["short-id"] = strconv.FormatUint(sid, 10)
+	case float64:
+		reality["short-id"] = strconv.FormatFloat(sid, 'f', -1, 64)
+	}
+	if fp, _ := m["client-fingerprint"].(string); !proto.KnownFingerprint(fp) {
+		m["client-fingerprint"] = proto.DefaultFingerprint
+	}
+	return m
 }
 
 // shareLinks reads the links of the protocols the panel re-serves. A link that parses
@@ -212,6 +240,15 @@ func tlsLink(link, typ string) (Server, bool) {
 		}
 		if len(reality) > 0 {
 			m["reality-opts"] = reality
+			// A mihomo client dials REALITY through uTLS and breaks the connection without
+			// a fingerprint it knows; Xray apps fall back to chrome on their own, so the
+			// feed's links without fp (or with fp=none) work there and only here. The
+			// link's own fingerprint stays when mihomo knows it.
+			if fp := q.Get("fp"); proto.KnownFingerprint(fp) {
+				m["client-fingerprint"] = fp
+			} else {
+				m["client-fingerprint"] = proto.DefaultFingerprint
+			}
 		}
 	} else if security == "tls" || q.Get("sni") != "" || port == 443 {
 		m["tls"] = true
@@ -324,7 +361,8 @@ func tuicLink(link string) (Server, bool) {
 }
 
 // applyQueryTLS carries the sni/skip-cert-verify/fingerprint query options every
-// TLS-speaking protocol shares into the map.
+// TLS-speaking protocol shares into the map. A fingerprint a REALITY proxy already got
+// stays: the link's own fp may be one mihomo clients cannot dial REALITY with.
 func applyQueryTLS(m map[string]any, q url.Values) {
 	if sni := q.Get("sni"); sni != "" {
 		m["sni"] = sni
@@ -332,7 +370,7 @@ func applyQueryTLS(m map[string]any, q url.Values) {
 	if q.Get("insecure") == "1" || q.Get("allowInsecure") == "1" {
 		m["skip-cert-verify"] = true
 	}
-	if fp := q.Get("fp"); fp != "" {
+	if fp := q.Get("fp"); fp != "" && m["client-fingerprint"] == nil {
 		m["client-fingerprint"] = fp
 	}
 }

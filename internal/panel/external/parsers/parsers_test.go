@@ -70,6 +70,82 @@ func TestBase64ShareLinks(t *testing.T) {
 	if vless.Mihomo["flow"] != "xtls-rprx-vision" {
 		t.Fatalf("vless flow: %v", vless.Mihomo)
 	}
+	if vless.Mihomo["client-fingerprint"] != "chrome" {
+		t.Fatalf("vless keeps the link's fingerprint: %v", vless.Mihomo["client-fingerprint"])
+	}
+}
+
+func TestRealityFingerprint(t *testing.T) {
+	const pbk = "kBPI_JRK3J0k3ShNb_g_6R1H4G4sdvIdC6V4hxGjyAw"
+	links := []string{
+		// No fp, fp=none, and an own profile of another panel: a mihomo client dials
+		// REALITY through uTLS and breaks the connection with each of these.
+		"vless://11111111-1111-1111-1111-111111111111@10.0.0.20:443?security=reality&pbk=" + pbk + "&sid=ab#NO-FP",
+		"vless://11111111-1111-1111-1111-111111111111@10.0.0.20:443?security=reality&pbk=" + pbk + "&sid=ab&fp=none#FP-NONE",
+		"vless://11111111-1111-1111-1111-111111111111@10.0.0.20:443?security=reality&pbk=" + pbk + "&sid=ab&fp=myownprofile#FP-OWN",
+		"trojan://pw@10.0.0.21:443?security=reality&pbk=" + pbk + "&sid=ab#TROJAN-REALITY",
+	}
+	for _, link := range links {
+		servers, err := ParseSubscription([]byte(link), "https://example.com/sub")
+		if err != nil || len(servers) != 1 {
+			t.Fatalf("%s: %v, %v", link, servers, err)
+		}
+		if servers[0].Mihomo["client-fingerprint"] != "chrome" {
+			t.Fatalf("%s: client-fingerprint %v, want chrome", link, servers[0].Mihomo["client-fingerprint"])
+		}
+	}
+	// A fingerprint mihomo knows rides along.
+	link := "vless://11111111-1111-1111-1111-111111111111@10.0.0.20:443?security=reality&pbk=" + pbk + "&sid=ab&fp=firefox#FP-KNOWN"
+	servers, _ := ParseSubscription([]byte(link), "https://example.com/sub")
+	if servers[0].Mihomo["client-fingerprint"] != "firefox" {
+		t.Fatalf("firefox lost: %v", servers[0].Mihomo["client-fingerprint"])
+	}
+	// Plain TLS keeps the old shape: fp only when the link names it.
+	links = []string{
+		"vless://11111111-1111-1111-1111-111111111111@10.0.0.22:443?security=tls#PLAIN",
+		"trojan://pw@10.0.0.22:443?sni=example.com&fp=safari#PLAIN-FP",
+	}
+	for _, link := range links {
+		servers, err := ParseSubscription([]byte(link), "https://example.com/sub")
+		if err != nil || len(servers) != 1 {
+			t.Fatalf("%s: %v, %v", link, servers, err)
+		}
+		fp, has := servers[0].Mihomo["client-fingerprint"]
+		if link[strings.Index(link, "#")+1:] == "PLAIN" && has {
+			t.Fatalf("plain TLS grew a fingerprint: %v", servers[0].Mihomo)
+		}
+		if strings.HasSuffix(link, "PLAIN-FP") && fp != "safari" {
+			t.Fatalf("plain TLS fp: %v", fp)
+		}
+	}
+}
+
+func TestClashRealityFixup(t *testing.T) {
+	body := []byte(`proxies:
+  - {name: R1, type: vless, server: 10.0.0.30, port: 443, uuid: 11111111-1111-1111-1111-111111111111,
+     tls: true, client-fingerprint: firefox, flow: xtls-rprx-vision,
+     reality-opts: {public-key: kBPI_JRK3J0k3ShNb_g_6R1H4G4sdvIdC6V4hxGjyAw, short-id: 12345678}}
+  - {name: R2, type: trojan, server: 10.0.0.31, port: 443, password: pw, tls: true,
+     reality-opts: {public-key: kBPI_JRK3J0k3ShNb_g_6R1H4G4sdvIdC6V4hxGjyAw}}
+`)
+	servers, err := ParseSubscription(body, "https://example.com/sub")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(servers) != 2 {
+		t.Fatalf("want 2 servers, got %d", len(servers))
+	}
+	r1 := servers[0].Mihomo
+	if r1["client-fingerprint"] != "firefox" {
+		t.Fatalf("R1 keeps its fingerprint: %v", r1["client-fingerprint"])
+	}
+	if sid, ok := r1["reality-opts"].(map[string]any)["short-id"]; !ok || sid != "12345678" {
+		t.Fatalf("R1 short-id %v of %T, want the text 12345678", sid, sid)
+	}
+	r2 := servers[1].Mihomo
+	if r2["client-fingerprint"] != "chrome" {
+		t.Fatalf("R2 grew no fingerprint: %v", r2["client-fingerprint"])
+	}
 }
 
 func TestVmessLink(t *testing.T) {
