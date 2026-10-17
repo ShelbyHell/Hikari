@@ -11,6 +11,7 @@ import (
 
 	"mikan/internal/panel/acme"
 	"mikan/internal/panel/certcheck"
+	"mikan/internal/panel/settings"
 	"mikan/internal/panel/store/db"
 	"mikan/internal/panel/tlscert"
 )
@@ -69,6 +70,12 @@ func (h *handlers) registerCerts() {
 		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt}, h.setCertificate)
 	huma.Register(h.api, huma.Operation{OperationID: "clear-certificate", Method: http.MethodDelete, Path: "/api/v1/settings/certificate", Summary: "Убрать свой сертификат панели: вернётся автоматический",
 		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt, DefaultStatus: http.StatusNoContent}, h.clearCertificate)
+	huma.Register(h.api, huma.Operation{OperationID: "renew-sub-certificate", Method: http.MethodPost, Path: "/api/v1/settings/sub-certificate/renew",
+		Summary: "Получить сертификат для ссылки подписки сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт)", Tags: tags}, h.renewSubCertificate)
+	huma.Register(h.api, huma.Operation{OperationID: "set-sub-certificate", Method: http.MethodPut, Path: "/api/v1/settings/sub-certificate", Summary: "Поставить свой сертификат для ссылки подписки",
+		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt}, h.setSubCertificate)
+	huma.Register(h.api, huma.Operation{OperationID: "clear-sub-certificate", Method: http.MethodDelete, Path: "/api/v1/settings/sub-certificate", Summary: "Убрать свой сертификат для ссылки подписки: вернётся автоматический",
+		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt, DefaultStatus: http.StatusNoContent}, h.clearSubCertificate)
 	nodeTags := []string{"node"}
 	huma.Register(h.api, huma.Operation{OperationID: "set-node-certificate", Method: http.MethodPut, Path: "/api/v1/nodes/{id}/certificate", Summary: "Поставить ноде свой сертификат",
 		Tags: nodeTags, Metadata: sessionOnly, Extensions: sessionOnlyExt}, h.setNodeCertificate)
@@ -116,6 +123,43 @@ func (h *handlers) clearCertificate(ctx context.Context, _ *struct{}) (*struct{}
 		return nil, err
 	}
 	h.audit(ctx, sessionOf(ctx).AdminID, "settings.certificate", "", "", map[string]any{"kind": "automatic"})
+	return nil, nil
+}
+
+func (h *handlers) renewSubCertificate(ctx context.Context, _ *struct{}) (*certificateOutput, error) {
+	if h.d.RenewSubCertNow == nil {
+		return nil, huma.Error409Conflict("acme_disabled")
+	}
+	h.audit(ctx, sessionOf(ctx).AdminID, "settings.renew_sub_certificate", "", "", nil)
+	st, _ := h.d.RenewSubCertNow(ctx, renewWait)
+	return &certificateOutput{Body: st}, nil
+}
+
+func (h *handlers) setSubCertificate(ctx context.Context, in *certInput) (*settingsOutput, error) {
+	if h.d.SetSubCert == nil {
+		return nil, huma.Error409Conflict("acme_disabled")
+	}
+	if err := h.d.SetSubCert(ctx, []byte(in.Body.Cert), []byte(in.Body.Key)); err != nil {
+		sub, _ := h.d.Settings.String(ctx, settings.KeySubDomain)
+		return nil, certError(err, sub)
+	}
+	st := h.d.SubCert()
+	h.audit(ctx, sessionOf(ctx).AdminID, "settings.sub_certificate", "", "", map[string]any{"kind": "custom", "names": st.Names, "not_after": st.NotAfter})
+	v, err := h.readSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settingsOutput{Body: v}, nil
+}
+
+func (h *handlers) clearSubCertificate(ctx context.Context, _ *struct{}) (*struct{}, error) {
+	if h.d.ClearSubCert == nil {
+		return nil, huma.Error409Conflict("acme_disabled")
+	}
+	if err := h.d.ClearSubCert(); err != nil {
+		return nil, err
+	}
+	h.audit(ctx, sessionOf(ctx).AdminID, "settings.sub_certificate", "", "", map[string]any{"kind": "automatic"})
 	return nil, nil
 }
 

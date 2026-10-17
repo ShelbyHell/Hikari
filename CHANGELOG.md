@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.6
+### en
+- **Dedicated certificate management for subscription domain** (Settings → Subscription → Subscription certificate). Isolated certificate lifecycle solely for the subscription domain (`sub_domain`), separate from the panel domain. Supports on-demand ACME issuance and retry ("Get now" / "Retry"), SNI-based certificate serving, custom certificate upload and replacement (`fullchain.pem` / `privkey.pem`) via drawer, and seamless reset to automatic certificate.
+### ru
+- **Единоличное управление сертификатом для домена подписки** («Настройки → Подписка → Сертификат для подписки»). Полностью изолированный жизненный цикл сертификата исключительно для домена ссылок подписки (`sub_domain`), отдельно от домена панели. Поддерживается ручной выпуск и повтор заказа ACME («Получить сейчас» / «Повторить»), выдача нужного сертификата по SNI, загрузка и замена своего сертификата (`fullchain.pem` / `privkey.pem`) через шторку и сброс обратно на автоматический.
+
 ## 0.5.1.2-rc.5
 ### en
 - **Telegram Admin Bot** (`/admin`). Full administrative control directly from Telegram without logging into the web panel: dashboard overview (clients stats, online users in 24h, nodes online/offline status), clients management with search and pagination, quick client creation, user details, term extension (+30/+7 days), traffic reset, account enable/disable toggle, bound devices management with unbind action, subscription link delivery, and live node status monitoring (CPU, RAM, network speed, active connections, and versions).

@@ -66,6 +66,10 @@ type Deps struct {
 	// RenewCertNow tries the panel's certificate now and waits up to wait for the outcome;
 	// done is false when the order still runs then. nil in development.
 	RenewCertNow func(ctx context.Context, wait time.Duration) (st acme.Status, done bool)
+	SubCert      func() acme.Status
+	RenewSubCert func()
+	// RenewSubCertNow tries the subscription certificate now and waits up to wait for the outcome.
+	RenewSubCertNow func(ctx context.Context, wait time.Duration) (st acme.Status, done bool)
 	// NodeTLS is the certificate a node's protocols on TLS use now; nil: not known.
 	NodeTLS func(ctx context.Context, n db.Node) *NodeTLSView
 	// RenewNodeCert orders a remote node's public certificate now (acme.Nodes.Renew).
@@ -112,6 +116,9 @@ type Deps struct {
 	// Let's Encrypt; nil in development.
 	SetCert   func(ctx context.Context, certPEM, keyPEM []byte) error
 	ClearCert func() error
+	// SetSubCert and ClearSubCert manage the custom certificate for the subscription domain.
+	SetSubCert   func(ctx context.Context, certPEM, keyPEM []byte) error
+	ClearSubCert func() error
 	// NodeCerts keeps the nodes' own certificates; nil: nodes cannot have one.
 	NodeCerts *tlscert.NodeStore
 	// ForgetNode removes the certificates and keys kept on disk for a node id; nil: none.

@@ -81,6 +81,18 @@ type Manager struct {
 	annMu     sync.Mutex
 	onChange  func()
 	announced string
+
+	// Dedicated certificate management solely for the subscription domain.
+	subDir        string
+	subCustomDir  string
+	subCustomMod  time.Time
+	subJournal    *journal
+	subStatus     atomic.Pointer[Status]
+	subOrderMu    sync.Mutex
+	subAttMu      sync.Mutex
+	subCur        *attempt
+	subWake       chan struct{}
+	subServedHost string
 }
 
 type attempt struct {
@@ -95,10 +107,20 @@ func New(dataDir string, holder *tlscert.Holder, fallback *tls.Certificate, set 
 		listen = acmechallenge.DefaultListen
 	}
 	root := filepath.Join(dataDir, "tls", "acme")
-	m := &Manager{dir: root, iss: newIssuer(root, set), holder: holder, fallback: fallback,
-		set: set, log: log, now: now, wake: make(chan struct{}, 1), challenge: acmechallenge.New(listen), customDir: filepath.Join(dataDir, "tls", "custom"),
-		journal: newJournal(root)}
+	subRoot := filepath.Join(dataDir, "tls", "sub-acme")
+	m := &Manager{
+		dir: root, iss: newIssuer(root, set), holder: holder, fallback: fallback,
+		set: set, log: log, now: now, wake: make(chan struct{}, 1),
+		subWake:   make(chan struct{}, 1),
+		challenge: acmechallenge.New(listen),
+		customDir: filepath.Join(dataDir, "tls", "custom"),
+		journal:   newJournal(root),
+		subDir:    subRoot,
+		subCustomDir: filepath.Join(dataDir, "tls", "sub-custom"),
+		subJournal:   newJournal(subRoot),
+	}
 	m.status.Store(&Status{Kind: "self-signed", WantCA: CALetsEncrypt, CheckedAt: now()})
+	m.subStatus.Store(&Status{Kind: "self-signed", WantCA: CALetsEncrypt, CheckedAt: now()})
 	return m
 }
 
@@ -116,6 +138,16 @@ func (m *Manager) Status() Status {
 	return st
 }
 
+// SubStatus is the certificate for the subscription domain now, with Ordering set while an order runs.
+func (m *Manager) SubStatus() Status {
+	st := *m.subStatus.Load()
+	m.subAttMu.Lock()
+	st.Ordering = m.subCur != nil
+	m.subAttMu.Unlock()
+	st.Attempts = m.subJournal.List()
+	return st
+}
+
 // OnChange sets what is called after Public changes: a certificate issued, renewed,
 // uploaded or dropped. It is called outside the manager's locks and must not block.
 func (m *Manager) OnChange(f func()) {
@@ -126,7 +158,10 @@ func (m *Manager) OnChange(f func()) {
 
 // Load serves the best certificate already on disk, with no network: called before the
 // nodes are first synced, so the local node starts with the certificate the links expect.
-func (m *Manager) Load(ctx context.Context) { m.settle(ctx) }
+func (m *Manager) Load(ctx context.Context) {
+	m.settle(ctx)
+	m.settleSub(ctx)
+}
 
 // announce calls onChange when Public is not the certificate last announced.
 func (m *Manager) announce() {
@@ -193,6 +228,14 @@ func (m *Manager) Renew() {
 	}
 }
 
+// RenewSub asks the background loop to try the subscription certificate now.
+func (m *Manager) RenewSub() {
+	select {
+	case m.subWake <- struct{}{}:
+	default:
+	}
+}
+
 // RenewNow tries now and waits up to wait for the outcome: the admin's "Request now". done
 // is false when the order still runs then; it goes on in the background.
 func (m *Manager) RenewNow(ctx context.Context, wait time.Duration) (st Status, done bool) {
@@ -210,6 +253,24 @@ func (m *Manager) RenewNow(ctx context.Context, wait time.Duration) (st Status, 
 	case <-ctx.Done():
 	}
 	return m.Status(), false
+}
+
+// RenewSubNow tries the subscription certificate now and waits up to wait for the outcome.
+func (m *Manager) RenewSubNow(ctx context.Context, wait time.Duration) (st Status, done bool) {
+	finished := make(chan struct{})
+	go func() {
+		m.subAttemptOnce(context.WithoutCancel(ctx))
+		close(finished)
+	}()
+	t := time.NewTimer(wait)
+	defer t.Stop()
+	select {
+	case <-finished:
+		return m.SubStatus(), true
+	case <-t.C:
+	case <-ctx.Done():
+	}
+	return m.SubStatus(), false
 }
 
 // attemptOnce runs ensure, or waits for the one under way and shares its outcome.
@@ -233,6 +294,26 @@ func (m *Manager) attemptOnce(ctx context.Context) (failed bool) {
 	return a.failed
 }
 
+func (m *Manager) subAttemptOnce(ctx context.Context) (failed bool) {
+	m.subAttMu.Lock()
+	if a := m.subCur; a != nil {
+		m.subAttMu.Unlock()
+		<-a.done
+		return a.failed
+	}
+	a := &attempt{done: make(chan struct{})}
+	m.subCur = a
+	m.subAttMu.Unlock()
+	defer func() {
+		m.subAttMu.Lock()
+		m.subCur = nil
+		m.subAttMu.Unlock()
+		close(a.done)
+	}()
+	a.failed = m.ensureSub(ctx)
+	return a.failed
+}
+
 // How often the certificate is looked after, and how soon after an order that failed. A
 // six-day certificate for an IP leaves two days to renew in: a port 80 that was busy once
 // must not cost the next six hours.
@@ -244,6 +325,8 @@ var (
 func (m *Manager) Run(ctx context.Context) {
 	next := time.NewTimer(checkEvery)
 	defer next.Stop()
+	subNext := time.NewTimer(checkEvery)
+	defer subNext.Stop()
 	// certbot, acme.sh or Caddy renew a custom certificate in place: a changed file is
 	// served within half a minute, no restart.
 	watch := time.NewTicker(30 * time.Second)
@@ -262,19 +345,41 @@ func (m *Manager) Run(ctx context.Context) {
 		}
 		next.Reset(d)
 	}
+	subLater := func(failed bool) {
+		d := checkEvery
+		if failed {
+			d = retryAfter
+		}
+		if !subNext.Stop() {
+			select {
+			case <-subNext.C:
+			default:
+			}
+		}
+		subNext.Reset(d)
+	}
 	later(m.attemptOnce(ctx))
+	subLater(m.subAttemptOnce(ctx))
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-next.C:
+			later(m.attemptOnce(ctx))
 		case <-m.wake:
+			later(m.attemptOnce(ctx))
+		case <-subNext.C:
+			subLater(m.subAttemptOnce(ctx))
+		case <-m.subWake:
+			subLater(m.subAttemptOnce(ctx))
 		case <-watch.C:
-			if !m.customChanged() {
-				continue
+			if m.customChanged() {
+				later(m.attemptOnce(ctx))
+			}
+			if m.subCustomChanged() {
+				subLater(m.subAttemptOnce(ctx))
 			}
 		}
-		later(m.attemptOnce(ctx))
 	}
 }
 
@@ -284,8 +389,14 @@ func (m *Manager) customChanged() bool {
 	return !tlscert.CustomModTime(m.customDir).Equal(m.customMod)
 }
 
+func (m *Manager) subCustomChanged() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return !tlscert.CustomModTime(m.subCustomDir).Equal(m.subCustomMod)
+}
+
 // SetCustom installs the admin's own certificate: checked, kept, served at once. It has
-// to cover the panel's address and the subscription domain, or subscription links would fail.
+// to cover the panel's address.
 func (m *Manager) SetCustom(ctx context.Context, certPEM, keyPEM []byte) error {
 	cert, err := tlscert.ParseCustom(certPEM, keyPEM, m.now())
 	if err != nil {
@@ -321,27 +432,53 @@ func (m *Manager) ClearCustom() error {
 	return nil
 }
 
+// SetCustomSub installs the admin's own certificate for the subscription domain: checked, kept, served at once.
+func (m *Manager) SetCustomSub(ctx context.Context, certPEM, keyPEM []byte) error {
+	cert, err := tlscert.ParseCustom(certPEM, keyPEM, m.now())
+	if err != nil {
+		return err
+	}
+	sub, err := m.subIdentifier(ctx)
+	if err != nil {
+		return err
+	}
+	if sub != "" && !tlscert.Covers(cert.Leaf, sub) {
+		return tlscert.ErrWrongHost
+	}
+	if err := tlscert.SaveCustom(m.subCustomDir, cert); err != nil {
+		return err
+	}
+	m.settleSub(ctx)
+	return nil
+}
+
+// ClearCustomSub removes the custom certificate for the subscription domain.
+func (m *Manager) ClearCustomSub() error {
+	if err := tlscert.RemoveCustom(m.subCustomDir); err != nil {
+		return err
+	}
+	m.RenewSub()
+	return nil
+}
+
 func (m *Manager) identifiers(ctx context.Context) (primary string, extra []string, err error) {
 	d, err := m.set.String(ctx, settings.KeyDomain)
 	if err != nil {
 		return "", nil, err
 	}
-	sub, err := m.set.String(ctx, settings.KeySubDomain)
-	if err != nil {
-		return "", nil, err
-	}
 	if d != "" {
-		primary = d
-		if sub != "" && !strings.EqualFold(sub, d) && !isPrivate(sub) {
-			extra = append(extra, sub)
-		}
-		return primary, extra, nil
-	}
-	if sub != "" && !isPrivate(sub) {
-		return sub, nil, nil
+		return d, nil, nil
 	}
 	h, err := m.set.String(ctx, settings.KeyPublicHost)
 	return h, nil, err
+}
+
+func (m *Manager) subIdentifier(ctx context.Context) (string, error) {
+	sub, err := m.set.String(ctx, settings.KeySubDomain)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(sub), nil
 }
 
 func (m *Manager) identifier(ctx context.Context) (string, error) {
@@ -490,4 +627,125 @@ func isPrivate(id string) bool {
 		return !hostname.Name(id) || hostname.Reserved(id)
 	}
 	return ip.IsPrivate() || ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsUnspecified()
+}
+
+// settleSub serves the best certificate for the subscription domain and says whether a new one has to
+// be ordered. It does no network.
+func (m *Manager) settleSub(ctx context.Context) (sub string, ca string, order bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	now := m.now()
+	sub, err := m.subIdentifier(ctx)
+	st := &Status{Kind: "self-signed", Identifier: sub, CheckedAt: now}
+	defer func() { m.subStatus.Store(st) }()
+	if err != nil {
+		st.Error, st.ErrorDetail = CodeUnknown, err.Error()
+		return sub, "", false
+	}
+	if sub == "" {
+		if m.subServedHost != "" {
+			m.holder.DeleteNamed(m.subServedHost)
+			m.subServedHost = ""
+		}
+		return "", "", false
+	}
+	chosen, err := ChosenCA(ctx, m.set)
+	if err != nil {
+		st.Error, st.ErrorDetail = CodeUnknown, err.Error()
+		return sub, "", false
+	}
+	ca = EffectiveCA(chosen, sub)
+	st.WantCA = ca
+
+	m.subCustomMod = tlscert.CustomModTime(m.subCustomDir)
+	if tlscert.HasCustom(m.subCustomDir) {
+		cert, err := tlscert.LoadCustom(m.subCustomDir, now)
+		if err == nil {
+			info := tlscert.Describe(cert, sub, now)
+			if m.subServedHost != "" && m.subServedHost != sub {
+				m.holder.DeleteNamed(m.subServedHost)
+			}
+			m.holder.SetNamed(sub, cert)
+			m.subServedHost = sub
+			st.Kind, st.NotAfter, st.Issuer, st.Names, st.Trusted = "custom", cert.Leaf.NotAfter, info.Issuer, info.Names, info.Trusted
+			if !tlscert.Covers(cert.Leaf, sub) {
+				st.Error = "custom_wrong_host"
+			}
+			return sub, ca, false
+		}
+		why := "custom_invalid"
+		if errors.Is(err, tlscert.ErrExpired) {
+			why = "custom_expired"
+		}
+		m.log.Warn("tls: the custom sub certificate is not used", "err", err)
+		defer func() { st.Error = why }()
+	}
+
+	if isPrivate(sub) {
+		if m.subServedHost != "" {
+			m.holder.DeleteNamed(m.subServedHost)
+			m.subServedHost = ""
+		}
+		st.Error = "no_public_host"
+		return sub, ca, false
+	}
+
+	if cert, have, err := loadPair(m.subDir); err == nil && tlscert.Covers(cert.Leaf, sub) && now.Before(cert.Leaf.NotAfter) {
+		if m.subServedHost != "" && m.subServedHost != sub {
+			m.holder.DeleteNamed(m.subServedHost)
+		}
+		m.holder.SetNamed(sub, cert)
+		m.subServedHost = sub
+		info := tlscert.Describe(cert, sub, now)
+		st.Kind, st.NotAfter, st.CA, st.Issuer, st.Names, st.Trusted = "acme", cert.Leaf.NotAfter, have, info.Issuer, info.Names, true
+		if !needsRenewal(cert.Leaf, now) && have == ca {
+			return sub, ca, false
+		}
+	} else {
+		if m.subServedHost != "" {
+			m.holder.DeleteNamed(m.subServedHost)
+			m.subServedHost = ""
+		}
+	}
+	return sub, ca, true
+}
+
+// ensureSub orders a certificate from the CA solely for the subscription domain.
+func (m *Manager) ensureSub(ctx context.Context) (orderFailed bool) {
+	sub, ca, need := m.settleSub(ctx)
+	if !need || sub == "" {
+		return false
+	}
+	m.subOrderMu.Lock()
+	defer m.subOrderMu.Unlock()
+	if sub, ca, need = m.settleSub(ctx); !need || sub == "" {
+		return false
+	}
+	certPEM, keyPEM, err := m.iss.obtain(ctx, sub, ca, serverProvider{m.challenge})
+	if err == nil {
+		err = savePair(m.subDir, certPEM, keyPEM, ca)
+	}
+	if err != nil {
+		host, _ := m.set.String(ctx, settings.KeyPublicHost)
+		p := Classify(err, dnscheck.Own(host), m.now())
+		m.log.Warn("acme: sub certificate not obtained", "identifier", sub, "ca", ca, "code", p.Code, "holder", p.Holder, "err", err)
+		m.subJournal.Add(Attempt{At: m.now(), CA: ca, Error: p.Code, Detail: p.Detail, Holder: p.Holder})
+		m.mu.Lock()
+		st := *m.subStatus.Load()
+		if st.Kind == "custom" {
+			m.mu.Unlock()
+			return false
+		}
+		if st.Error == "" {
+			st.Error, st.ErrorDetail, st.Holder, st.RetryAt = p.Code, p.Detail, p.Holder, p.RetryAt
+		}
+		st.CheckedAt = m.now()
+		m.subStatus.Store(&st)
+		m.mu.Unlock()
+		return true
+	}
+	m.log.Info("acme: sub certificate installed", "identifier", sub, "ca", ca)
+	m.subJournal.Add(Attempt{At: m.now(), CA: ca})
+	m.settleSub(ctx)
+	return false
 }

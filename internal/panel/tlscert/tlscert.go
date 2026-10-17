@@ -14,6 +14,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -24,12 +25,37 @@ import (
 
 // Holder lets the certificate be swapped (ACME renewal, host change) without a restart.
 type Holder struct {
-	cert atomic.Pointer[tls.Certificate]
+	cert  atomic.Pointer[tls.Certificate]
+	named sync.Map
 }
 
 func (h *Holder) Set(c *tls.Certificate) { h.cert.Store(c) }
 
-func (h *Holder) Get(*tls.ClientHelloInfo) (*tls.Certificate, error) {
+func (h *Holder) SetNamed(host string, c *tls.Certificate) {
+	if host == "" {
+		return
+	}
+	if c == nil {
+		h.named.Delete(strings.ToLower(host))
+		return
+	}
+	h.named.Store(strings.ToLower(host), c)
+}
+
+func (h *Holder) DeleteNamed(host string) {
+	if host == "" {
+		return
+	}
+	h.named.Delete(strings.ToLower(host))
+}
+
+func (h *Holder) Get(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	if hello != nil && hello.ServerName != "" {
+		sni := strings.ToLower(hello.ServerName)
+		if v, ok := h.named.Load(sni); ok && v != nil {
+			return v.(*tls.Certificate), nil
+		}
+	}
 	c := h.cert.Load()
 	if c == nil {
 		return nil, errors.New("no certificate")

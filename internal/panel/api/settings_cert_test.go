@@ -25,8 +25,9 @@ type certAPI struct {
 	token   string
 	csrf    string
 	set     *settings.Settings
-	renewed int
-	woken   int
+	renewed    int
+	woken      int
+	subRenewed int
 }
 
 func newCertAPI(t *testing.T) *certAPI {
@@ -57,6 +58,7 @@ func newCertAPI(t *testing.T) *certAPI {
 		IPLimit: auth.NewLimiter(10, time.Minute, time.Minute, time.Hour), UserLimit: auth.NewLimiter(10, time.Minute, time.Minute, time.Hour), TOTP: auth.NewTOTPGuard(),
 		Users: domain.NewUsers(st, pool, noChanges{}, clock), Pool: pool, Changes: noChanges{},
 		Settings: c.set, RenewCert: func() { c.renewed++ }, WakeNodeCerts: func() { c.woken++ },
+		RenewSubCert: func() { c.subRenewed++ },
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -97,8 +99,8 @@ func TestAddressChangeRenewsTheCertificate(t *testing.T) {
 	c.ok(`{"public_host":"203.0.113.10"}`)
 	c.ok(`{"domain":""}`)
 	c.ok(`{"sub_domain":""}`)
-	if c.renewed != 3 || c.woken != 0 {
-		t.Fatalf("an address, domain, and sub_domain saved, %d renewals, %d node wakes", c.renewed, c.woken)
+	if c.renewed != 2 || c.subRenewed != 1 || c.woken != 0 {
+		t.Fatalf("an address and domain renewed panel cert (%d), sub_domain renewed sub cert (%d), node wakes %d", c.renewed, c.subRenewed, c.woken)
 	}
 }
 

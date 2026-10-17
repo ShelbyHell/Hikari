@@ -59,7 +59,8 @@ type SettingsView struct {
 	// LinkReissue is how often subscribers may replace their own link (the admin is not held by it).
 	LinkReissue domain.ReissueRules `json:"link_reissue" doc:"Как часто подписчик может сменить свою ссылку подписки сам (бот и Mini App)"`
 	DefaultLang string              `json:"default_lang" enum:"auto,ru,en" doc:"Язык админки и страницы подписки, пока человек не выбрал свой; auto — по языку браузера. На нём же названия по умолчанию: группа автовыбора и меню ненастроенного бота"`
-	Certificate acme.Status         `json:"certificate"`
+	Certificate    acme.Status  `json:"certificate"`
+	SubCertificate *acme.Status `json:"sub_certificate,omitempty" doc:"Сертификат для ссылки подписки (sub_domain)"`
 	// The certificate authority of the panel and its nodes.
 	ACMECA      string `json:"acme_ca" enum:"letsencrypt,zerossl,google" doc:"Центр сертификации панели и нод: letsencrypt, zerossl (нужен e-mail) или google (нужен ключ EAB). IP-адреса всегда получают сертификат Let's Encrypt"`
 	ACMEEmail   string `json:"acme_email" doc:"E-mail для центра сертификации; ZeroSSL привязывает к нему аккаунт"`
@@ -267,6 +268,10 @@ func (h *handlers) readSettings(ctx context.Context) (SettingsView, error) {
 	v.Certificate = acme.Status{Kind: "self-signed", WantCA: acme.CALetsEncrypt}
 	if h.d.Cert != nil {
 		v.Certificate = h.d.Cert()
+	}
+	if h.d.SubCert != nil {
+		st := h.d.SubCert()
+		v.SubCertificate = &st
 	}
 	if v.ACMECA, err = acme.ChosenCA(ctx, h.d.Settings); err != nil {
 		return v, err
@@ -523,8 +528,11 @@ func (h *handlers) updateSettings(ctx context.Context, in *patchSettingsInput) (
 	// The certificate is for the domain, or the address without one: a new name gets its
 	// certificate now, not at the next six-hourly check.
 	caChanged := b.ACMECA != nil || b.ACMEEmail != nil || b.ACMEEABKID != nil || b.ACMEEABHMAC != nil
-	if (b.Domain != nil || b.SubDomain != nil || b.PublicHost != nil || caChanged) && h.d.RenewCert != nil {
+	if (b.Domain != nil || b.PublicHost != nil || caChanged) && h.d.RenewCert != nil {
 		h.d.RenewCert()
+	}
+	if (b.SubDomain != nil || caChanged) && h.d.RenewSubCert != nil {
+		h.d.RenewSubCert()
 	}
 	// Another CA reissues the nodes' certificates too; a new e-mail or key may let a failed
 	// order through.

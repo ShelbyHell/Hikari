@@ -200,6 +200,8 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 	if o.Certs != nil {
 		deps.Cert, deps.RenewCert, deps.RenewCertNow = o.Certs.Status, o.Certs.Renew, o.Certs.RenewNow
 		deps.SetCert, deps.ClearCert = o.Certs.SetCustom, o.Certs.ClearCustom
+		deps.SubCert, deps.RenewSubCert, deps.RenewSubCertNow = o.Certs.SubStatus, o.Certs.RenewSub, o.Certs.RenewSubNow
+		deps.SetSubCert, deps.ClearSubCert = o.Certs.SetCustomSub, o.Certs.ClearCustomSub
 	}
 	if o.NodesACME != nil {
 		deps.RenewNodeCert, deps.WakeNodeCerts = o.NodesACME.Renew, o.NodesACME.Wake

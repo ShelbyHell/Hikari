@@ -6937,6 +6937,10 @@
           "sub_base_url": {
             "type": "string"
           },
+          "sub_certificate": {
+            "$ref": "#/components/schemas/Status",
+            "description": "Сертификат для ссылки подписки (sub_domain)"
+          },
           "sub_domain": {
             "description": "Свой домен или поддомен для ссылок подписки; пусто — домен или адрес панели",
             "type": "string"
@@ -13784,6 +13788,102 @@
           }
         },
         "summary": "Получить сертификат панели сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт)",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/sub-certificate": {
+      "delete": {
+        "operationId": "clear-sub-certificate",
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Убрать свой сертификат для ссылки подписки: вернётся автоматический",
+        "tags": [
+          "settings"
+        ],
+        "x-session-only": true
+      },
+      "put": {
+        "operationId": "set-sub-certificate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CertInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsView"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Поставить свой сертификат для ссылки подписки",
+        "tags": [
+          "settings"
+        ],
+        "x-session-only": true
+      }
+    },
+    "/api/v1/settings/sub-certificate/renew": {
+      "post": {
+        "operationId": "renew-sub-certificate",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Получить сертификат для ссылки подписки сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт)",
         "tags": [
           "settings"
         ]
