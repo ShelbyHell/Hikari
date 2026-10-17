@@ -86,6 +86,18 @@ type Backend interface {
 	Shop() Shop
 	// Tariff is one tariff, for what a trial, a free plan or an invoice gives.
 	Tariff(ctx context.Context, id int64) (db.Tariff, error)
+
+	// Admin methods for Telegram admin bot:
+	IsAdmin(ctx context.Context, tgID int64) bool
+	AdminOverview(ctx context.Context) (AdminOverview, error)
+	AdminListUsers(ctx context.Context, query string, offset, limit int) (AdminUsersPage, error)
+	AdminGetUser(ctx context.Context, id int64) (AdminUserDetail, error)
+	AdminCreateUser(ctx context.Context, name string) (AdminUserDetail, error)
+	AdminExtendUser(ctx context.Context, userID int64, days int64) error
+	AdminResetTraffic(ctx context.Context, userID int64) error
+	AdminToggleUser(ctx context.Context, userID int64) (string, error)
+	AdminDeleteDevice(ctx context.Context, userID, deviceID int64) error
+	AdminListNodes(ctx context.Context) ([]AdminNodeSummary, error)
 }
 
 // PanelBackend is Backend and what only the panel's side of the bot reads: the notices
@@ -152,6 +164,73 @@ type Pool struct {
 	Limit     int64
 	Extra     int64 // left of the pool's packages
 	Exhausted bool
+}
+
+// AdminOverview holds overall system statistics for the admin dashboard.
+type AdminOverview struct {
+	TotalUsers    int64 `json:"total_users"`
+	ActiveUsers   int64 `json:"active_users"`
+	ExpiringUsers int64 `json:"expiring_users"`
+	LimitedUsers  int64 `json:"limited_users"`
+	ExpiredUsers  int64 `json:"expired_users"`
+	DisabledUsers int64 `json:"disabled_users"`
+	Online24h     int64 `json:"online_24h"`
+	TotalNodes    int   `json:"total_nodes"`
+	OnlineNodes   int   `json:"online_nodes"`
+	OfflineNodes  int   `json:"offline_nodes"`
+}
+
+// AdminUserSummary is a concise summary of a user for pagination and lists.
+type AdminUserSummary struct {
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	Status       string `json:"status"` // active, expiring, limited, expired, disabled
+	ExpiresAt    int64  `json:"expires_at"`
+	TrafficUsed  int64  `json:"traffic_used"`
+	TrafficLimit int64  `json:"traffic_limit"`
+}
+
+// AdminUsersPage holds a page of user summaries and the total count.
+type AdminUsersPage struct {
+	Users      []AdminUserSummary `json:"users"`
+	TotalCount int                `json:"total_count"`
+	Offset     int                `json:"offset"`
+	Limit      int                `json:"limit"`
+}
+
+// AdminUserDetail provides full details of a user for the detail card.
+type AdminUserDetail struct {
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	Status       string `json:"status"`
+	RawStatus    string `json:"raw_status"` // "active" or "disabled"
+	TariffName   string `json:"tariff_name"`
+	ExpiresAt    int64  `json:"expires_at"`
+	TrafficUsed  int64  `json:"traffic_used"`
+	TrafficLimit int64  `json:"traffic_limit"`
+	DeviceCount  int64  `json:"device_count"`
+	DeviceLimit  int64  `json:"device_limit"`
+	SubURL       string `json:"sub_url"`
+	OnlineAt     int64  `json:"online_at"`
+	CreatedAt    int64  `json:"created_at"`
+}
+
+// AdminNodeSummary describes a node's status and health for the admin list.
+type AdminNodeSummary struct {
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	Address     string  `json:"address"`
+	PublicHost  string  `json:"public_host"`
+	Enabled     bool    `json:"enabled"`
+	Online      bool    `json:"online"`
+	Error       string  `json:"error,omitempty"`
+	Version     string  `json:"version,omitempty"`
+	ActiveConns int     `json:"active_conns"`
+	CPUPercent  float64 `json:"cpu_percent"`
+	MemUsed     uint64  `json:"mem_used"`
+	MemTotal    uint64  `json:"mem_total"`
+	NetRxBps    uint64  `json:"net_rx_bps"`
+	NetTxBps    uint64  `json:"net_tx_bps"`
 }
 
 var (

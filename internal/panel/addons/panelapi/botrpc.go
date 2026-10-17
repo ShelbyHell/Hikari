@@ -69,6 +69,17 @@ var botRPC = map[string]rpcRule{
 	"Shop.TrialInvoice":   rule("billing:invoice", []int{0}, nil),
 	"Shop.Trial":          rule("billing:invoice", []int{0}, nil),
 	"Shop.FreePlan":       rule("billing:invoice", []int{0}, nil),
+	// Admin bot methods.
+	"IsAdmin":           rule("", []int{0}, nil),
+	"AdminOverview":     rule("users:read", nil, nil),
+	"AdminListUsers":    rule("users:read", nil, nil),
+	"AdminGetUser":      rule("users:read", nil, nil),
+	"AdminCreateUser":   rule("users:write", nil, nil),
+	"AdminExtendUser":   rule("users:write", nil, nil),
+	"AdminResetTraffic": rule("users:write", nil, nil),
+	"AdminToggleUser":   rule("users:write", nil, nil),
+	"AdminDeleteDevice": rule("users:write", nil, nil),
+	"AdminListNodes":    rule("users:read", nil, nil),
 }
 
 // talkWindow: how long an account counts as talking to the bot after its last message.

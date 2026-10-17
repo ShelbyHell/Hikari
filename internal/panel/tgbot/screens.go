@@ -178,6 +178,13 @@ func (b *Bot) welcome(ctx context.Context, cfg Config, w *words, chat int64, not
 	if sup := b.supportURL(ctx); sup != "" {
 		rows = append(rows, []tgate.Button{{Text: labelOf(cfg, "support", w.support), URL: sup}})
 	}
+	if b.d.Backend.IsAdmin(ctx, chat) {
+		adminLabel := "⚙️ Админка"
+		if cfg.Lang == "en" {
+			adminLabel = "⚙️ Admin"
+		}
+		rows = append(rows, []tgate.Button{{Text: adminLabel, CallbackData: "a:m"}})
+	}
 	if rows == nil {
 		return text, nil
 	}
@@ -235,6 +242,13 @@ func (b *Bot) menu(ctx context.Context, cfg Config, w *words, chat int64, subs i
 	}
 	if subs > 1 {
 		rows = append(rows, []tgate.Button{{Text: fmt.Sprintf("%s (%d)", w.subscriptions, subs), CallbackData: "w"}})
+	}
+	if b.d.Backend.IsAdmin(ctx, chat) {
+		adminLabel := "⚙️ Админка"
+		if cfg.Lang == "en" {
+			adminLabel = "⚙️ Admin"
+		}
+		rows = append(rows, []tgate.Button{{Text: adminLabel, CallbackData: "a:m"}})
 	}
 	return &tgate.Keyboard{InlineKeyboard: rows}
 }

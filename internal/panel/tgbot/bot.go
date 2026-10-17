@@ -40,6 +40,8 @@ type Bot struct {
 	// Subscriptions somebody asked to take over: by subscription, and who was refused.
 	transfers map[int64]transfer
 	refused   map[string]time.Time
+
+	adminStates sync.Map
 }
 
 func New(d Deps) *Bot {
@@ -95,8 +97,40 @@ func (b *Bot) onMessage(ctx context.Context, m *tgate.Message) {
 		id := m.MessageID
 		b.d.Outbox.Reply(chat, "", 1, func(ctx context.Context, c *tgate.Client) error { return c.Delete(ctx, chat, id) })
 	}
-	var notice string
 	text := strings.TrimSpace(m.Text)
+	if b.d.Backend.IsAdmin(ctx, chat) {
+		if text == "/admin" {
+			b.setAdminState(chat, "")
+			b.freshAdminMenu(chat, "a:m", "")
+			return
+		}
+		if strings.HasPrefix(text, "/admin ") {
+			q := strings.TrimSpace(strings.TrimPrefix(text, "/admin "))
+			b.setAdminState(chat, "")
+			b.freshAdminMenu(chat, "a:u:0:"+q, "")
+			return
+		}
+		st := b.getAdminState(chat)
+		if st == "search" {
+			b.setAdminState(chat, "")
+			b.freshAdminMenu(chat, "a:u:0:"+text, "")
+			return
+		}
+		if st == "new_user" {
+			b.setAdminState(chat, "")
+			u, err := b.d.Backend.AdminCreateUser(ctx, text)
+			if err != nil {
+				aw := adminWordsFor(cfg.Lang)
+				b.freshAdminMenu(chat, "a:m", fmt.Sprintf(aw.errorNotice, err.Error()))
+			} else {
+				aw := adminWordsFor(cfg.Lang)
+				b.freshAdminMenu(chat, fmt.Sprintf("a:ud:%d", u.ID), aw.userCreatedNotice)
+			}
+			return
+		}
+	}
+
+	var notice string
 	switch {
 	case strings.HasPrefix(text, "/start "):
 		notice = b.linkByCode(ctx, w, chat, who(m.From), strings.TrimSpace(strings.TrimPrefix(text, "/start ")))
@@ -139,6 +173,44 @@ func (b *Bot) answer(ctx context.Context, id string) {
 func (b *Bot) onPress(ctx context.Context, q *tgate.CallbackQuery) {
 	chat, msg := q.Message.Chat.ID, q.Message.MessageID
 	b.answer(ctx, q.ID)
+
+	if strings.HasPrefix(q.Data, "a:") {
+		if !b.d.Backend.IsAdmin(ctx, chat) {
+			return
+		}
+		if q.Data == "a:close" {
+			b.setAdminState(chat, "")
+			b.d.Outbox.Reply(chat, "edit:"+strconv.FormatInt(chat, 10)+":"+strconv.FormatInt(msg, 10), 1, func(ctx context.Context, c *tgate.Client) error {
+				text, kb := b.screen(ctx, b.config(ctx), chat, "m", "")
+				if err := c.Edit(ctx, chat, msg, text, kb); err != nil {
+					return b.sendMenu(ctx, c, chat, "")
+				}
+				_ = b.d.Backend.SetMenu(ctx, chat, msg)
+				return nil
+			})
+			return
+		}
+		screenData, notice := b.adminAct(ctx, chat, q.Data)
+		b.d.Outbox.Reply(chat, "edit:"+strconv.FormatInt(chat, 10)+":"+strconv.FormatInt(msg, 10), 1, func(ctx context.Context, c *tgate.Client) error {
+			text, kb := b.adminScreen(ctx, b.config(ctx), chat, screenData, notice)
+			if err := c.Edit(ctx, chat, msg, text, kb); err != nil {
+				var ae *tgate.APIError
+				if errors.As(err, &ae) && ae.Code == 429 {
+					return err
+				}
+				sent, err := c.Send(ctx, chat, text, kb, false)
+				if err != nil {
+					return err
+				}
+				_ = b.d.Backend.SetMenu(ctx, chat, sent.MessageID)
+				return nil
+			}
+			_ = b.d.Backend.SetMenu(ctx, chat, msg)
+			return nil
+		})
+		return
+	}
+
 	// What a tap changes happens now, only its screen may wait.
 	data, notice := b.act(ctx, chat, q.Data)
 	b.d.Outbox.Reply(chat, "edit:"+strconv.FormatInt(chat, 10)+":"+strconv.FormatInt(msg, 10), 1, func(ctx context.Context, c *tgate.Client) error {

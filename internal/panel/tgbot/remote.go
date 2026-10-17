@@ -178,6 +178,61 @@ func (r *Remote) Tariff(ctx context.Context, id int64) (db.Tariff, error) {
 	return t, err
 }
 
+func (r *Remote) IsAdmin(ctx context.Context, tgID int64) bool {
+	var ok bool
+	_ = r.call(ctx, "IsAdmin", []any{tgID}, &ok)
+	return ok
+}
+
+func (r *Remote) AdminOverview(ctx context.Context) (AdminOverview, error) {
+	var o AdminOverview
+	err := r.call(ctx, "AdminOverview", nil, &o)
+	return o, err
+}
+
+func (r *Remote) AdminListUsers(ctx context.Context, query string, offset, limit int) (AdminUsersPage, error) {
+	var p AdminUsersPage
+	err := r.call(ctx, "AdminListUsers", []any{query, offset, limit}, &p)
+	return p, err
+}
+
+func (r *Remote) AdminGetUser(ctx context.Context, id int64) (AdminUserDetail, error) {
+	var d AdminUserDetail
+	err := r.call(ctx, "AdminGetUser", []any{id}, &d)
+	return d, err
+}
+
+func (r *Remote) AdminCreateUser(ctx context.Context, name string) (AdminUserDetail, error) {
+	var d AdminUserDetail
+	err := r.call(ctx, "AdminCreateUser", []any{name}, &d)
+	return d, err
+}
+
+func (r *Remote) AdminExtendUser(ctx context.Context, userID int64, days int64) error {
+	return r.call(ctx, "AdminExtendUser", []any{userID, days})
+}
+
+func (r *Remote) AdminResetTraffic(ctx context.Context, userID int64) error {
+	return r.call(ctx, "AdminResetTraffic", []any{userID})
+}
+
+func (r *Remote) AdminToggleUser(ctx context.Context, userID int64) (string, error) {
+	var s string
+	err := r.call(ctx, "AdminToggleUser", []any{userID}, &s)
+	return s, err
+}
+
+func (r *Remote) AdminDeleteDevice(ctx context.Context, userID, deviceID int64) error {
+	return r.call(ctx, "AdminDeleteDevice", []any{userID, deviceID})
+}
+
+func (r *Remote) AdminListNodes(ctx context.Context) ([]AdminNodeSummary, error) {
+	var list []AdminNodeSummary
+	err := r.call(ctx, "AdminListNodes", nil, &list)
+	return list, err
+}
+
+
 // remoteShop is Shop over the Panel API ("Shop.<method>").
 type remoteShop struct{ r *Remote }
 

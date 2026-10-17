@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.5
+### en
+- **Telegram Admin Bot** (`/admin`). Full administrative control directly from Telegram without logging into the web panel: dashboard overview (clients stats, online users in 24h, nodes online/offline status), clients management with search and pagination, quick client creation, user details, term extension (+30/+7 days), traffic reset, account enable/disable toggle, bound devices management with unbind action, subscription link delivery, and live node status monitoring (CPU, RAM, network speed, active connections, and versions).
+### ru
+- **Админ-бот в Telegram** (команда `/admin`). Управление панелью прямо из Telegram без необходимости входа в веб-интерфейс: дашборд статистики (клиенты, онлайн за 24ч, статус нод), список клиентов с пагинацией и поиском по имени/ID/токену, быстрое создание клиентов, детальная карточка клиента, продление срока (+30/+7 дней), сброс трафика, переключение активности (вкл/выкл), управление привязанными устройствами с возможностью отвязки, отправка ссылки на подписку в чат и мониторинг нод (CPU, память, скорость сети Rx/Tx, активные соединения, версия и ошибки).
+
 ## 0.5.1.2-rc.4
 ### en
 - **Dedicated subscription domain** (Settings → Subscription → Subscription domain). A separate domain or subdomain (e.g. `sub.example.com`) specifically for subscription links and the subscription page. Subscription links stay intact if the admin panel moves to another domain or server. The secret admin panel is completely isolated and inaccessible on this domain (returns 404). ACME automatically obtains and renews a multi-domain certificate covering both the panel domain and the subscription domain.
