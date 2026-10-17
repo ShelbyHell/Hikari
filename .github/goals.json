@@ -17,7 +17,7 @@
         "ru": "Добавить чужую подписку по ссылке: панель сама подтягивает её серверы, обновляет их и раздаёт клиентам под вашим названием. Для перепродажи.",
         "en": "Add someone else's subscription by link: the panel pulls its servers, keeps them updated and hands them to your clients under your name. For resellers."
       },
-      "target": 300, "raised": 0, "currency": "USD", "status": "open", "url": "https://t.me/tribute/app?startapp=g6qT"
+      "target": 300, "raised": 300, "currency": "USD", "status": "done", "version": "0.5.1.1", "url": "https://t.me/tribute/app?startapp=g6qT"
     },
     {
       "id": "admin-bot",
@@ -26,7 +26,7 @@
         "ru": "Команда /admin в боте: клиенты, подписки, устройства и ноды прямо из Telegram, без входа в панель.",
         "en": "An /admin command in the bot: clients, subscriptions, devices and nodes right from Telegram, without opening the panel."
       },
-      "target": 200, "raised": 0, "currency": "USD", "status": "open", "url": "https://t.me/tribute/app?startapp=g6qU"
+      "target": 200, "raised": 200, "currency": "USD", "status": "done", "version": "0.5.1.2-rc.5", "url": "https://t.me/tribute/app?startapp=g6qU"
     },
     {
       "id": "device-addon",
@@ -62,7 +62,7 @@
         "ru": "Отдельный домен или поддомен для ссылок подписки, отдельно от панели и серверов. Ссылки не меняются при переезде панели.",
         "en": "A separate domain or subdomain for subscription links, apart from the panel and the servers. Links stay the same when the panel moves."
       },
-      "target": 50, "raised": 10, "currency": "USD", "status": "open", "url": "https://t.me/tribute/app?startapp=g6qY"
+      "target": 50, "raised": 50, "currency": "USD", "status": "done", "version": "0.5.1.2-rc.4", "url": "https://t.me/tribute/app?startapp=g6qY"
     },
     {
       "id": "node-clients",
