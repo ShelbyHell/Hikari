@@ -32,6 +32,7 @@ type SettingsView struct {
 	BrandLogoURL string      `json:"brand_logo_url" doc:"Логотип: https, PNG, WebP или JPEG до 512 КБ; пусто — значок приложения"`
 	PublicHost   string      `json:"public_host"`
 	Domain       string      `json:"domain"`
+	SubDomain    string      `json:"sub_domain" doc:"Свой домен или поддомен для ссылок подписки; пусто — домен или адрес панели"`
 	PanelPort    int         `json:"panel_port"`
 	SubPort      int         `json:"sub_port" doc:"Отдельный порт подписок; 0 — порт панели. Порт панели отдаёт подписки в любом случае"`
 	SubPortError string      `json:"sub_port_error,omitempty" doc:"sub_port_busy — сохранённый порт занят на сервере, подписки пока идут через порт панели"`
@@ -97,6 +98,7 @@ type patchSettingsBody = struct {
 	HappCrypt     *string              `json:"happ_crypt,omitempty" enum:"off,api,local"`
 	PublicHost    *string              `json:"public_host,omitempty" maxLength:"253"`
 	Domain        *string              `json:"domain,omitempty" maxLength:"253"`
+	SubDomain     *string              `json:"sub_domain,omitempty" maxLength:"253" doc:"Свой домен или поддомен для ссылок подписки; пусто — сбросить"`
 	QuietHourUTC  *int                 `json:"quiet_hour_utc,omitempty" minimum:"0" maximum:"23"`
 	SubGroupMain  *string              `json:"sub_group_main,omitempty" maxLength:"200"`
 	SubGroupAuto  *string              `json:"sub_group_auto,omitempty" maxLength:"200"`
@@ -166,6 +168,7 @@ func (h *handlers) readSettings(ctx context.Context) (SettingsView, error) {
 	get(settings.KeyHappCrypt, &v.HappCrypt)
 	get(settings.KeyPublicHost, &v.PublicHost)
 	get(settings.KeyDomain, &v.Domain)
+	get(settings.KeySubDomain, &v.SubDomain)
 	get(settings.KeyGroupMain, &v.SubGroupMain)
 	get(settings.KeyGroupAuto, &v.SubGroupAuto)
 	get(settings.KeyRouting, &v.SubRouting)
@@ -452,6 +455,27 @@ func (h *handlers) updateSettings(ctx context.Context, in *patchSettingsInput) (
 			}
 		}
 	}
+	if (b.SubDomain != nil || b.PublicHost != nil) && len(details) == 0 {
+		cur, err := h.d.Settings.String(ctx, settings.KeySubDomain)
+		if err != nil {
+			return nil, err
+		}
+		subDom := cur
+		if b.SubDomain != nil {
+			subDom = strings.TrimSpace(*b.SubDomain)
+		}
+		if subDom != "" && (subDom != cur || b.PublicHost != nil) {
+			host := ""
+			if b.PublicHost != nil {
+				host = strings.TrimSpace(*b.PublicHost)
+			} else if host, err = h.d.Settings.String(ctx, settings.KeyPublicHost); err != nil {
+				return nil, err
+			}
+			if d := h.domainHere(ctx, "body.sub_domain", subDom, dnscheck.Own(host)); d != nil {
+				details = append(details, d)
+			}
+		}
+	}
 	if len(details) > 0 {
 		return nil, fieldErrs(details...)
 	}
@@ -499,7 +523,7 @@ func (h *handlers) updateSettings(ctx context.Context, in *patchSettingsInput) (
 	// The certificate is for the domain, or the address without one: a new name gets its
 	// certificate now, not at the next six-hourly check.
 	caChanged := b.ACMECA != nil || b.ACMEEmail != nil || b.ACMEEABKID != nil || b.ACMEEABHMAC != nil
-	if (b.Domain != nil || b.PublicHost != nil || caChanged) && h.d.RenewCert != nil {
+	if (b.Domain != nil || b.SubDomain != nil || b.PublicHost != nil || caChanged) && h.d.RenewCert != nil {
 		h.d.RenewCert()
 	}
 	// Another CA reissues the nodes' certificates too; a new e-mail or key may let a failed

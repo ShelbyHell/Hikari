@@ -4137,6 +4137,8 @@ export interface components {
             sub_announce?: string;
             /** @description https://… или tg://… */
             sub_announce_url?: string;
+            /** @description Свой домен или поддомен для ссылок подписки; пусто — сбросить */
+            sub_domain?: string;
             sub_group_auto?: string;
             sub_group_main?: string;
             /**
@@ -4794,6 +4796,8 @@ export interface components {
             /** @description Куда ведёт нажатие на объявление */
             sub_announce_url: string;
             sub_base_url: string;
+            /** @description Свой домен или поддомен для ссылок подписки; пусто — домен или адрес панели */
+            sub_domain: string;
             /** @description Группа автовыбора самого быстрого подключения */
             sub_group_auto: string;
             /** @description Главная группа в Clash-приложениях */

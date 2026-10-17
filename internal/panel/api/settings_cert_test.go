@@ -96,8 +96,9 @@ func TestAddressChangeRenewsTheCertificate(t *testing.T) {
 	}
 	c.ok(`{"public_host":"203.0.113.10"}`)
 	c.ok(`{"domain":""}`)
-	if c.renewed != 2 || c.woken != 0 {
-		t.Fatalf("an address and a domain saved, %d renewals, %d node wakes", c.renewed, c.woken)
+	c.ok(`{"sub_domain":""}`)
+	if c.renewed != 3 || c.woken != 0 {
+		t.Fatalf("an address, domain, and sub_domain saved, %d renewals, %d node wakes", c.renewed, c.woken)
 	}
 }
 

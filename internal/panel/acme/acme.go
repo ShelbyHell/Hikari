@@ -15,6 +15,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -284,18 +285,23 @@ func (m *Manager) customChanged() bool {
 }
 
 // SetCustom installs the admin's own certificate: checked, kept, served at once. It has
-// to cover the panel's address, or every subscription link would fail.
+// to cover the panel's address and the subscription domain, or subscription links would fail.
 func (m *Manager) SetCustom(ctx context.Context, certPEM, keyPEM []byte) error {
 	cert, err := tlscert.ParseCustom(certPEM, keyPEM, m.now())
 	if err != nil {
 		return err
 	}
-	id, err := m.identifier(ctx)
+	primary, extra, err := m.identifiers(ctx)
 	if err != nil {
 		return err
 	}
-	if id != "" && !tlscert.Covers(cert.Leaf, id) {
+	if primary != "" && !tlscert.Covers(cert.Leaf, primary) {
 		return tlscert.ErrWrongHost
+	}
+	for _, x := range extra {
+		if !tlscert.Covers(cert.Leaf, x) {
+			return tlscert.ErrWrongHost
+		}
 	}
 	if err := tlscert.SaveCustom(m.customDir, cert); err != nil {
 		return err
@@ -315,36 +321,58 @@ func (m *Manager) ClearCustom() error {
 	return nil
 }
 
-func (m *Manager) identifier(ctx context.Context) (string, error) {
+func (m *Manager) identifiers(ctx context.Context) (primary string, extra []string, err error) {
 	d, err := m.set.String(ctx, settings.KeyDomain)
-	if err != nil || d != "" {
-		return d, err
+	if err != nil {
+		return "", nil, err
 	}
-	return m.set.String(ctx, settings.KeyPublicHost)
+	sub, err := m.set.String(ctx, settings.KeySubDomain)
+	if err != nil {
+		return "", nil, err
+	}
+	if d != "" {
+		primary = d
+		if sub != "" && !strings.EqualFold(sub, d) && !isPrivate(sub) {
+			extra = append(extra, sub)
+		}
+		return primary, extra, nil
+	}
+	if sub != "" && !isPrivate(sub) {
+		return sub, nil, nil
+	}
+	h, err := m.set.String(ctx, settings.KeyPublicHost)
+	return h, nil, err
+}
+
+func (m *Manager) identifier(ctx context.Context) (string, error) {
+	primary, _, err := m.identifiers(ctx)
+	return primary, err
 }
 
 // ensure makes the panel serve the right certificate and, when it needs a new one from
 // the CA, orders it. It reports whether that order failed. The order runs outside m.mu:
 // uploading a certificate of one's own must not wait for it.
 func (m *Manager) ensure(ctx context.Context) (orderFailed bool) {
-	id, ca, need := m.settle(ctx)
+	primary, extra, ca, need := m.settle(ctx)
 	if !need {
 		return false
 	}
 	m.orderMu.Lock()
 	defer m.orderMu.Unlock()
 	// Checked again: a certificate may have come meanwhile, an order that waited for ours.
-	if id, ca, need = m.settle(ctx); !need {
+	if primary, extra, ca, need = m.settle(ctx); !need {
 		return false
 	}
-	certPEM, keyPEM, err := m.iss.obtain(ctx, id, ca, serverProvider{m.challenge})
+	certPEM, keyPEM, err := m.iss.obtain(ctx, primary, ca, serverProvider{m.challenge}, extra...)
 	if err == nil {
 		err = savePair(m.dir, certPEM, keyPEM, ca)
 	}
+	ids := append([]string{primary}, extra...)
+	idDesc := strings.Join(ids, ", ")
 	if err != nil {
 		host, _ := m.set.String(ctx, settings.KeyPublicHost)
 		p := Classify(err, dnscheck.Own(host), m.now())
-		m.log.Warn("acme: certificate not obtained", "identifier", id, "ca", ca, "code", p.Code, "holder", p.Holder, "err", err)
+		m.log.Warn("acme: certificate not obtained", "identifier", idDesc, "ca", ca, "code", p.Code, "holder", p.Holder, "err", err)
 		m.journal.Add(Attempt{At: m.now(), CA: ca, Error: p.Code, Detail: p.Detail, Holder: p.Holder})
 		m.mu.Lock()
 		st := *m.status.Load()
@@ -366,7 +394,7 @@ func (m *Manager) ensure(ctx context.Context) (orderFailed bool) {
 		m.announce()
 		return true
 	}
-	m.log.Info("acme: certificate installed", "identifier", id, "ca", ca)
+	m.log.Info("acme: certificate installed", "identifier", idDesc, "ca", ca)
 	m.journal.Add(Attempt{At: m.now(), CA: ca})
 	m.settle(ctx) // now on disk: served, unless the admin's own certificate has come in the meantime
 	return false
@@ -374,24 +402,24 @@ func (m *Manager) ensure(ctx context.Context) (orderFailed bool) {
 
 // settle serves the best certificate there already is and says whether a new one has to
 // be ordered for id, from ca. It does no network.
-func (m *Manager) settle(ctx context.Context) (id, ca string, order bool) {
+func (m *Manager) settle(ctx context.Context) (primary string, extra []string, ca string, order bool) {
 	defer m.announce() // after the lock and the status: Public reads both
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	now := m.now()
-	id, err := m.identifier(ctx)
-	st := &Status{Kind: "self-signed", Identifier: id, CheckedAt: now}
+	primary, extra, err := m.identifiers(ctx)
+	st := &Status{Kind: "self-signed", Identifier: primary, CheckedAt: now}
 	defer func() { m.status.Store(st) }()
 	if err != nil {
 		st.Error, st.ErrorDetail = CodeUnknown, err.Error()
-		return id, "", false
+		return primary, extra, "", false
 	}
 	chosen, err := ChosenCA(ctx, m.set)
 	if err != nil {
 		st.Error, st.ErrorDetail = CodeUnknown, err.Error()
-		return id, "", false
+		return primary, extra, "", false
 	}
-	ca = EffectiveCA(chosen, id)
+	ca = EffectiveCA(chosen, primary)
 	st.WantCA = ca
 	// The admin's own certificate wins while it is valid; an expired or broken one falls
 	// back to the rest, and the status says why.
@@ -399,13 +427,20 @@ func (m *Manager) settle(ctx context.Context) (id, ca string, order bool) {
 	if tlscert.HasCustom(m.customDir) {
 		cert, err := tlscert.LoadCustom(m.customDir, now)
 		if err == nil {
-			info := tlscert.Describe(cert, id, now)
+			info := tlscert.Describe(cert, primary, now)
 			m.holder.Set(cert)
 			st.Kind, st.NotAfter, st.Issuer, st.Names, st.Trusted = "custom", cert.Leaf.NotAfter, info.Issuer, info.Names, info.Trusted
-			if id != "" && !tlscert.Covers(cert.Leaf, id) {
+			coversAll := primary == "" || tlscert.Covers(cert.Leaf, primary)
+			for _, x := range extra {
+				if !tlscert.Covers(cert.Leaf, x) {
+					coversAll = false
+					break
+				}
+			}
+			if !coversAll {
 				st.Error = "custom_wrong_host"
 			}
-			return id, ca, false
+			return primary, extra, ca, false
 		}
 		why := "custom_invalid"
 		if errors.Is(err, tlscert.ErrExpired) {
@@ -415,23 +450,30 @@ func (m *Manager) settle(ctx context.Context) (id, ca string, order bool) {
 		// What the admin set up and lost says more than why the fallback is what it is.
 		defer func() { st.Error = why }()
 	}
-	if isPrivate(id) {
+	if isPrivate(primary) {
 		m.useFallback()
 		st.Error = "no_public_host"
-		return id, ca, false
+		return primary, extra, ca, false
 	}
-	if cert, have, err := loadPair(m.dir); err == nil && tlscert.Covers(cert.Leaf, id) && now.Before(cert.Leaf.NotAfter) {
+	if cert, have, err := loadPair(m.dir); err == nil && tlscert.Covers(cert.Leaf, primary) && now.Before(cert.Leaf.NotAfter) {
 		m.holder.Set(cert) // kept serving while it is renewed, or ordered from another CA
-		info := tlscert.Describe(cert, id, now)
+		info := tlscert.Describe(cert, primary, now)
 		st.Kind, st.NotAfter, st.CA, st.Issuer, st.Names, st.Trusted = "acme", cert.Leaf.NotAfter, have, info.Issuer, info.Names, true
-		if !needsRenewal(cert.Leaf, now) && have == ca {
-			return id, ca, false
+		coversAll := true
+		for _, x := range extra {
+			if !tlscert.Covers(cert.Leaf, x) {
+				coversAll = false
+				break
+			}
+		}
+		if !needsRenewal(cert.Leaf, now) && have == ca && coversAll {
+			return primary, extra, ca, false
 		}
 	}
 	if st.Kind == "self-signed" {
 		m.useFallback()
 	}
-	return id, ca, true
+	return primary, extra, ca, true
 }
 
 func (m *Manager) useFallback() {

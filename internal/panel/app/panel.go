@@ -346,16 +346,20 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 		if err != nil {
 			return subs.Config{}, err
 		}
-		var domainName, publicHost, routing, fingerprint, rules string
+		var domainName, publicHost, subDomain, routing, fingerprint, rules string
 		var groups subs.Groups
-		for key, dst := range map[string]*string{settings.KeyDomain: &domainName, settings.KeyPublicHost: &publicHost, settings.KeyGroupMain: &groups.Main, settings.KeyGroupAuto: &groups.Auto,
+		for key, dst := range map[string]*string{settings.KeyDomain: &domainName, settings.KeyPublicHost: &publicHost, settings.KeySubDomain: &subDomain, settings.KeyGroupMain: &groups.Main, settings.KeyGroupAuto: &groups.Auto,
 			settings.KeyRouting: &routing, settings.KeyFingerprint: &fingerprint, settings.KeyRules: &rules} {
 			if *dst, err = set.String(ctx, key); err != nil {
 				return subs.Config{}, err
 			}
 		}
+		direct := []string{publicHost, domainName}
+		if subDomain != "" {
+			direct = append(direct, subDomain)
+		}
 		cfg := subs.Config{Brand: brand, SupportURL: support, Groups: groups, Routing: subs.ParseRouting(routing), Fingerprint: fingerprint,
-			Direct: []string{publicHost, domainName}, Lang: lang, Rules: subs.ServedRules(rules, groups.WithDefaults(lang))}
+			Direct: direct, Lang: lang, Rules: subs.ServedRules(rules, groups.WithDefaults(lang))}
 		if cfg.Routes, _, err = settings.Get[subs.Routes](ctx, set, settings.KeyRoutes); err != nil {
 			return subs.Config{}, err
 		}
@@ -487,7 +491,12 @@ func (p *Panel) Apply(ctx context.Context) (settings.Paths, error) {
 	if err != nil {
 		return paths, err
 	}
+	subDom, err := p.reload.String(ctx, settings.KeySubDomain)
+	if err != nil {
+		return paths, err
+	}
 	p.server.SetPaths(paths)
+	p.server.SetSubDomain(subDom)
 	p.spa.SetPrefix(paths.Admin)
 	p.spa.SetLang(lang)
 	if p.subPage != nil {

@@ -16,6 +16,57 @@ import { LimitPicker } from "../user/limit-picker";
 // port among them needs nothing else on the server.
 const OPEN_PORTS = [443, 2053, 2083, 2087, 2096, 8443] as const;
 
+// Subscriptions on a domain of their own: subscription links and the subscription page
+// point here. The admin panel is not served on this domain (404), keeping it separate.
+export function SubDomainCard({ s }: { s: Schemas["SettingsView"] }) {
+  const save = useSaveSettings();
+  const { draft: domain, setDraft: setDomain } = useDraft(s.sub_domain ?? "");
+  const error = fieldErrors(save.error).sub_domain;
+  const trimmed = domain.trim();
+  const changed = trimmed !== (s.sub_domain ?? "");
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    save.mutate({ sub_domain: trimmed });
+  };
+  return (
+    <section className="card glass reveal" style={{ "--i": 1 } as React.CSSProperties}>
+      <form onSubmit={submit} noValidate>
+        <div className="card-head">
+          <div>
+            <h2 className="card-title">{t("settings.subDomain")}</h2>
+            <div className="card-sub">{t("settings.subDomainSub")}</div>
+          </div>
+          {s.sub_domain ? <Pill tone="ok">{s.sub_domain}</Pill> : null}
+        </div>
+        {s.sub_base_url ? (
+          <div className="panel-soft mb-4 p-3">
+            <div className="text-xs text-[var(--ink-500)]">{t("settings.subPortLinks")}</div>
+            <div className="mono truncate text-[13px]">{s.sub_base_url.replace(/[^/]+\/$/, "…")}</div>
+          </div>
+        ) : null}
+        <Field label={t("settings.subDomainField")} htmlFor="s-sub-domain" hint={t("settings.subDomainHint")} error={error}>
+          <input
+            id="s-sub-domain"
+            className="input mono max-w-[320px]"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder={s.domain || "sub.example.com"}
+            aria-invalid={!!error}
+          />
+        </Field>
+        <p className="text-xs text-[var(--ink-500)]">{t("settings.subDomainNote")}</p>
+        <FormActions saving={save.isPending && save.variables?.sub_domain === trimmed} disabled={!changed}>
+          {s.sub_domain ? (
+            <Button variant="ghost" loading={save.isPending && save.variables?.sub_domain === ""} onClick={() => save.mutate({ sub_domain: "" })}>
+              {t("settings.subDomainOff")}
+            </Button>
+          ) : null}
+        </FormActions>
+      </form>
+    </section>
+  );
+}
+
 // Subscriptions on a port of their own: a usual HTTPS port looks like any site, and the
 // admin panel's port stops showing in every link. Links on the old port keep working.
 export function SubPortCard({ s }: { s: Schemas["SettingsView"] }) {

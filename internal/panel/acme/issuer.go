@@ -72,7 +72,7 @@ func (u *user) GetPrivateKey() crypto.PrivateKey        { return u.key }
 
 // obtain orders a certificate for id from ca, the challenge answered by p. It returns the
 // chain and the key in PEM.
-func (i *issuer) obtain(ctx context.Context, id, ca string, p challenge.Provider) (certPEM, keyPEM []byte, err error) {
+func (i *issuer) obtain(ctx context.Context, id, ca string, p challenge.Provider, extra ...string) (certPEM, keyPEM []byte, err error) {
 	key, err := i.accountKey(ca)
 	if err != nil {
 		return nil, nil, err
@@ -82,7 +82,8 @@ func (i *issuer) obtain(ctx context.Context, id, ca string, p challenge.Provider
 		return nil, nil, err
 	}
 	u := &user{email: email, key: key}
-	req, noCN := order(id)
+	ids := append([]string{id}, extra...)
+	req, noCN := order(ids...)
 	cfg := lego.NewConfig(u)
 	cfg.CADirURL = i.directory(ca)
 	cfg.Certificate.KeyType = certcrypto.EC256
@@ -161,9 +162,9 @@ func (i *issuer) accountKey(ca string) (crypto.PrivateKey, error) {
 // order is what the CA is asked for. Let's Encrypt issues an IP certificate only with the
 // shortlived profile and only with the IP in the SAN: an IP in the Common Name is refused
 // as badCSR, so the CSR goes without one. A domain keeps its Common Name.
-func order(id string) (req certificate.ObtainRequest, noCommonName bool) {
-	req = certificate.ObtainRequest{Domains: []string{id}, Bundle: true}
-	if net.ParseIP(id) != nil {
+func order(ids ...string) (req certificate.ObtainRequest, noCommonName bool) {
+	req = certificate.ObtainRequest{Domains: ids, Bundle: true}
+	if len(ids) > 0 && net.ParseIP(ids[0]) != nil {
 		req.Profile = "shortlived"
 		return req, true
 	}

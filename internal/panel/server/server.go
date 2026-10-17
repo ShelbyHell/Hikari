@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net"
 	"net/http"
 	"path"
 	"strings"
@@ -14,12 +15,13 @@ import (
 // path, or nothing. Everything else gets the same bare 404, so a scanner cannot tell
 // a panel from any other HTTPS endpoint.
 type Server struct {
-	paths  atomic.Pointer[settings.Paths]
-	admin  http.Handler
-	sub    http.Handler
-	legacy http.Handler // the old panel's links (settings.Paths.Legacy); nil: none
-	site   http.Handler // every other path (OwnSite); nil: NotFound
-	hsts   atomic.Pointer[func() bool]
+	paths     atomic.Pointer[settings.Paths]
+	subDomain atomic.Pointer[string]
+	admin     http.Handler
+	sub       http.Handler
+	legacy    http.Handler // the old panel's links (settings.Paths.Legacy); nil: none
+	site      http.Handler // every other path (OwnSite); nil: NotFound
+	hsts      atomic.Pointer[func() bool]
 	// hello answers a node's hello and says so; whatever it does not answer is served
 	// like any unknown path (see nodehello). nil: none.
 	hello func(w http.ResponseWriter, r *http.Request) bool
@@ -41,6 +43,16 @@ func New(admin, sub http.Handler) *Server {
 }
 
 func (s *Server) SetPaths(p settings.Paths) { s.paths.Store(&p) }
+
+// SetSubDomain sets the subscription domain: requests for the admin panel on this domain
+// get the same 404 as any unknown path, so the secret admin path stays hidden on it.
+func (s *Server) SetSubDomain(d string) {
+	if d == "" {
+		s.subDomain.Store(nil)
+		return
+	}
+	s.subDomain.Store(&d)
+}
 
 // SetHSTS makes the answers tell browsers to use HTTPS for this host from now on, while on
 // says so. Only for a panel that serves TLS itself, and only while its certificate is one
@@ -64,6 +76,17 @@ func (s *Server) SubOnly() http.Handler {
 }
 
 func (s *Server) serve(w http.ResponseWriter, r *http.Request, admin bool) {
+	if admin {
+		if sub := s.subDomain.Load(); sub != nil && *sub != "" {
+			host := r.Host
+			if h, _, err := net.SplitHostPort(host); err == nil {
+				host = h
+			}
+			if strings.EqualFold(host, *sub) {
+				admin = false
+			}
+		}
+	}
 	SecurityHeaders(w.Header())
 	if on := s.hsts.Load(); on != nil && (*on)() {
 		w.Header().Set("Strict-Transport-Security", HSTSValue)

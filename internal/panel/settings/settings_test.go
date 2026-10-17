@@ -58,3 +58,65 @@ func TestCachedSettings(t *testing.T) {
 		t.Fatal("a plain Settings reads the table every time")
 	}
 }
+
+func TestSubEndpoint(t *testing.T) {
+	ctx := context.Background()
+	st, err := storetest.Open(ctx, t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { st.Close() })
+	s := New(st.Q)
+
+	// Default: public_host + panel_port
+	if err := Set(ctx, s, KeyPublicHost, "1.2.3.4"); err != nil {
+		t.Fatal(err)
+	}
+	if err := Set(ctx, s, KeyPanelPort, 8443); err != nil {
+		t.Fatal(err)
+	}
+	ep, err := s.SubEndpoint(ctx)
+	if err != nil || ep.Host != "1.2.3.4" || ep.Port != 8443 {
+		t.Fatalf("default: %+v %v", ep, err)
+	}
+
+	// Domain set
+	if err := Set(ctx, s, KeyDomain, "panel.example.com"); err != nil {
+		t.Fatal(err)
+	}
+	ep, err = s.SubEndpoint(ctx)
+	if err != nil || ep.Host != "panel.example.com" || ep.Port != 8443 {
+		t.Fatalf("domain: %+v %v", ep, err)
+	}
+
+	// SubPort set
+	if err := Set(ctx, s, KeySubPort, 2053); err != nil {
+		t.Fatal(err)
+	}
+	ep, err = s.SubEndpoint(ctx)
+	if err != nil || ep.Host != "panel.example.com" || ep.Port != 2053 {
+		t.Fatalf("sub_port: %+v %v", ep, err)
+	}
+
+	// SubDomain set: overrides domain
+	if err := Set(ctx, s, KeySubDomain, "sub.example.com"); err != nil {
+		t.Fatal(err)
+	}
+	ep, err = s.SubEndpoint(ctx)
+	if err != nil || ep.Host != "sub.example.com" || ep.Port != 2053 {
+		t.Fatalf("sub_domain: %+v %v", ep, err)
+	}
+	if u := ep.URL(); u != "https://sub.example.com:2053" {
+		t.Fatalf("sub URL: %q", u)
+	}
+
+	// Reset SubDomain -> falls back to domain
+	if err := Set(ctx, s, KeySubDomain, ""); err != nil {
+		t.Fatal(err)
+	}
+	ep, err = s.SubEndpoint(ctx)
+	if err != nil || ep.Host != "panel.example.com" || ep.Port != 2053 {
+		t.Fatalf("sub_domain reset: %+v %v", ep, err)
+	}
+}
+

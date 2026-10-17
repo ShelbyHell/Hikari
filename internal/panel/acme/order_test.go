@@ -18,4 +18,8 @@ func TestOrder(t *testing.T) {
 			t.Errorf("%s: %+v, no CN %v", id, req, noCN)
 		}
 	}
+	multiReq, multiNoCN := order("vpn.example.com", "sub.example.com")
+	if multiReq.Profile != "" || multiNoCN || len(multiReq.Domains) != 2 || multiReq.Domains[0] != "vpn.example.com" || multiReq.Domains[1] != "sub.example.com" {
+		t.Errorf("multi-domain order: %+v, no CN %v", multiReq, multiNoCN)
+	}
 }
