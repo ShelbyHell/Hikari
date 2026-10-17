@@ -338,7 +338,9 @@ func (h *Handler) serveProfile(w http.ResponseWriter, r *http.Request, u db.User
 		w.Header().Set("Content-Disposition", "attachment; filename*=UTF-8''"+url.PathEscape(fileName(profileTitle(cfg, vars)))+".json")
 		_, _ = w.Write(body)
 	default:
-		links, err := URIs(prof)
+		prof.Routes, prof.App, prof.Lang = cfg.Routes, app, cfg.Lang
+		prof.Groups = cfg.Groups
+		links, err := URIs(prof, cfg.Groups)
 		if err != nil {
 			h.profileFailed(w, u, cfg, format, err)
 			return

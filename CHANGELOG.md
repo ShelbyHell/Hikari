@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.7
+### en
+- **Auto choice group in Happ, v2RayTun and Xray apps**. Subscriptions for Xray-family applications (`Happ`, `v2RayTun`, `INCY`, `v2rayNG`, `v2rayN`, etc.) now include an auto choice group with its own name (`sub_group_auto`, default "Авто" / "Auto"), matching Clash and Sing-box behavior: the client automatically tests latency and keeps the fastest working server.
+### ru
+- **Автовыбор в Happ, v2RayTun и приложениях на Xray**. В подписки для приложений семейства Xray (`Happ`, `v2RayTun`, `INCY`, `v2rayNG`, `v2rayN` и др.) теперь добавляется группа автовыбора со своим названием (`sub_group_auto`, по умолчанию «Авто» / «Auto»), аналогично Clash- и Sing-box-приложениям: приложение само держит самый быстрый рабочий сервер по минимальному пингу.
+
 ## 0.5.1.2-rc.6
 ### en
 - **Dedicated certificate management for subscription domain** (Settings → Subscription → Subscription certificate). Isolated certificate lifecycle solely for the subscription domain (`sub_domain`), separate from the panel domain. Supports on-demand ACME issuance and retry ("Get now" / "Retry"), SNI-based certificate serving, custom certificate upload and replacement (`fullchain.pem` / `privkey.pem`) via drawer, and seamless reset to automatic certificate.

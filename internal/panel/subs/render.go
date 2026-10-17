@@ -3,6 +3,8 @@
 package subs
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/netip"
@@ -155,6 +157,7 @@ type Profile struct {
 	Routes Routes
 	App    App
 	Lang   string
+	Groups Groups
 }
 
 type proxy struct {
@@ -258,13 +261,29 @@ func firstPort(spec string) (int, error) {
 	return p, nil
 }
 
-// URIs renders one share link per inbound.
-func URIs(p Profile) (string, error) {
+// PolicyGroupURI renders an Xray policy-group (balancer) link for v2rayN, v2rayNG, Happ, v2RayTun.
+func PolicyGroupURI(name string) string {
+	raw, _ := json.Marshal(map[string]any{
+		"IndexId":       "auto",
+		"ConfigType":    101,
+		"ConfigVersion": 4,
+		"Remarks":       name,
+		"ProtoExtraObj": map[string]any{
+			"SubChildItems": "self",
+			"Filter":        ".*",
+			"MultipleLoad":  0,
+		},
+	})
+	return "v2rayn://policygroup/" + base64.StdEncoding.EncodeToString(raw)
+}
+
+// URIs renders one share link per inbound, and an auto-choice group when groups are given.
+func URIs(p Profile, groups ...Groups) (string, error) {
 	ps, err := build(p)
 	if err != nil {
 		return "", err
 	}
-	lines := make([]string, 0, len(ps))
+	lines := make([]string, 0, len(ps)+1)
 	for _, x := range ps {
 		if x.uri != "" { // the mihomo-only types have no share link
 			lines = append(lines, x.uri)
@@ -272,6 +291,18 @@ func URIs(p Profile) (string, error) {
 	}
 	if len(lines) == 0 {
 		return "", ErrNoProxies
+	}
+	var g Groups
+	if len(groups) > 0 {
+		g = groups[0]
+	} else if p.Groups != (Groups{}) {
+		g = p.Groups
+	}
+	if g != (Groups{}) || len(groups) > 0 {
+		autoName := g.WithDefaults(p.Lang).Auto
+		if autoName != "" {
+			lines = append(lines, PolicyGroupURI(autoName))
+		}
 	}
 	return strings.Join(lines, "\n"), nil
 }

@@ -154,3 +154,73 @@ func anyStrings(v any) []string {
 	}
 	return out
 }
+
+func TestXrayAutoSelectionGroup(t *testing.T) {
+	k := newKeyHarness(t)
+	ctx := t.Context()
+	clock := func() time.Time { return k.now }
+	tariffs, _ := k.st.Q.ListTariffs(ctx)
+	u, err := domain.NewUsers(k.st, domain.NewPool(k.st, clock), noChanges{}, clock).Create(ctx, domain.CreateInput{Name: "xray-user", TariffID: tariffs[1].ID})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fetchAutoGroup := func(ua string) string {
+		t.Helper()
+		resp, raw := k.do(http.MethodGet, "/"+subPath+"/"+u.SubToken, nil, map[string]string{"User-Agent": ua})
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("fetch %s: %d", ua, resp.StatusCode)
+		}
+		decoded, err := base64.StdEncoding.DecodeString(string(raw))
+		if err != nil {
+			t.Fatalf("decode base64: %v", err)
+		}
+		lines := strings.Split(strings.TrimSpace(string(decoded)), "\n")
+		last := lines[len(lines)-1]
+		if !strings.HasPrefix(last, "v2rayn://policygroup/") {
+			t.Fatalf("expected last line to be policygroup: %s", last)
+		}
+		payload := strings.TrimPrefix(last, "v2rayn://policygroup/")
+		groupJSON, err := base64.StdEncoding.DecodeString(payload)
+		if err != nil {
+			t.Fatalf("decode group base64: %v", err)
+		}
+		var item struct {
+			IndexId       string `json:"IndexId"`
+			ConfigType    int    `json:"ConfigType"`
+			ConfigVersion int    `json:"ConfigVersion"`
+			Remarks       string `json:"Remarks"`
+			ProtoExtraObj struct {
+				SubChildItems string `json:"SubChildItems"`
+				Filter        string `json:"Filter"`
+				MultipleLoad  int    `json:"MultipleLoad"`
+			} `json:"ProtoExtraObj"`
+		}
+		if err := json.Unmarshal(groupJSON, &item); err != nil {
+			t.Fatalf("unmarshal group json: %v", err)
+		}
+		if item.ConfigType != 101 || item.ProtoExtraObj.SubChildItems != "self" || item.ProtoExtraObj.MultipleLoad != 0 {
+			t.Fatalf("unexpected group item: %+v", item)
+		}
+		return item.Remarks
+	}
+
+	// Default name in Russian: "Авто"
+	for _, ua := range []string{"Happ/3.6.0/Android", "v2RayTun/5.1.0", "v2rayNG/1.8.12", "v2rayN/6.23"} {
+		if name := fetchAutoGroup(ua); name != "Авто" {
+			t.Errorf("%s got group name %q, want 'Авто'", ua, name)
+		}
+	}
+
+	// Custom name via sub_group_auto
+	k.now = k.now.Add(time.Minute)
+	if resp, raw := k.do(http.MethodPatch, k.api+"/settings", map[string]any{"sub_group_auto": "⚡ Быстрый"}, k.csrf); resp.StatusCode != http.StatusOK {
+		t.Fatalf("patch sub_group_auto: %d %s", resp.StatusCode, raw)
+	}
+	k.now = k.now.Add(time.Minute) // past settings cache
+	for _, ua := range []string{"Happ/3.6.0/Android", "v2RayTun/5.1.0"} {
+		if name := fetchAutoGroup(ua); name != "⚡ Быстрый" {
+			t.Errorf("%s got group name %q, want '⚡ Быстрый'", ua, name)
+		}
+	}
+}

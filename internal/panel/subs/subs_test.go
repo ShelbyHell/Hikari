@@ -1,6 +1,7 @@
 package subs
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/url"
 	"strings"
@@ -109,6 +110,78 @@ func TestURIsWithRealCertificateDoNotPin(t *testing.T) {
 	}
 	if strings.Contains(links, "insecure") || strings.Contains(links, "pinSHA256") {
 		t.Fatalf("real certificate must be verified normally: %s", links)
+	}
+}
+
+func TestPolicyGroupURI(t *testing.T) {
+	uri := PolicyGroupURI("Авто")
+	if !strings.HasPrefix(uri, "v2rayn://policygroup/") {
+		t.Fatalf("unexpected prefix: %s", uri)
+	}
+	payload := strings.TrimPrefix(uri, "v2rayn://policygroup/")
+	raw, err := base64.StdEncoding.DecodeString(payload)
+	if err != nil {
+		t.Fatalf("decode base64: %v", err)
+	}
+	var item struct {
+		IndexId       string `json:"IndexId"`
+		ConfigType    int    `json:"ConfigType"`
+		ConfigVersion int    `json:"ConfigVersion"`
+		Remarks       string `json:"Remarks"`
+		ProtoExtraObj struct {
+			SubChildItems string `json:"SubChildItems"`
+			Filter        string `json:"Filter"`
+			MultipleLoad  int    `json:"MultipleLoad"`
+		} `json:"ProtoExtraObj"`
+	}
+	if err := json.Unmarshal(raw, &item); err != nil {
+		t.Fatalf("unmarshal json: %v", err)
+	}
+	if item.IndexId != "auto" || item.ConfigType != 101 || item.ConfigVersion != 4 || item.Remarks != "Авто" {
+		t.Fatalf("policygroup item: %+v", item)
+	}
+	if item.ProtoExtraObj.SubChildItems != "self" || item.ProtoExtraObj.Filter != ".*" || item.ProtoExtraObj.MultipleLoad != 0 {
+		t.Fatalf("policygroup proto: %+v", item.ProtoExtraObj)
+	}
+}
+
+func TestURIsWithGroups(t *testing.T) {
+	prof := profile(t, "ab12")
+	links, err := URIs(prof, Groups{Auto: "Fastest"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(links, "\n")
+	if len(lines) != 5 {
+		t.Fatalf("got %d lines, want 5 (4 inbounds + 1 policygroup)", len(lines))
+	}
+	last := lines[len(lines)-1]
+	if !strings.HasPrefix(last, "v2rayn://policygroup/") {
+		t.Fatalf("last line should be policygroup: %s", last)
+	}
+	payload := strings.TrimPrefix(last, "v2rayn://policygroup/")
+	raw, err := base64.StdEncoding.DecodeString(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var item struct {
+		Remarks string `json:"Remarks"`
+	}
+	if err := json.Unmarshal(raw, &item); err != nil || item.Remarks != "Fastest" {
+		t.Fatalf("expected Remarks 'Fastest', got %+v", item)
+	}
+
+	// English default
+	prof.Lang = "en"
+	linksEn, err := URIs(prof, Groups{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	linesEn := strings.Split(linksEn, "\n")
+	rawEn, _ := base64.StdEncoding.DecodeString(strings.TrimPrefix(linesEn[len(linesEn)-1], "v2rayn://policygroup/"))
+	_ = json.Unmarshal(rawEn, &item)
+	if item.Remarks != "Auto" {
+		t.Fatalf("expected 'Auto' for English default, got %q", item.Remarks)
 	}
 }
 

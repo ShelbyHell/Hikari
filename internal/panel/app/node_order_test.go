@@ -86,6 +86,9 @@ func TestNodeOrder(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			if link.Scheme == "v2rayn" {
+				continue
+			}
 			if len(out) == 0 || out[len(out)-1] != link.Hostname() {
 				out = append(out, link.Hostname())
 			}
