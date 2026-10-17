@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.4
+### en
+- **Dedicated subscription domain** (Settings → Subscription → Subscription domain). A separate domain or subdomain (e.g. `sub.example.com`) specifically for subscription links and the subscription page. Subscription links stay intact if the admin panel moves to another domain or server. The secret admin panel is completely isolated and inaccessible on this domain (returns 404). ACME automatically obtains and renews a multi-domain certificate covering both the panel domain and the subscription domain.
+### ru
+- **Свой домен для подписки** («Настройки → Подписка → Домен подписки»). Отдельный домен или поддомен (например, `sub.example.com`) для ссылок подписки и страницы подключения. Ссылки клиентов больше не меняются при смене домена или переезде панели управления. Секретный путь панели на домене подписки полностью скрыт и недоступен (возвращается 404). Сертификат ACME автоматически заказывается и продлевается сразу на оба домена (основной и подписки).
+
 ## 0.5.1.2-rc.3
 ### en
 - **Addon image validation updated**: official addons now validated against `ghcr.io/shelbyhell/` instead of `ghcr.io/getmikan/`.
