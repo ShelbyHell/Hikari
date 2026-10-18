@@ -28,6 +28,7 @@ impl Install {
             if missing { anyhow!("Hikari is not installed here: run `hikari install`") } else { e }
         })?;
         let node = env.get("MIKAN_MODE") == Some("node");
+        let _ = docker::ensure_compose(Path::new(DIR), node);
         Ok(Self { env, node })
     }
 
