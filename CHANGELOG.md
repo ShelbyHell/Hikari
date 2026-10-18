@@ -5,9 +5,19 @@ the signed manifest, and the panel shows the one in its language.
 
 ## 0.5.1.2-rc.11
 ### en
-- **Fix Docker Compose environment interpolation and pre-update database backup**: Pass configuration and secret variables into `docker compose` process environment so old `compose.yaml` templates interpolate without unset variable warnings. Pass `MIKAN_DATABASE_URL` explicitly into `docker compose run panel database` and `admin` to ensure pre-update backups running on older container images succeed.
+- **Full Docker secrets & `config.json` transition polish**:
+  - Automatically migrate legacy `.env` to `config.json` and `secrets/` whenever `Install::load()` is called by any command.
+  - Enforce atomic order: write secrets (`0700` dir, `0600` files) and `config.json` to disk *before* writing or updating `compose.yaml`.
+  - Pass all configuration and secret variables directly into `docker compose` process environment, cleanly eliminating unset variable warnings on old templates.
+  - Pass `MIKAN_DATABASE_URL` explicitly into `docker compose run panel database` and `admin` to ensure pre-update backups on older container images succeed.
+  - Updated all diagnostic messages, ACME guide texts, and error messages to reference `/opt/mikan/config.json`.
 ### ru
-- **Исправление переменных окружения Docker Compose и бэкапа перед обновлением**: Переменные конфигурации и секретов теперь передаются напрямую в процесс `docker compose`, предотвращая предупреждения о незаданных переменных в старых `compose.yaml`. `MIKAN_DATABASE_URL` явно передаётся в `docker compose run panel database` и `admin`, гарантируя успешное создание бэкапа базы данных перед обновлением на контейнерах со старым образом.
+- **Полная доработка перехода с `.env` на Docker secrets и `config.json`**:
+  - Автоматическая миграция со старого `.env` на `config.json` и `secrets/` при вызове любых команд `hikari` (`Install::load`).
+  - Строгий порядок создания: секреты (директория `0700`, файлы `0600`) и `config.json` гарантированно записываются на диск *до* создания или обновления `compose.yaml`.
+  - Переменные конфигурации и секретов передаются напрямую в процесс `docker compose`, устраняя предупреждения о незаданных переменных в старых `compose.yaml`.
+  - `MIKAN_DATABASE_URL` явно передаётся в `docker compose run panel database` и `admin`, гарантируя успешное создание бэкапа базы данных перед обновлением на контейнерах со старым образом.
+  - Все диагностические сообщения, подсказки ACME и ошибки приведены в соответствие с `/opt/mikan/config.json`.
 
 ## 0.5.1.2-rc.10
 ### en

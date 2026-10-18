@@ -704,15 +704,16 @@ fn write_files_in(root: &Path, plan: &Plan, image: &str, version: &str, api_port
             false
         }
     };
+    if !node {
+        postgres_env(&mut env)?;
+    }
+    env.save()?;
     if plan.resume {
         docker::ensure_compose(root, node)?;
     } else {
         write_private(&root.join("compose.yaml"), docker::compose_text(node).as_bytes())?;
     }
-    if !node {
-        postgres_env(&mut env)?;
-    }
-    env.save()
+    Ok(())
 }
 
 /// Credentials persist across updates and resumed installs; never rotate a live database.

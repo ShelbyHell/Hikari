@@ -24,9 +24,12 @@ impl Install {
     pub fn load() -> Result<Self> {
         let env = EnvFile::load(Path::new(DIR)).map_err(|e| {
             let missing = e.root_cause().downcast_ref::<std::io::Error>().is_some_and(|io| io.kind() == std::io::ErrorKind::NotFound);
-            // Only a missing file means "not installed": a .env that cannot be read says why.
+            // Only a missing file means "not installed": configuration that cannot be read says why.
             if missing { anyhow!("Hikari is not installed here: run `hikari install`") } else { e }
         })?;
+        if !Path::new(DIR).join("config.json").exists() {
+            let _ = env.save();
+        }
         let node = env.get("MIKAN_MODE") == Some("node");
         let _ = docker::ensure_compose(Path::new(DIR), node);
         Ok(Self { env, node })
@@ -122,7 +125,7 @@ pub fn cert_proxy(domain: &str, yes: bool) -> Result<()> {
             Ok(())
         }
         acme::Port80::Other(who) => bail!(
-            "port 80 is held by {who}, which Hikari cannot configure. Free port 80, or make {who} pass /.well-known/acme-challenge/ to 127.0.0.1:{port}, set MIKAN_ACME_LISTEN=127.0.0.1:{port} in {DIR}/.env and run: hikari restart",
+            "port 80 is held by {who}, which Hikari cannot configure. Free port 80, or make {who} pass /.well-known/acme-challenge/ to 127.0.0.1:{port}, set \"acme_listen\": \"127.0.0.1:{port}\" in {DIR}/config.json and run: hikari restart",
             port = acme::free_port()
         ),
         acme::Port80::Front(front, port) => {
@@ -338,7 +341,7 @@ pub fn join(key: &str, panel_ip: Option<IpAddr>) -> Result<()> {
     if !install.node {
         bail!("join is for a node: this server runs a panel");
     }
-    let image = install.env.get("MIKAN_IMAGE").context("no MIKAN_IMAGE in .env")?.to_owned();
+    let image = install.env.get("MIKAN_IMAGE").context("no MIKAN_IMAGE in configuration")?.to_owned();
     let port = setup::node_port(&image, key.trim())?;
     install.env.set("MIKAN_NODE_JOIN", key.trim())?;
     install.env.set("NODE_API_PORT", &port.to_string())?;

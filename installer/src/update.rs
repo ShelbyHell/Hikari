@@ -895,7 +895,7 @@ fn schema_change(out: &str) -> Option<(u64, u64)> {
 /// meanwhile stays: its volume may already be initialized with it, and another one on the
 /// next attempt would lock the panel out of its own database.
 fn previous_env(root: &Path, now: &EnvFile, old_env: &str) -> Result<EnvFile> {
-    let mut env = EnvFile::from_text(root.join(".env"), old_env);
+    let mut env = EnvFile::from_text(root.join("config.json"), old_env);
     if let Some(password) = now.get("MIKAN_POSTGRES_PASSWORD") {
         env.set("MIKAN_POSTGRES_PASSWORD", password)?;
     }

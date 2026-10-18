@@ -186,7 +186,7 @@ fn ports(install: &Install, engine: bool) -> Vec<Item> {
                 ),
             },
             None => {
-                Item::error("API port", "NODE_API_PORT is not set in /opt/mikan/.env", "hikari join <new key from the panel's Nodes page>")
+                Item::error("API port", "node_api_port is not set in /opt/mikan/config.json", "hikari join <new key from the panel's Nodes page>")
             }
         }];
     }

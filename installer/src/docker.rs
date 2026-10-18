@@ -191,6 +191,9 @@ pub fn ensure_compose(root: &Path, node: bool) -> Result<Option<String>> {
     if have.as_deref() == Some(want) {
         return Ok(None);
     }
+    if let Ok(env) = crate::envfile::EnvFile::load(root) {
+        let _ = env.save();
+    }
     if let Some(old) = &have {
         write_private(&root.join("compose.yaml.old"), old.as_bytes())?;
     }
