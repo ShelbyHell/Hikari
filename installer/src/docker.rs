@@ -420,6 +420,11 @@ pub fn load(archive: &str) -> Result<String> {
 pub fn compose(args: &[&str]) -> Command {
     let mut cmd = Command::new("docker");
     cmd.args(["compose", "--project-directory", DIR]).args(args).current_dir(DIR);
+    if let Ok(env) = crate::envfile::EnvFile::load(Path::new(DIR)) {
+        for (k, v) in env.entries() {
+            cmd.env(k, v);
+        }
+    }
     cmd
 }
 
@@ -442,7 +447,14 @@ pub fn admin(args: &[&str], stdin: Option<&str>) -> Result<Output> {
 
 /// `hikari admin …` in a one-off panel container, before the panel runs (bootstrap).
 pub fn admin_once(args: &[&str], stdin: Option<&str>) -> Result<Output> {
-    let mut full = vec!["run", "--rm", "--no-deps", "-T", "panel", "admin"];
+    let mut full = vec!["run", "--rm", "--no-deps", "-T"];
+    let env = crate::envfile::EnvFile::load(Path::new(DIR)).ok();
+    let dsn = env.as_ref().and_then(|e| e.get("MIKAN_DATABASE_URL")).map(|d| format!("MIKAN_DATABASE_URL={d}"));
+    if let Some(d) = &dsn {
+        full.push("-e");
+        full.push(d.as_str());
+    }
+    full.extend_from_slice(&["panel", "admin"]);
     full.extend_from_slice(args);
     with_stdin(compose(&full), stdin)
 }
@@ -460,7 +472,15 @@ pub fn database(args: &[&str]) -> Result<Output> {
 /// run` alone leaves the container running); PostgreSQL rolls its transaction back.
 fn database_within(args: &[&str], limit: Duration) -> Result<Output> {
     let name = format!("mikan-database-{}-{}", std::process::id(), crate::clock::Utc::now().stamp());
-    let mut full = vec!["run", "--rm", "--no-deps", "-T", "--name", name.as_str(), "panel", "database"];
+    let mut full = vec!["run", "--rm", "--no-deps", "-T", "--name", name.as_str()];
+    let env = crate::envfile::EnvFile::load(Path::new(DIR)).ok();
+    let dsn = env.as_ref().and_then(|e| e.get("MIKAN_DATABASE_URL")).map(|d| format!("MIKAN_DATABASE_URL={d}"));
+    if let Some(d) = &dsn {
+        full.push("-e");
+        full.push(d.as_str());
+    }
+    full.push("panel");
+    full.push("database");
     full.extend_from_slice(args);
     let what = format!("docker compose run panel database {}", args.join(" "));
     let child = compose(&full).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn().with_context(|| what.clone())?;

@@ -169,6 +169,23 @@ impl EnvFile {
         self.lines.retain(|l| !l.strip_prefix(key).is_some_and(|r| r.starts_with('=')));
     }
 
+    /// Returns all key-value entries currently loaded.
+    pub fn entries(&self) -> Vec<(&str, &str)> {
+        let mut map = std::collections::BTreeMap::new();
+        for line in &self.lines {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
+            if let Some((k, _)) = line.split_once('=') {
+                if let Some(v) = self.get(k) {
+                    map.insert(k, v);
+                }
+            }
+        }
+        map.into_iter().collect()
+    }
+
     pub fn render(&self) -> String {
         let mut s = self.lines.join("\n");
         s.push('\n');
@@ -387,6 +404,13 @@ mod tests {
         assert_eq!(e.get("E"), None);
         e.set("MIKAN_IMAGE", "fresh").unwrap();
         assert_eq!(e.render(), "PANEL_PORT=\"2053\"\nMIKAN_IMAGE=fresh\nQ='x'\nE=\n");
+    }
+
+    #[test]
+    fn entries_returns_all_keys() {
+        let e = EnvFile::parse("x".into(), "A=1\n# comment\nB='2'\nC=\"hello\"\nA=updated\n");
+        let entries = e.entries();
+        assert_eq!(entries, vec![("A", "updated"), ("B", "2"), ("C", "hello")]);
     }
 
     #[test]

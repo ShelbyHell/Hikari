@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.11
+### en
+- **Fix Docker Compose environment interpolation and pre-update database backup**: Pass configuration and secret variables into `docker compose` process environment so old `compose.yaml` templates interpolate without unset variable warnings. Pass `MIKAN_DATABASE_URL` explicitly into `docker compose run panel database` and `admin` to ensure pre-update backups running on older container images succeed.
+### ru
+- **Исправление переменных окружения Docker Compose и бэкапа перед обновлением**: Переменные конфигурации и секретов теперь передаются напрямую в процесс `docker compose`, предотвращая предупреждения о незаданных переменных в старых `compose.yaml`. `MIKAN_DATABASE_URL` явно передаётся в `docker compose run panel database` и `admin`, гарантируя успешное создание бэкапа базы данных перед обновлением на контейнерах со старым образом.
+
 ## 0.5.1.2-rc.10
 ### en
 - **DNS at the exit on nodes (Exit DNS)**: Nodes can now sniff the visited website domain name directly from connection handshakes (TLS, HTTP, QUIC on ports 443, 8443, 80, 8080–8880) instead of relying on the IP address resolved by the client device. This resolves issues where clients using Xray-based cores (Happ, v2RayTun, v2rayNG) resolve DNS locally and sites incorrectly detect the user's origin country. Includes configurable outbound resolver presets (node's host resolver, Cloudflare, Google, Quad9, or custom list) dynamically applied at runtime on Apply. Configured in panel under Settings → Routing → DNS at the exit (`exit_dns`), enabled by default.
