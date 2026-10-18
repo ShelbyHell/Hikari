@@ -12,6 +12,31 @@ import (
 	"github.com/lib/pq"
 )
 
+const createDevicePayment = `-- name: CreateDevicePayment :one
+INSERT INTO payments (provider, payload, tg_id, kind, user_id, tariff_name, amount, currency, status, created_at)
+VALUES ($1, $2, $3, 'device', $4, $5, $6, $7, 'pending', $8)
+RETURNING id, provider, payload, external_id, tg_id, kind, user_id, tariff_id, package_id, tariff_name, amount, currency, status, error, pay_url, created_at, paid_at, applied_at, refunded_at, term_days, revert
+`
+
+type CreateDevicePaymentParams struct { Provider, Payload string; TgID int64; UserID sql.NullInt64; TariffName string; Amount int64; Currency string; CreatedAt int64 }
+func (q *Queries) CreateDevicePayment(ctx context.Context, arg CreateDevicePaymentParams) (Payment, error) {
+	row := q.db.QueryRowContext(ctx, createDevicePayment, arg.Provider, arg.Payload, arg.TgID, arg.UserID, arg.TariffName, arg.Amount, arg.Currency, arg.CreatedAt)
+	var i Payment
+	err := row.Scan(&i.ID, &i.Provider, &i.Payload, &i.ExternalID, &i.TgID, &i.Kind, &i.UserID, &i.TariffID, &i.PackageID, &i.TariffName, &i.Amount, &i.Currency, &i.Status, &i.Error, &i.PayUrl, &i.CreatedAt, &i.PaidAt, &i.AppliedAt, &i.RefundedAt, &i.TermDays, &i.Revert)
+	return i, err
+}
+
+const findOpenDevicePayments = `-- name: FindOpenDevicePayments :many
+SELECT * FROM payments WHERE tg_id = $1 AND user_id = $2 AND provider = $3 AND kind = 'device' AND status = 'pending' AND pay_url <> '' AND created_at > $4 ORDER BY id DESC
+`
+type FindOpenDevicePaymentsParams struct { TgID int64; UserID sql.NullInt64; Provider string; Since int64 }
+func (q *Queries) FindOpenDevicePayments(ctx context.Context, arg FindOpenDevicePaymentsParams) ([]Payment, error) {
+	rows, err := q.db.QueryContext(ctx, findOpenDevicePayments, arg.TgID, arg.UserID, arg.Provider, arg.Since); if err != nil { return nil, err }; defer rows.Close()
+	items := []Payment{}
+	for rows.Next() { var i Payment; if err := rows.Scan(&i.ID, &i.Provider, &i.Payload, &i.ExternalID, &i.TgID, &i.Kind, &i.UserID, &i.TariffID, &i.PackageID, &i.TariffName, &i.Amount, &i.Currency, &i.Status, &i.Error, &i.PayUrl, &i.CreatedAt, &i.PaidAt, &i.AppliedAt, &i.RefundedAt, &i.TermDays, &i.Revert); err != nil { return nil, err }; items = append(items, i) }
+	return items, rows.Err()
+}
+
 const archiveTrafficPackage = `-- name: ArchiveTrafficPackage :execrows
 UPDATE traffic_packages SET archived = 1, on_sale = 0 WHERE id = $1 AND archived = 0
 `

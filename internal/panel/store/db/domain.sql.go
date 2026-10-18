@@ -1318,6 +1318,18 @@ func (q *Queries) SetUserDeviceMode(ctx context.Context, arg SetUserDeviceModePa
 	return err
 }
 
+const addUserDevice = `-- name: AddUserDevice :one
+UPDATE users SET device_limit = device_limit + 1, updated_at = $1 WHERE id = $2 AND device_limit IS NOT NULL AND device_limit < 100
+RETURNING *
+`
+type AddUserDeviceParams struct { UpdatedAt int64; ID int64 }
+func (q *Queries) AddUserDevice(ctx context.Context, arg AddUserDeviceParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, addUserDevice, arg.UpdatedAt, arg.ID)
+	var i User
+	err := row.Scan(&i.ID, &i.Name, &i.Contact, &i.Note, &i.Tags, &i.Status, &i.TariffID, &i.TrafficLimit, &i.DeviceLimit, &i.ResetStrategy, &i.PeriodDays, &i.PeriodStart, &i.UsedUp, &i.UsedDown, &i.TotalUp, &i.TotalDown, &i.ExpiresAt, &i.Inbounds, &i.SubToken, &i.SlotID, &i.OnlineAt, &i.CreatedAt, &i.UpdatedAt, &i.BillingDay, &i.Source, &i.Hidden, &i.FolderID, &i.SpeedLimit, &i.DeviceMode)
+	return i, err
+}
+
 const slotCounter = `-- name: SlotCounter :one
 SELECT last FROM slot_counter WHERE id = 1
 `

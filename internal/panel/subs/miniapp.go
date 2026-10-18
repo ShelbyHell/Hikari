@@ -259,6 +259,7 @@ func (h *Handler) miniAppOffers(ctx context.Context, w http.ResponseWriter, tgID
 		Addons    []addon         `json:"addons"`
 		Offers    []offer         `json:"offers"`
 		Packages  []shopPackage   `json:"packages"`
+		Device    *shopDevice     `json:"device,omitempty"`
 		// Trial is the priced trial this account may buy now, if any.
 		Trial *offer `json:"trial,omitempty"`
 		// Free is the free plan this account may take now, if any.
@@ -268,6 +269,7 @@ func (h *Handler) miniAppOffers(ctx context.Context, w http.ResponseWriter, tgID
 	if fo, ok := h.shop.FreeOffer(ctx, tgID); ok {
 		out.Free = &freeOffer{Name: fo.Tariff.Name, Description: billing.Describe(fo.Tariff, fo.Tariff.DurationDays, cfg.Lang), Channel: fo.Channel}
 	}
+	if userID != 0 { if o, _, err := h.shop.DeviceOffer(ctx, userID); err == nil && (o.Stars > 0 || o.Rub > 0) { out.Device = &shopDevice{Stars:o.Stars, Rub:o.Rub} } }
 	if to, _, ok := h.shop.TrialOffer(ctx, tgID); ok {
 		out.Trial = &offer{ID: to.Tariff.ID, Name: to.Tariff.Name, Description: billing.Describe(to.Tariff, to.Tariff.DurationDays, cfg.Lang), Note: to.Tariff.Description, Stars: to.Stars, Rub: to.Rub, Terms: []term{}}
 	}

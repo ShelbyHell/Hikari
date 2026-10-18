@@ -60,6 +60,17 @@ WHERE tg_id = sqlc.arg(tg_id) AND package_id = sqlc.arg(package_id) AND provider
   AND status = 'pending' AND pay_url <> '' AND created_at > sqlc.arg(since)
 ORDER BY id DESC;
 
+-- name: CreateDevicePayment :one
+INSERT INTO payments (provider, payload, tg_id, kind, user_id, tariff_name, amount, currency, status, created_at)
+VALUES ($1, $2, $3, 'device', $4, $5, $6, $7, 'pending', $8)
+RETURNING *;
+
+-- name: FindOpenDevicePayments :many
+SELECT * FROM payments
+WHERE tg_id = sqlc.arg(tg_id) AND user_id = sqlc.arg(user_id) AND provider = sqlc.arg(provider) AND kind = 'device'
+  AND status = 'pending' AND pay_url <> '' AND created_at > sqlc.arg(since)
+ORDER BY id DESC;
+
 -- name: DeleteGrantByPayment :execrows
 DELETE FROM traffic_grants WHERE payment_id = $1;
 

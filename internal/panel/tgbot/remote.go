@@ -278,6 +278,19 @@ func (s remoteShop) PackageInvoice(ctx context.Context, req billing.PackageReque
 	return p, err
 }
 
+func (s remoteShop) DeviceOffer(ctx context.Context, userID int64) (billing.DeviceOffer, billing.Available, error) {
+	var o billing.DeviceOffer
+	var a billing.Available
+	err := s.r.call(ctx, "Shop.DeviceOffer", []any{userID}, &o, &a)
+	return o, a, err
+}
+
+func (s remoteShop) DeviceInvoice(ctx context.Context, req billing.DeviceRequest) (db.Payment, error) {
+	var p db.Payment
+	err := s.r.call(ctx, "Shop.DeviceInvoice", []any{req}, &p)
+	return p, err
+}
+
 func (s remoteShop) TrialTariff(ctx context.Context) (db.Tariff, bool) {
 	var (
 		t  db.Tariff

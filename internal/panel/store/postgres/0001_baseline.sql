@@ -266,7 +266,7 @@ CREATE TABLE "payments" (
   payload     TEXT NOT NULL UNIQUE,
   external_id TEXT,
   tg_id       BIGINT NOT NULL,
-  kind        TEXT NOT NULL CHECK (kind IN ('new', 'renew', 'package')),
+  kind        TEXT NOT NULL CHECK (kind IN ('new', 'renew', 'package', 'device')),
   user_id     BIGINT REFERENCES users(id) ON DELETE SET NULL,
   tariff_id   BIGINT REFERENCES tariffs(id),                         -- new and renew
   package_id  BIGINT REFERENCES traffic_packages(id) ON DELETE SET NULL, -- package
@@ -280,7 +280,7 @@ CREATE TABLE "payments" (
   paid_at     BIGINT,
   applied_at  BIGINT,
   refunded_at BIGINT,
-  CHECK (kind = 'package' OR tariff_id IS NOT NULL)
+  CHECK (kind IN ('package', 'device') OR tariff_id IS NOT NULL)
 );
 
 CREATE TABLE sub_fetches (

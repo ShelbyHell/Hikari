@@ -204,6 +204,11 @@ UPDATE tariffs SET device_mode = $1 WHERE id = $2;
 -- name: SetUserDeviceMode :exec
 UPDATE users SET device_mode = $1, updated_at = $2 WHERE id = $3;
 
+-- name: AddUserDevice :one
+UPDATE users SET device_limit = device_limit + 1, updated_at = $1
+WHERE id = $2 AND device_limit IS NOT NULL AND device_limit < 100
+RETURNING *;
+
 -- name: ListUserNamesAfter :many
 -- A page of users by id with just what a search reads, for the Panel API's cursor: stable
 -- while users come and go. The rows of the page itself come from ListUsersByIDs.

@@ -64,6 +64,8 @@ type Config struct {
 	// one, through the providers that take its price: it needs selling on.
 	TrialStars int64 `json:"trial_stars,omitempty"`
 	TrialRub   int64 `json:"trial_rub,omitempty"`
+	DeviceStars int64 `json:"device_stars,omitempty"`
+	DeviceRub   int64 `json:"device_rub,omitempty"`
 	// FreeTariffID is the tariff of the free plan (free.go): unlike the trial, an account
 	// takes it again once its previous free subscription has ended; 0: no free plan. It
 	// takes no payment, so it works with selling off too.
@@ -79,6 +81,41 @@ func (c Config) TrialPaid() bool { return c.TrialStars > 0 || c.TrialRub > 0 }
 // DefaultConfig: selling off until the admin turns it on; then Stars (it needs nothing but
 // the bot) and new buyers are welcome.
 var DefaultConfig = Config{Stars: true, AllowNew: true, RenewResetsTraffic: true}
+
+const KindDevice = "device"
+
+type DeviceOffer struct { Stars, Rub int64 }
+
+func (s *Service) DeviceOffer(ctx context.Context, userID int64) (DeviceOffer, Available, error) {
+	av := s.Available(ctx)
+	if !av.Any() { return DeviceOffer{}, av, nil }
+	u, err := s.d.Store.Q.GetUser(ctx, userID)
+	if err != nil || !u.DeviceLimit.Valid || u.DeviceLimit.Int64 >= 100 { return DeviceOffer{}, av, err }
+	c := s.Config(ctx)
+	o := DeviceOffer{}
+	if av.Stars { o.Stars = c.DeviceStars }
+	if av.Rub() { o.Rub = c.DeviceRub }
+	return o, av, nil
+}
+
+type DeviceRequest struct { TgID, UserID int64; Provider string }
+
+func (s *Service) DeviceInvoice(ctx context.Context, req DeviceRequest) (db.Payment, error) {
+	link, err := s.d.Store.Q.GetTgLink(ctx, req.UserID)
+	if err != nil || link.TgID != req.TgID { return db.Payment{}, ErrNotYours }
+	o, av, err := s.DeviceOffer(ctx, req.UserID)
+	if err != nil { return db.Payment{}, err }
+	amount, currency, ok := av.price(req.Provider, sql.NullInt64{Int64:o.Stars, Valid:o.Stars>0}, sql.NullInt64{Int64:o.Rub, Valid:o.Rub>0})
+	if !ok { return db.Payment{}, ErrNotForSale }
+	unlock, err := s.lockBuyer(ctx, req.TgID); if err != nil { return db.Payment{}, err }; defer unlock()
+	now := s.d.Now(); uid := sql.NullInt64{Int64:req.UserID, Valid:true}
+	pay, open, err := s.newPayment(ctx, req.TgID, now,
+		func(q *db.Queries) ([]db.Payment,error) { return q.FindOpenDevicePayments(ctx, db.FindOpenDevicePaymentsParams{TgID:req.TgID, UserID:uid, Provider:req.Provider, Since:now.Add(-invoiceReuse).Unix()}) },
+		func(_ *db.Queries, p db.Payment) (bool,error) { return p.Amount == amount && p.Currency == currency, nil },
+		func(q *db.Queries) (db.Payment,error) { return q.CreateDevicePayment(ctx, db.CreateDevicePaymentParams{Provider:req.Provider, Payload:secure.Token(32), TgID:req.TgID, UserID:uid, TariffName:"+1 device", Amount:amount, Currency:currency, CreatedAt:now.Unix()}) })
+	if err != nil || open { return pay, err }
+	return s.openPayment(ctx, pay, "+1 device", "One additional device place")
+}
 
 // Telegram is the Telegram gateway's part (tgate.Gateway): Stars invoices and refunds, the
 // bot's link and its channel. It stays in the panel whatever runs the bot's screens.
@@ -886,6 +923,11 @@ func (s *Service) Apply(ctx context.Context, id int64) error {
 					return err
 				}
 			}
+			return markApplied(ctx, q, id, u.ID, s.d.Now())
+		}
+		if pay.Kind == KindDevice {
+			if !pay.UserID.Valid { return errors.New("user_gone") }
+			if u, err = q.AddUserDevice(ctx, db.AddUserDeviceParams{UpdatedAt: s.d.Now().Unix(), ID: pay.UserID.Int64}); err != nil { return err }
 			return markApplied(ctx, q, id, u.ID, s.d.Now())
 		}
 		if pay.Kind == KindTrial {

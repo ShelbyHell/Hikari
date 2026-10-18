@@ -22,6 +22,8 @@ export type ShopData = {
   trial?: Offer;
   /** The free plan the account may take now; channel is the one it asks the account to join. */
   free?: { name: string; description: string; channel?: string };
+  /** One extra device place for the subscription on screen. */
+  device?: { stars?: number; rub?: number };
 };
 type Provider = "stars" | `addon:${string}`;
 
@@ -202,6 +204,25 @@ export function Shop({
             {goName ? t("sub.shopGoVia", { name: goName }) : t("sub.shopGo")}
           </Button>
           {opened ? null : <p className="text-xs text-[var(--ink-500)]">{t("sub.shopGoHint")}</p>}
+        </div>
+      ) : null}
+      {data.device && (field === "tariff_id" || field === "package_id") && !offer ? (
+        <div className="mt-3">
+          <p className="mb-2 text-xs text-[var(--ink-500)]">{t("sub.deviceBuyHint")}</p>
+          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (data.device.stars && data.providers.stars ? 1 : 0) + (data.device.rub ? 1 : 0))}, minmax(0, 1fr))` }}>
+            {data.device.stars && data.providers.stars && (
+              <Button variant="primary" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay("stars")}>
+                <span className="text-[13px] font-semibold">⭐ {data.device.stars}</span>
+                <span className="text-[11px] opacity-80">{t("sub.shopStars")}</span>
+              </Button>
+            )}
+            {data.device.rub && data.addons?.length && (
+              <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(data.addons[0].provider as Provider)}>
+                <span className="text-[13px] font-semibold">{rubles(data.device.rub)}</span>
+                <span className="text-[11px] opacity-80">{data.addons[0].name}</span>
+              </Button>
+            )}
+          </div>
         </div>
       ) : null}
       {error ? (

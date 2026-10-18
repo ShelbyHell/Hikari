@@ -51,6 +51,7 @@ type words struct {
 
 	// Traffic packages.
 	buyTraffic, trafficTitle, payPackage, packageGone, paidPackage, plusPackages string
+	buyDevice, payDevice string
 
 	// A refund takes back what the payment gave.
 	refundedNew, refundedRenew, refundedPackage, refundedGone string
@@ -145,6 +146,7 @@ var ru = words{
 	freeChannel:   "Бесплатный тариф для подписчиков нашего канала. Подпишитесь и нажмите «Проверить».",
 
 	buyTraffic:   "📦 Докупить трафик",
+	buyDevice: "➕ Докупить устройство", payDevice: "После оплаты лимит устройств увеличится на 1.",
 	trafficTitle: "Трафик для подписки «%s»: выберите пакет",
 	payPackage:   "трафик начислится",
 	packageGone:  "Этот пакет больше не продаётся.",
@@ -246,6 +248,7 @@ var en = words{
 	freeChannel:   "The free plan is for our channel's subscribers. Join it and tap “Check”.",
 
 	buyTraffic:   "📦 Buy more traffic",
+	buyDevice: "➕ Buy one more device", payDevice: "After payment the device limit increases by 1.",
 	trafficTitle: "Traffic for subscription “%s”: pick a package",
 	payPackage:   "traffic is added",
 	packageGone:  "This package is no longer sold.",

@@ -2064,6 +2064,7 @@
     "shopGoVia": "Go to payment: {name}",
     "shopGoHint": "The payment page opens separately. After paying, come back here and the subscription updates by itself.",
     "shopFail": "Could not open the payment. Try again or message support.",
+    "deviceBuyHint": "Buy one extra device place for the subscription:",
     "shopNotForSale": "This plan is no longer sold.",
     "shopTooMany": "Too many invoices in a row. Try again in an hour.",
     "trialTitle": "Trial",

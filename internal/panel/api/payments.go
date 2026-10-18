@@ -24,6 +24,8 @@ type PaymentSettingsView struct {
 	TrialTariffID      *int64 `json:"trial_tariff_id" doc:"Тариф пробного периода: один раз на Telegram-аккаунт без подписки и оплат, кнопка в приветствии бота; null — пробного периода нет. Работает и при выключенной продаже"`
 	TrialStars         int64  `json:"trial_stars" doc:"Цена пробного периода в Stars; 0 вместе с trial_rub — бесплатно"`
 	TrialRub           int64  `json:"trial_rub" doc:"Цена пробного периода в копейках; с ценой пробный период покупают один раз в боте и Mini App, нужна включённая продажа"`
+	DeviceStars        int64  `json:"device_stars"`
+	DeviceRub          int64  `json:"device_rub"`
 	Trials             int64  `json:"trials" doc:"Сколько пробных подписок выдано"`
 	FreeTariffID       *int64 `json:"free_tariff_id" doc:"Тариф бесплатного тарифа: кнопка в боте и Mini App, снова взять можно, когда прошлая бесплатная подписка аккаунта закончилась; null: бесплатного тарифа нет. Работает и при выключенной продаже"`
 	FreeCondition      string `json:"free_condition" enum:"none,channel" doc:"Условие бесплатного тарифа: none: без условий, channel: подписка на канал бота (Telegram → Меню и тексты)"`
@@ -48,6 +50,8 @@ type patchPaymentSettingsInput struct {
 		// name; the handler checks the prices against them.
 		TrialStars *int64 `json:"trial_stars,omitempty" minimum:"0" maximum:"10000" doc:"Цена пробного периода в Stars; 0 — не за Stars. Без пробного периода (trial_tariff_id 0) обе цены сбрасываются"`
 		TrialRub   *int64 `json:"trial_rub,omitempty" minimum:"0" maximum:"100000000" doc:"Цена пробного периода в копейках, от 100 (1 ₽); 0 — не за рубли. Обе 0 — пробный период бесплатный"`
+		DeviceStars *int64 `json:"device_stars,omitempty" minimum:"0" maximum:"10000"`
+		DeviceRub *int64 `json:"device_rub,omitempty" minimum:"0" maximum:"100000000"`
 		// The free plan: its tariff needs a term, as the trial's does, and the channel
 		// condition a channel set up in the bot.
 		FreeTariffID  *int64  `json:"free_tariff_id,omitempty" minimum:"0" doc:"Тариф бесплатного тарифа, нужен срок; 0: выключить"`
@@ -116,7 +120,7 @@ func (h *handlers) paymentSettings(ctx context.Context) (PaymentSettingsView, er
 	if err != nil {
 		return PaymentSettingsView{}, err
 	}
-	v := PaymentSettingsView{Enabled: c.Enabled, Stars: c.Stars, AllowNew: c.AllowNew, RenewResetsTraffic: c.RenewResetsTraffic, TrialStars: c.TrialStars, TrialRub: c.TrialRub}
+	v := PaymentSettingsView{Enabled: c.Enabled, Stars: c.Stars, AllowNew: c.AllowNew, RenewResetsTraffic: c.RenewResetsTraffic, TrialStars: c.TrialStars, TrialRub: c.TrialRub, DeviceStars: c.DeviceStars, DeviceRub: c.DeviceRub}
 	if t, ok := h.d.Billing.TrialTariff(ctx); ok {
 		v.TrialTariffID = &t.ID
 	}
@@ -219,6 +223,9 @@ func (h *handlers) updatePaymentSettings(ctx context.Context, in *patchPaymentSe
 			if v != nil {
 				*dst = *v
 			}
+		}
+		for dst, v := range map[*int64]*int64{&c.DeviceStars: b.DeviceStars, &c.DeviceRub: b.DeviceRub} {
+			if v != nil { *dst = *v }
 		}
 		// No trial, no price, as in the form: a price kept for a trial turned off would
 		// come back with the next one.

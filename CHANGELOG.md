@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.8
+### en
+- **Buy extra device place in bot and Mini App**. A subscription owner can now purchase one additional device slot (+1 device) without renewing the plan. The admin sets the price in Telegram Stars and/or rubles (Payments → Sales rules → Device price). The button appears in the bot's "Devices" screen and in the Mini App's shop when the user has a device limit. Payment applies atomically: `device_limit` increases by 1, term and traffic stay unchanged.
+### ru
+- **Докупка устройства в боте и Mini App**. Владелец подписки может купить одно дополнительное устройство (+1 устройство) без продления тарифа. Админ задаёт цену в Telegram Stars и/или рублях («Оплата → Правила продажи → Цена устройства»). Кнопка появляется в разделе бота «Устройства» и в магазине Mini App, когда у пользователя есть лимит устройств. Оплата применяется атомарно: `device_limit` увеличивается на 1, срок и трафик не меняются.
+
 ## 0.5.1.2-rc.7
 ### en
 - **Auto choice group in Happ, v2RayTun and Xray apps**. Subscriptions for Xray-family applications (`Happ`, `v2RayTun`, `INCY`, `v2rayNG`, `v2rayN`, etc.) now include an auto choice group with its own name (`sub_group_auto`, default "Авто" / "Auto"), matching Clash and Sing-box behavior: the client automatically tests latency and keeps the fastest working server.

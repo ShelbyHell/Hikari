@@ -1,0 +1,3 @@
+-- +goose Up
+-- Device purchases are represented by payments and do not alter a tariff term.
+-- +goose Down
