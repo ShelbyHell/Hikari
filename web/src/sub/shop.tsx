@@ -216,12 +216,15 @@ export function Shop({
                 <span className="text-[11px] opacity-80">{t("sub.shopStars")}</span>
               </Button>
             )}
-            {data.device.rub && data.addons && data.addons.length > 0 && (
-              <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(data.addons[0].provider as Provider)}>
-                <span className="text-[13px] font-semibold">{rubles(data.device.rub)}</span>
-                <span className="text-[11px] opacity-80">{data.addons[0].name}</span>
-              </Button>
-            )}
+            {data.device.rub && data.addons && data.addons.length > 0 ? (() => {
+              const firstAddon = data.addons[0];
+              return (
+                <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(firstAddon.provider as Provider)}>
+                  <span className="text-[13px] font-semibold">{rubles(data.device.rub)}</span>
+                  <span className="text-[11px] opacity-80">{firstAddon.name}</span>
+                </Button>
+              );
+            })() : null}
           </div>
         </div>
       ) : null}
