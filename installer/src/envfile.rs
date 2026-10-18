@@ -208,7 +208,9 @@ impl EnvFile {
         // 1. Secrets
         let secrets_dir = dir.join("secrets");
         let mut wrote_secret = false;
-        if let Some(pw) = self.get("MIKAN_POSTGRES_PASSWORD") {
+        let db_pw = self.get("MIKAN_POSTGRES_PASSWORD").map(str::to_owned)
+            .or_else(|| self.get("MIKAN_DATABASE_URL").and_then(password_from_dsn));
+        if let Some(pw) = db_pw {
             if !secrets_dir.exists() {
                 fs::DirBuilder::new().mode(0o700).create(&secrets_dir)?;
             }
@@ -312,6 +314,14 @@ fn plain_dsn(value: &str) -> bool {
     value.bytes().all(|b| b.is_ascii_alphanumeric() || b"._:/@+=,-?&%".contains(&b))
 }
 
+/// Extracts password from a PostgreSQL DSN (`postgresql://user:password@host/db...`).
+pub fn password_from_dsn(dsn: &str) -> Option<String> {
+    let (_, rest) = dsn.split_once("://")?;
+    let (user_pass, _) = rest.split_once('@')?;
+    let (_, pass) = user_pass.split_once(':')?;
+    Some(pass.to_owned()).filter(|p| !p.is_empty())
+}
+
 /// Writes a file readable by root only, replacing it at once: a new file under its own
 /// name (never a leftover one, never through a link), synced, then renamed over path.
 pub fn write_private(path: &Path, data: &[u8]) -> Result<()> {
@@ -411,6 +421,15 @@ mod tests {
         let e = EnvFile::parse("x".into(), "A=1\n# comment\nB='2'\nC=\"hello\"\nA=updated\n");
         let entries = e.entries();
         assert_eq!(entries, vec![("A", "updated"), ("B", "2"), ("C", "hello")]);
+    }
+
+    #[test]
+    fn extracts_password_from_dsn() {
+        assert_eq!(
+            password_from_dsn("postgresql://mikan:SuperSecret123@localhost/mikan?host=/run/postgresql"),
+            Some("SuperSecret123".into())
+        );
+        assert_eq!(password_from_dsn("invalid"), None);
     }
 
     #[test]

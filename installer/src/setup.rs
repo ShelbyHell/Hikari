@@ -719,6 +719,13 @@ fn write_files_in(root: &Path, plan: &Plan, image: &str, version: &str, api_port
 /// Credentials persist across updates and resumed installs; never rotate a live database.
 pub fn postgres_env(env: &mut EnvFile) -> Result<()> {
     if env.get("MIKAN_POSTGRES_PASSWORD").is_none() {
+        if let Some(dsn) = env.get("MIKAN_DATABASE_URL") {
+            if let Some(pw) = crate::envfile::password_from_dsn(dsn) {
+                env.set("MIKAN_POSTGRES_PASSWORD", &pw)?;
+            }
+        }
+    }
+    if env.get("MIKAN_POSTGRES_PASSWORD").is_none() {
         env.set("MIKAN_POSTGRES_PASSWORD", &token(48, ALNUM))?;
     }
     if env.get("MIKAN_DATABASE_URL").is_none() {
@@ -921,7 +928,7 @@ mod tests {
         let mut env = EnvFile::new("unused");
         postgres_env(&mut env).unwrap();
         let before = env.render();
-        let password = env.get("MIKAN_POSTGRES_PASSWORD").unwrap();
+        let password = env.get("MIKAN_POSTGRES_PASSWORD").unwrap().to_owned();
         assert_eq!(password.len(), 48);
         assert!(password.bytes().all(|b| b.is_ascii_alphanumeric()));
         assert_eq!(
@@ -930,6 +937,11 @@ mod tests {
         );
         postgres_env(&mut env).unwrap();
         assert_eq!(env.render(), before, "live credentials must never rotate");
+
+        // If MIKAN_DATABASE_URL is set but MIKAN_POSTGRES_PASSWORD is missing, recover it:
+        let mut dsn_only = EnvFile::from_text("unused", &format!("MIKAN_DATABASE_URL=postgresql://mikan:{password}@localhost/mikan?host=/run/postgresql\n"));
+        postgres_env(&mut dsn_only).unwrap();
+        assert_eq!(dsn_only.get("MIKAN_POSTGRES_PASSWORD"), Some(password.as_str()));
     }
 
     #[test]
