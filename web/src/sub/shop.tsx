@@ -207,11 +207,12 @@ export function Shop({
         </div>
       ) : null}
       {data.device && (field === "tariff_id" || field === "package_id") && !offer ? (() => {
-          const addon = data.device.rub && data.addons && data.addons.length > 0 ? data.addons[0] : null;
+          const rub = data.device.rub ?? 0;
+          const addon = rub > 0 && data.addons && data.addons.length > 0 ? data.addons[0] : null;
           return (
             <div className="mt-3">
               <p className="mb-2 text-xs text-[var(--ink-500)]">{t("sub.deviceBuyHint")}</p>
-              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (data.device.stars && data.providers.stars ? 1 : 0) + (data.device.rub ? 1 : 0))}, minmax(0, 1fr))` }}>
+              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (data.device.stars && data.providers.stars ? 1 : 0) + (rub > 0 ? 1 : 0))}, minmax(0, 1fr))` }}>
                 {data.device.stars && data.providers.stars && (
                   <Button variant="primary" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay("stars")}>
                     <span className="text-[13px] font-semibold">⭐ {data.device.stars}</span>
@@ -220,7 +221,7 @@ export function Shop({
                 )}
                 {addon && (
                   <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(addon.provider as Provider)}>
-                    <span className="text-[13px] font-semibold">{rubles(data.device.rub)}</span>
+                    <span className="text-[13px] font-semibold">{rubles(rub)}</span>
                     <span className="text-[11px] opacity-80">{addon.name}</span>
                   </Button>
                 )}
