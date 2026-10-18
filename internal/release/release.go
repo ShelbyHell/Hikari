@@ -6,7 +6,9 @@ package release
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,6 +23,14 @@ import (
 // with the maintainer. It is this fork's own key: releases of ShelbyHell/Hikari are
 // signed with it, and a manifest signed with the upstream key is refused here.
 const PublicKey = "vsFZSTqFm9CoL68mA4XY8GYIMmq+VO6/gA8fcp5S90s="
+ 
+// KeyFingerprint names the release key a build trusts: the first 16 hex digits of the
+// SHA-256 of PublicKey. The support desk compares it with the official one; a build that
+// trusts another key is not mikan's own.
+func KeyFingerprint() string {
+	sum := sha256.Sum256([]byte(PublicKey))
+	return hex.EncodeToString(sum[:8])
+}
 
 // Repo is where this fork publishes its releases.
 const Repo = "ShelbyHell/Hikari"

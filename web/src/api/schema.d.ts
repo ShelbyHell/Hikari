@@ -398,6 +398,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/exit-dns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** DNS на выходе */
+        get: operations["get-exit-dns"];
+        /**
+         * Настроить DNS на выходе
+         * @description Ноды получают настройку со своим состоянием; ноды старше неё её не применяют.
+         */
+        put: operations["update-exit-dns"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/external-subscriptions": {
         parameters: {
             query?: never;
@@ -996,7 +1017,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Проверить порты ноды из России через check-host.net */
+        /** Проверить порты ноды из России через Globalping */
         post: operations["check-node-russia"];
         delete?: never;
         options?: never;
@@ -1466,41 +1487,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/settings/sub-certificate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Поставить свой сертификат для ссылки подписки */
-        put: operations["set-sub-certificate"];
-        post?: never;
-        /** Убрать свой сертификат для ссылки подписки: вернётся автоматический */
-        delete: operations["clear-sub-certificate"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/settings/sub-certificate/renew": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Получить сертификат для ссылки подписки сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт) */
-        post: operations["renew-sub-certificate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/settings/reset-admin-path": {
         parameters: {
             query?: never;
@@ -1546,6 +1532,41 @@ export interface paths {
         put?: never;
         /** Профиль Clash с этой маршрутизацией, без сохранения */
         post: operations["routes-preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/sub-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Поставить свой сертификат для ссылки подписки */
+        put: operations["set-sub-certificate"];
+        post?: never;
+        /** Убрать свой сертификат для ссылки подписки: вернётся автоматический */
+        delete: operations["clear-sub-certificate"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/sub-certificate/renew": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Получить сертификат для ссылки подписки сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт) */
+        post: operations["renew-sub-certificate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1707,6 +1728,26 @@ export interface paths {
         put?: never;
         /** Проверить сервер панели */
         post: operations["check-server"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/reach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Проверить, открываются ли порты сервера из России
+         * @description Зонды Globalping в домашних и мобильных сетях России и в дата-центрах подключаются к портам, контроль из Европы. Адрес сервера уходит в Globalping.
+         */
+        post: operations["check-reach"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2817,11 +2858,6 @@ export interface components {
             /** @description Отчёт для чата: адреса, домены, порт API и ключи скрыты */
             report: string;
         };
-        CityResult: {
-            city: string;
-            id: string;
-            ports: components["schemas"]["PortResult"][];
-        };
         ClientEndpoint: {
             /**
              * Format: int64
@@ -3062,6 +3098,32 @@ export interface components {
             torrent?: boolean;
             update?: boolean;
             warp?: boolean;
+        };
+        ExitDNSInfo: {
+            /** @description Серверы готовых вариантов */
+            presets: {
+                [key: string]: string[];
+            };
+            /**
+             * @description DNS-сервер ноды: host — DNS самого сервера, cloudflare, google, quad9 — их DoH, custom — свой список
+             * @enum {string}
+             */
+            resolver: "host" | "cloudflare" | "google" | "quad9" | "custom";
+            /** @description Свои серверы для custom: 1.1.1.1, tls://dns.google, https://1.1.1.1/dns-query, quic://dns.adguard-dns.com; хранятся и при другом выборе */
+            servers: string[];
+            /** @description Нода сама узнаёт, на какой сайт идёт пользователь (TLS, HTTP, QUIC на портах 443, 8443, 80, 8080–8880), и подключается к нему из своей страны: сайты видят страну ноды, а не пользователя */
+            sniff: boolean;
+        };
+        ExitDNSView: {
+            /**
+             * @description DNS-сервер ноды: host — DNS самого сервера, cloudflare, google, quad9 — их DoH, custom — свой список
+             * @enum {string}
+             */
+            resolver: "host" | "cloudflare" | "google" | "quad9" | "custom";
+            /** @description Свои серверы для custom: 1.1.1.1, tls://dns.google, https://1.1.1.1/dns-query, quic://dns.adguard-dns.com; хранятся и при другом выборе */
+            servers: string[];
+            /** @description Нода сама узнаёт, на какой сайт идёт пользователь (TLS, HTTP, QUIC на портах 443, 8443, 80, 8080–8880), и подключается к нему из своей страны: сайты видят страну ноды, а не пользователя */
+            sniff: boolean;
         };
         ExtendInputBody: {
             /** Format: int64 */
@@ -4102,6 +4164,10 @@ export interface components {
         };
         PatchPaymentSettingsInputBody: {
             allow_new?: boolean;
+            /** Format: int64 */
+            device_rub?: number;
+            /** Format: int64 */
+            device_stars?: number;
             enabled?: boolean;
             /**
              * @description none: без условий; channel: только подписчикам канала бота, канал должен быть указан на странице Telegram
@@ -4130,8 +4196,6 @@ export interface components {
              * @description Тариф пробного периода; 0 — выключить
              */
             trial_tariff_id?: number;
-            device_rub?: number;
-            device_stars?: number;
         };
         PatchSettingsInputBody: {
             /**
@@ -4270,6 +4334,10 @@ export interface components {
             allow_new: boolean;
             /** @description Что принимает оплату прямо сейчас: включено, настроено, для Stars — бот запущен */
             available: components["schemas"]["PaymentSettingsViewAvailableStruct"];
+            /** Format: int64 */
+            device_rub: number;
+            /** Format: int64 */
+            device_stars: number;
             /** @description Продажа подписок: выключено — бот и Mini App ничего не продают, новые счета не создаются, уже открытые засчитываются */
             enabled: boolean;
             /**
@@ -4306,8 +4374,6 @@ export interface components {
              * @description Цена пробного периода в Stars; 0 вместе с trial_rub — бесплатно
              */
             trial_stars: number;
-            device_rub?: number;
-            device_stars?: number;
             /**
              * Format: int64
              * @description Тариф пробного периода: один раз на Telegram-аккаунт без подписки и оплат, кнопка в приветствии бота; null — пробного периода нет. Работает и при выключенной продаже
@@ -4404,15 +4470,6 @@ export interface components {
             /** @description Подключения, которые считаются в этот пул */
             inbounds: string[];
             name: string;
-        };
-        PortResult: {
-            error?: string;
-            /** Format: int64 */
-            ms?: number;
-            ok: boolean;
-            pending?: boolean;
-            /** Format: int64 */
-            port: number;
         };
         Preview: {
             /** @description Пользователи, которых Hikari не примет, с причиной */
@@ -4602,6 +4659,44 @@ export interface components {
             brand_accent?: string;
             config: components["schemas"]["Page"];
         };
+        ReachCheck: {
+            /** Format: date-time */
+            at: string;
+            cached: boolean;
+            host: string;
+            ports: number[];
+            probes: components["schemas"]["ReachProbe"][];
+            /** @enum {string} */
+            verdict: "ok" | "partial" | "blocked" | "down";
+        };
+        ReachInputBody: {
+            /** @description IP или домен сервера */
+            host: string;
+            /** @description TCP-порты: 22 у любого сервера с SSH, 443 у ноды */
+            ports: number[];
+        };
+        ReachPort: {
+            /** Format: int64 */
+            got: number;
+            /** Format: int64 */
+            ms?: number;
+            ok: boolean;
+            pending?: boolean;
+            /** Format: int64 */
+            port: number;
+            /** Format: int64 */
+            sent: number;
+        };
+        ReachProbe: {
+            /** Format: int64 */
+            asn: number;
+            city: string;
+            control: boolean;
+            country: string;
+            home: boolean;
+            network: string;
+            ports: components["schemas"]["ReachPort"][];
+        };
         RecoveryOutputBody: {
             /** @description Показываются один раз */
             recovery_codes: string[];
@@ -4738,8 +4833,13 @@ export interface components {
             /** Format: date-time */
             at: string;
             cached: boolean;
-            cities: components["schemas"]["CityResult"][];
-            ports: components["schemas"]["RussiaPort"][];
+            host: string;
+            /** @description Что за порты ноды проверены */
+            names: components["schemas"]["RussiaPort"][];
+            ports: number[];
+            probes: components["schemas"]["ReachProbe"][];
+            /** @enum {string} */
+            verdict: "ok" | "partial" | "blocked" | "down";
         };
         ScanTargetsOutputBody: {
             /** @description Адрес сервера, вокруг которого искали */
@@ -6520,6 +6620,68 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "get-exit-dns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExitDNSInfo"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "update-exit-dns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExitDNSView"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExitDNSInfo"];
+                };
             };
             /** @description Error */
             default: {
@@ -9186,95 +9348,6 @@ export interface operations {
             };
         };
     };
-    "set-sub-certificate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CertInputBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SettingsView"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ErrorModel"];
-                };
-            };
-        };
-    };
-    "clear-sub-certificate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ErrorModel"];
-                };
-            };
-        };
-    };
-    "renew-sub-certificate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Status"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ErrorModel"];
-                };
-            };
-        };
-    };
     "reset-admin-path": {
         parameters: {
             query?: never;
@@ -9353,6 +9426,95 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RoutesPreviewOutputBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "set-sub-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CertInputBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SettingsView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "clear-sub-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "renew-sub-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Status"];
                 };
             };
             /** @description Error */
@@ -9794,6 +9956,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CheckView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "check-reach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReachInputBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReachCheck"];
                 };
             };
             /** @description Error */
