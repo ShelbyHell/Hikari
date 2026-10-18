@@ -214,14 +214,14 @@ impl EnvFile {
             if !secrets_dir.exists() {
                 fs::DirBuilder::new().mode(0o700).create(&secrets_dir)?;
             }
-            write_private(&secrets_dir.join("db_password"), pw.as_bytes())?;
+            write_private_mode(&secrets_dir.join("db_password"), pw.as_bytes(), 0o644)?;
             wrote_secret = true;
         }
         if let Some(join) = self.get("MIKAN_NODE_JOIN") {
             if !secrets_dir.exists() {
                 fs::DirBuilder::new().mode(0o700).create(&secrets_dir)?;
             }
-            write_private(&secrets_dir.join("node_join"), join.as_bytes())?;
+            write_private_mode(&secrets_dir.join("node_join"), join.as_bytes(), 0o644)?;
             wrote_secret = true;
         }
         if wrote_secret && secrets_dir.exists() {
@@ -325,13 +325,18 @@ pub fn password_from_dsn(dsn: &str) -> Option<String> {
 /// Writes a file readable by root only, replacing it at once: a new file under its own
 /// name (never a leftover one, never through a link), synced, then renamed over path.
 pub fn write_private(path: &Path, data: &[u8]) -> Result<()> {
+    write_private_mode(path, data, 0o600)
+}
+
+/// Writes a file with specified permissions atomically.
+pub fn write_private_mode(path: &Path, data: &[u8], mode: u32) -> Result<()> {
     let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
     let nanos = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
     let tmp = path.with_file_name(format!(".{name}.{}.{nanos}.tmp", std::process::id()));
     let mut f = fs::OpenOptions::new()
         .write(true)
         .create_new(true)
-        .mode(0o600)
+        .mode(mode)
         .custom_flags(libc::O_NOFOLLOW)
         .open(&tmp)
         .with_context(|| format!("create {}", tmp.display()))?;
@@ -476,6 +481,8 @@ mod tests {
         assert!(!env_path.exists(), ".env must be removed");
         assert!(d.join("config.json").exists(), "config.json must exist");
         assert!(d.join("secrets/db_password").exists(), "secrets/db_password must exist");
+        assert_eq!(fs::metadata(d.join("secrets")).unwrap().permissions().mode() & 0o777, 0o700);
+        assert_eq!(fs::metadata(d.join("secrets/db_password")).unwrap().permissions().mode() & 0o777, 0o644);
         assert_eq!(fs::read_to_string(d.join("secrets/db_password")).unwrap(), "secret123");
 
         let json_text = fs::read_to_string(d.join("config.json")).unwrap();
