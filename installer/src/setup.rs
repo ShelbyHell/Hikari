@@ -262,7 +262,7 @@ fn port80(plan: &Plan) -> Option<Port80> {
     // A continued install keeps the port the attempt before it chose.
     let earlier = plan
         .resume
-        .then(|| EnvFile::load(Path::new(DIR).join(".env")).ok())
+        .then(|| EnvFile::load(Path::new(DIR)).ok())
         .flatten()
         .and_then(|e| e.get("MIKAN_ACME_LISTEN").and_then(acme::listen_port));
     Some(Port80::Front(front, earlier.unwrap_or_else(acme::free_port)))
@@ -367,7 +367,7 @@ fn run(plan: &Plan, tx: &Sender<Event>) -> StepResult<()> {
         };
         let earlier = plan
             .resume
-            .then(|| EnvFile::load(Path::new(DIR).join(".env")).ok())
+            .then(|| EnvFile::load(Path::new(DIR)).ok())
             .flatten()
             .and_then(|e| e.get("MIKAN_IMAGE").map(str::to_owned));
         let image = if let Some(tar) = &plan.image_tar {

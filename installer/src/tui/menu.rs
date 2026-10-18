@@ -255,7 +255,7 @@ impl Menu {
             let Some(_lock) = lock::acquire(Wait::Skip, &mut quiet)? else {
                 anyhow::bail!("an update or another change is running: try again when it ends");
             };
-            let mut env = EnvFile::load(std::path::Path::new(DIR).join(".env"))?;
+            let mut env = EnvFile::load(std::path::Path::new(DIR))?;
             let on = env.get("MIKAN_AUTO_UPDATE") == Some("1");
             env.set("MIKAN_AUTO_UPDATE", if on { "0" } else { "1" })?;
             env.save()?;
