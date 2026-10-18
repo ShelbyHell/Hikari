@@ -358,6 +358,8 @@ function RulesCard({ s }: { s: Settings }) {
     trial: s.trial_tariff_id ?? 0,
     trialStars: s.trial_stars ? String(s.trial_stars) : "",
     trialRub: s.trial_rub ? String(s.trial_rub / 100) : "",
+    deviceStars: s.device_stars ? String(s.device_stars) : "",
+    deviceRub: s.device_rub ? String(s.device_rub / 100) : "",
     free: s.free_tariff_id ?? 0,
     freeCondition: s.free_condition,
   });
@@ -370,6 +372,10 @@ function RulesCard({ s }: { s: Settings }) {
     const rubN = rubKopecks(form.trialRub);
     if (form.trialStars.trim() && !isStars(starsN)) errs.trial_stars = t("tariffs.errStars");
     if (form.trialRub.trim() && !isKopecks(rubN)) errs.trial_rub = t("tariffs.errRub");
+    const devStarsN = Number(form.deviceStars);
+    const devRubN = rubKopecks(form.deviceRub);
+    if (form.deviceStars.trim() && !isStars(devStarsN)) errs.device_stars = t("tariffs.errStars");
+    if (form.deviceRub.trim() && !isKopecks(devRubN)) errs.device_rub = t("tariffs.errRub");
     setErrors(errs);
     if (Object.keys(errs).length) return;
     save.mutate({
@@ -379,6 +385,8 @@ function RulesCard({ s }: { s: Settings }) {
       // No trial, no price: a price left in the hidden fields does not come back later.
       trial_stars: form.trial && form.trialStars.trim() ? starsN : 0,
       trial_rub: form.trial && form.trialRub.trim() ? rubN : 0,
+      device_stars: form.deviceStars.trim() ? devStarsN : 0,
+      device_rub: form.deviceRub.trim() ? devRubN : 0,
       free_tariff_id: form.free,
       // Sent only when changed: a channel removed from the bot since does not block saving the rest.
       ...(form.freeCondition !== s.free_condition ? { free_condition: form.freeCondition } : {}),
@@ -453,6 +461,32 @@ function RulesCard({ s }: { s: Settings }) {
                 </select>
               </Field>
             ) : null}
+          </div>
+          <div className="pt-4">
+            <Field label={t("payments.devicePrice")} htmlFor="pay-device-stars" hint={t("payments.devicePriceSub")}>
+              <div className="grid gap-x-3 sm:grid-cols-2" role="group" aria-label={t("payments.devicePrice")}>
+                <Field label={`${t("payments.devicePrice")}, ⭐`} htmlFor="pay-device-stars" error={errors.device_stars}>
+                  <input
+                    id="pay-device-stars"
+                    className="input max-w-[140px]"
+                    inputMode="numeric"
+                    value={form.deviceStars}
+                    onChange={(e) => setForm((f) => ({ ...f, deviceStars: e.target.value }))}
+                    aria-invalid={!!errors.device_stars}
+                  />
+                </Field>
+                <Field label={`${t("payments.devicePrice")}, ₽`} htmlFor="pay-device-rub" error={errors.device_rub}>
+                  <input
+                    id="pay-device-rub"
+                    className="input max-w-[140px]"
+                    inputMode="decimal"
+                    value={form.deviceRub}
+                    onChange={(e) => setForm((f) => ({ ...f, deviceRub: e.target.value }))}
+                    aria-invalid={!!errors.device_rub}
+                  />
+                </Field>
+              </div>
+            </Field>
           </div>
         </div>
         <FormActions dirty={dirty} saving={save.isPending} onReset={() => { reset(); setErrors({}); }} />

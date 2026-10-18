@@ -144,6 +144,34 @@ export function Shop({
     }
   };
 
+  const payDevice = async (provider: Provider) => {
+    setBusy(provider);
+    setError("");
+    setReady(null);
+    try {
+      const r = await postJSON<{ url: string; code: string }>(subRoot + "/tg/pay", {
+        init_data: initData,
+        device: true,
+        provider,
+        token,
+      });
+      const body = r.data;
+      if (!r.ok || !body.url) {
+        setError(failText(body.code ?? ""));
+        return;
+      }
+      const slug = /^https:\/\/t\.me\/\$(.+)$/.exec(body.url)?.[1];
+      if (provider === "stars" && slug) {
+        openInvoice(slug);
+        setOpened(true);
+      } else setReady({ url: body.url, provider });
+    } catch {
+      setError(t("sub.shopFail"));
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const methods: { id: Provider; label: string; price?: string }[] = [];
   if (price?.stars && data.providers.stars) methods.push({ id: "stars", label: t("sub.shopStars"), price: `⭐ ${price.stars}` });
   if (price?.rub) {
@@ -156,20 +184,22 @@ export function Shop({
   return (
     <section className="glass sub-card p-4" aria-label={title}>
       <h2 className="mb-1 text-[15px] font-semibold">{title}</h2>
-      <p className="mb-3 text-xs text-[var(--ink-500)]">{pick}{promoCode ? ` · ${t("sub.promoSelected", { code: promoCode })}` : ""}</p>
+      {offers.length > 0 && pick ? <p className="mb-3 text-xs text-[var(--ink-500)]">{pick}{promoCode ? ` · ${t("sub.promoSelected", { code: promoCode })}` : ""}</p> : null}
       {promoPreview ? <p className="mb-3 text-xs text-[var(--leaf-600)]">{t("sub.promoCheckoutDiscount", { discount: money(promoPreview.discount, promoPreview.currency), total: money(promoPreview.final_amount, promoPreview.currency) })}</p> : null}
-      <div className="flex flex-col gap-2" role="radiogroup" aria-label={pick}>
-        {offers.map((o) => (
-          <button key={o.id} type="button" role="radio" aria-checked={picked === o.id} className="opt" onClick={() => setPicked(o.id)}>
-            <span className="flex items-center justify-between gap-2">
-              <span className="font-semibold">{o.name}</span>
-              <span className="num text-[13px] text-[var(--ink-700)]">{listPrice(o)}</span>
-            </span>
-            <span className="text-xs text-[var(--ink-500)]">{o.description}</span>
-            {o.note ? <span className="whitespace-pre-line text-xs text-[var(--ink-700)]">{o.note}</span> : null}
-          </button>
-        ))}
-      </div>
+      {offers.length > 0 ? (
+        <div className="flex flex-col gap-2" role="radiogroup" aria-label={pick}>
+          {offers.map((o) => (
+            <button key={o.id} type="button" role="radio" aria-checked={picked === o.id} className="opt" onClick={() => setPicked(o.id)}>
+              <span className="flex items-center justify-between gap-2">
+                <span className="font-semibold">{o.name}</span>
+                <span className="num text-[13px] text-[var(--ink-700)]">{listPrice(o)}</span>
+              </span>
+              <span className="text-xs text-[var(--ink-500)]">{o.description}</span>
+              {o.note ? <span className="whitespace-pre-line text-xs text-[var(--ink-700)]">{o.note}</span> : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
       {terms ? (
         <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label={t("sub.shopPickTerm")}>
           {terms.map((x) => (
@@ -206,29 +236,45 @@ export function Shop({
           {opened ? null : <p className="text-xs text-[var(--ink-500)]">{t("sub.shopGoHint")}</p>}
         </div>
       ) : null}
-      {data.device && (field === "tariff_id" || field === "package_id") && !offer ? (() => {
-          const rub = data.device.rub ?? 0;
-          const addon = rub > 0 && data.addons && data.addons.length > 0 ? data.addons[0] : null;
-          return (
-            <div className="mt-3">
-              <p className="mb-2 text-xs text-[var(--ink-500)]">{t("sub.deviceBuyHint")}</p>
-              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (data.device.stars && data.providers.stars ? 1 : 0) + (rub > 0 ? 1 : 0))}, minmax(0, 1fr))` }}>
-                {data.device.stars && data.providers.stars && (
-                  <Button variant="primary" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay("stars")}>
-                    <span className="text-[13px] font-semibold">⭐ {data.device.stars}</span>
-                    <span className="text-[11px] opacity-80">{t("sub.shopStars")}</span>
-                  </Button>
-                )}
-                {addon && (
-                  <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(addon.provider as Provider)}>
-                    <span className="text-[13px] font-semibold">{rubles(rub)}</span>
-                    <span className="text-[11px] opacity-80">{addon.name}</span>
-                  </Button>
-                )}
-              </div>
+      {data.device && token ? (() => {
+        const rub = data.device.rub ?? 0;
+        const stars = data.device.stars ?? 0;
+        const hasStars = stars > 0 && !!data.providers.stars;
+        const addons = rub > 0 && data.addons ? data.addons : [];
+        if (!hasStars && addons.length === 0) return null;
+        return (
+          <div className={offers.length > 0 ? "mt-4 border-t border-[var(--hairline)] pt-3" : "mt-2"}>
+            <p className="mb-2 text-xs font-medium text-[var(--ink-700)]">{t("sub.deviceBuyHint")}</p>
+            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (hasStars ? 1 : 0) + addons.length)}, minmax(0, 1fr))` }}>
+              {hasStars && (
+                <Button
+                  variant="primary"
+                  disabled={busy !== null}
+                  className="flex-col gap-0 py-2"
+                  style={{ height: "auto" }}
+                  onClick={() => void payDevice("stars")}
+                >
+                  <span className="text-[13px] font-semibold">⭐ {stars}</span>
+                  <span className="text-[11px] opacity-80">{t("sub.shopStars")}</span>
+                </Button>
+              )}
+              {addons.map((a) => (
+                <Button
+                  key={a.provider}
+                  variant="glass"
+                  disabled={busy !== null}
+                  className="flex-col gap-0 py-2"
+                  style={{ height: "auto" }}
+                  onClick={() => void payDevice(a.provider as Provider)}
+                >
+                  <span className="text-[13px] font-semibold">{rubles(rub)}</span>
+                  <span className="text-[11px] opacity-80">{a.name}</span>
+                </Button>
+              ))}
             </div>
-          );
-        })() : null}
+          </div>
+        );
+      })() : null}
       {error ? (
         <p className="mt-3 text-xs text-[var(--berry-600)]" role="alert">
           {error}

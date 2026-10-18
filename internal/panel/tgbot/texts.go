@@ -49,9 +49,9 @@ type words struct {
 	channelJoin, channelCheck, channelNotYet             string
 	freeDone, freeActive, freeOff, freeFail, freeChannel string
 
-	// Traffic packages.
+	// Traffic packages and extra devices.
 	buyTraffic, trafficTitle, payPackage, packageGone, paidPackage, plusPackages string
-	buyDevice, payDevice string
+	buyDevice, payDevice, paidDevice, refundedDevice                             string
 
 	// A refund takes back what the payment gave.
 	refundedNew, refundedRenew, refundedPackage, refundedGone string
@@ -146,7 +146,10 @@ var ru = words{
 	freeChannel:   "Бесплатный тариф для подписчиков нашего канала. Подпишитесь и нажмите «Проверить».",
 
 	buyTraffic:   "📦 Докупить трафик",
-	buyDevice: "➕ Докупить устройство", payDevice: "После оплаты лимит устройств увеличится на 1.",
+	buyDevice:    "➕ Докупить устройство",
+	payDevice:    "После оплаты лимит устройств увеличится на 1.",
+	paidDevice:    "✅ Оплата получена — лимит устройств подписки «%s» увеличен на 1.",
+	refundedDevice: "↩️ Платёж за дополнительное устройство подписки «%s» возвращён. Лимит устройств уменьшен.",
 	trafficTitle: "Трафик для подписки «%s»: выберите пакет",
 	payPackage:   "трафик начислится",
 	packageGone:  "Этот пакет больше не продаётся.",
@@ -248,7 +251,10 @@ var en = words{
 	freeChannel:   "The free plan is for our channel's subscribers. Join it and tap “Check”.",
 
 	buyTraffic:   "📦 Buy more traffic",
-	buyDevice: "➕ Buy one more device", payDevice: "After payment the device limit increases by 1.",
+	buyDevice:    "➕ Buy one more device",
+	payDevice:    "After payment the device limit increases by 1.",
+	paidDevice:    "✅ Payment received — device limit for subscription “%s” increased by 1.",
+	refundedDevice: "↩️ Payment for extra device for subscription “%s” has been refunded. Device limit decreased.",
 	trafficTitle: "Traffic for subscription “%s”: pick a package",
 	payPackage:   "traffic is added",
 	packageGone:  "This package is no longer sold.",

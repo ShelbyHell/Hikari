@@ -2621,6 +2621,8 @@
     "freeChannelHint": "The channel is set in Telegram → Menu and texts. Works even with the mandatory subscription off",
     "freeNoChannel": "The bot has no channel: set it in Telegram → Menu and texts to choose this condition",
     "trialPriceSub": "Empty: free. With a price the trial is bought once in the bot and the Mini App, and after it only the regular plans. Needs selling on and a payment method for this price. A paid trial that can no longer be given is refunded by the panel, or marked for a refund by hand when the payment method cannot refund. “Sell to new people” may stay off.",
+    "devicePrice": "Device price",
+    "devicePriceSub": "Empty: extra device purchase off. With a price, subscribers with a device limit can purchase additional device slots (+1 device) in the bot and Mini App without renewing their plan.",
     "nothingOnSale": "The bot sells nothing yet: mark a plan “On sale” and set a price.",
     "openTariffs": "Open plans",
     "salesOff": "Selling is off: the bot and the Mini App sell nothing. Payment methods can be set up beforehand.",

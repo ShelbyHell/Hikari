@@ -239,11 +239,15 @@ function SubPage() {
     setDocId(id);
   };
 
+  const hasOffers = !!shop && shop.offers.length > 0;
+  const hasPackages = !!packages && packages.token === token && (packages.data.packages?.length ?? 0) > 0;
+  const deviceOffer = packages?.token === token ? packages.data.device : undefined;
+
   const shopFor = (shopToken: string, title: string) =>
-    shop && shop.offers.length > 0 ? (
+    hasOffers ? (
       <Shop
-        data={shop}
-        offers={shop.offers}
+        data={deviceOffer && packages?.token === shopToken ? { ...shop!, device: deviceOffer } : shop!}
+        offers={shop!.offers}
         subRoot={subRoot}
         initData={initData}
         token={shopToken}
@@ -256,11 +260,11 @@ function SubPage() {
     ) : null;
   // Traffic packages are for the subscription on screen.
   const packagesShop =
-    packages && packages.data.packages?.length && packages.token === token ? (
+    hasPackages ? (
       <Shop
         key={token}
-        data={packages.data}
-        offers={packages.data.packages}
+        data={hasOffers ? { ...packages!.data, device: undefined } : packages!.data}
+        offers={packages!.data.packages ?? []}
         field="package_id"
         pick={t("sub.packagesPick")}
         subRoot={subRoot}
@@ -271,6 +275,21 @@ function SubPage() {
         openLink={openOutside}
         onRefresh={refresh}
         promoCode={promoCode}
+      />
+    ) : null;
+  // When no plans or packages are on sale, an extra device can still be purchased.
+  const deviceShop =
+    !hasOffers && !hasPackages && deviceOffer && token && packages ? (
+      <Shop
+        data={packages.data}
+        offers={[]}
+        subRoot={subRoot}
+        initData={initData}
+        token={token}
+        title={titleOf(config, "shop") || t("sub.shop")}
+        openInvoice={(slug) => tgEvent("web_app_open_invoice", { slug })}
+        openLink={openOutside}
+        onRefresh={refresh}
       />
     ) : null;
 
@@ -406,6 +425,7 @@ function SubPage() {
             <>
               {shopFor(token, titleOf(config, "shop") || t("sub.shop"))}
               {packagesShop}
+              {deviceShop}
               {freePlan}
             </>
           ) : null

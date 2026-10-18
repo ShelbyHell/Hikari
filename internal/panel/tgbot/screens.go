@@ -115,6 +115,8 @@ func (b *Bot) screen(ctx context.Context, cfg Config, chat int64, data, notice s
 	case "d", "dc":
 		id, _ := strconv.ParseInt(arg, 10, 64)
 		return b.devices(ctx, w, u, cmd, id, notice, now)
+	case "db":
+		return b.deviceShop(ctx, w, chat, u)
 	case "da":
 		return b.deviceInvoice(ctx, w, chat, u.ID, arg)
 	case "c":
@@ -315,8 +317,8 @@ func (b *Bot) devices(ctx context.Context, w *words, u db.User, cmd string, id i
 		lines = append([]string{"<b>" + html.EscapeString(fmt.Sprintf(w.wait, b.when(w, rules.Next))) + "</b>", ""}, lines...)
 	}
 	rows := [][]tgate.Button{}
-	if o, av, _ := b.d.Backend.Shop().DeviceOffer(ctx, u.ID); o.Stars > 0 || o.Rub > 0 {
-		rows = append(rows, []tgate.Button{{Text: w.buyDevice, CallbackData: "da:" + providerCode(av, o)}})
+	if o, av, _ := b.d.Backend.Shop().DeviceOffer(ctx, u.ID); (o.Stars > 0 && av.Stars) || (o.Rub > 0 && av.Rub()) {
+		rows = append(rows, []tgate.Button{{Text: w.buyDevice, CallbackData: "db"}})
 	}
 	if len(devs) == 0 {
 		lines = append(lines, html.EscapeString(w.devicesNone))
@@ -554,14 +556,32 @@ func (b *Bot) poolLines(ctx context.Context, w *words, userID int64) []string {
 	return out
 }
 
-func providerCode(av billing.Available, o billing.DeviceOffer) string {
-	if o.Stars > 0 && av.Stars { return "stars" }
-	if o.Rub > 0 && len(av.Addons) > 0 { return "addon:" + av.Addons[0] }
-	return ""
+func (b *Bot) deviceShop(ctx context.Context, w *words, chat int64, u db.User) (string, *tgate.Keyboard) {
+	back := []tgate.Button{{Text: w.back, CallbackData: "d"}}
+	o, av, err := b.d.Backend.Shop().DeviceOffer(ctx, u.ID)
+	if err != nil || (!av.Stars || o.Stars <= 0) && (!av.Rub() || o.Rub <= 0) {
+		return html.EscapeString(w.payUnavailable), &tgate.Keyboard{InlineKeyboard: [][]tgate.Button{back}}
+	}
+	text := "<b>" + html.EscapeString(w.buyDevice) + "</b>\n" + html.EscapeString(w.payDevice) + "\n\n" + w.payHow
+	return text, &tgate.Keyboard{InlineKeyboard: append(w.payButtons("da:", o.Stars, o.Rub, av, b.addonName(ctx)), back)}
 }
 
-func (b *Bot) deviceInvoice(ctx context.Context, w *words, chat, userID int64, provider string) (string, *tgate.Keyboard) {
+func (b *Bot) deviceInvoice(ctx context.Context, w *words, chat, userID int64, code string) (string, *tgate.Keyboard) {
+	provider, ok := providerOf(code)
+	if !ok {
+		if code == billing.Stars || strings.HasPrefix(code, billing.AddonPrefix) {
+			provider = code
+			ok = true
+		}
+	}
+	back := []tgate.Button{{Text: w.back, CallbackData: "db"}}
+	if !ok {
+		return html.EscapeString(w.payUnavailable), &tgate.Keyboard{InlineKeyboard: [][]tgate.Button{back}}
+	}
 	p, err := b.d.Backend.Shop().DeviceInvoice(ctx, billing.DeviceRequest{TgID: chat, UserID: userID, Provider: provider})
-	if err != nil { return html.EscapeString(w.payError(err)), &tgate.Keyboard{InlineKeyboard: [][]tgate.Button{{{Text: w.back, CallbackData: "d"}}}} }
-	return fmt.Sprintf(w.invoice, html.EscapeString(p.TariffName), html.EscapeString(w.price(p.Amount, p.Currency)), w.payDevice), &tgate.Keyboard{InlineKeyboard: [][]tgate.Button{{{Text: fmt.Sprintf(w.payButton, w.price(p.Amount, p.Currency)), URL: p.PayUrl}}, {{Text: w.back, CallbackData: "d"}}}}
+	if err != nil {
+		return html.EscapeString(w.payError(err)), &tgate.Keyboard{InlineKeyboard: [][]tgate.Button{back}}
+	}
+	text := fmt.Sprintf(w.invoice, html.EscapeString(p.TariffName), html.EscapeString(w.price(p.Amount, p.Currency)), w.payDevice)
+	return text, &tgate.Keyboard{InlineKeyboard: [][]tgate.Button{{{Text: fmt.Sprintf(w.payButton, w.price(p.Amount, p.Currency)), URL: p.PayUrl}}, back}}
 }

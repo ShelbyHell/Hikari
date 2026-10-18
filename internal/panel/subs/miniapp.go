@@ -155,21 +155,29 @@ type shopRequest struct {
 	TariffID  int64  `json:"tariff_id"`
 	TermDays  *int64 `json:"term_days"` // the tariff's term; absent: its first
 	PackageID int64  `json:"package_id"`
-	Trial     bool   `json:"trial"` // the priced trial, for an account without a subscription
+	Trial     bool   `json:"trial"`  // the priced trial, for an account without a subscription
+	Device    bool   `json:"device"` // +1 extra device place for the subscription
 	Provider  string `json:"provider"`
 	Token     string `json:"token"`
 	PromoCode string `json:"promo_code"`
 }
 
-// valid: the trial is bought for no subscription and at its own price, without a code.
+// valid: the trial is bought for no subscription and at its own price, without a code;
+// the extra device place is for one subscription and has no promo codes.
 func (in shopRequest) valid() bool {
-	return !in.Trial || in.Token == "" && strings.TrimSpace(in.PromoCode) == ""
+	if in.Trial && (in.Token != "" || strings.TrimSpace(in.PromoCode) != "") {
+		return false
+	}
+	if in.Device && (in.Token == "" || strings.TrimSpace(in.PromoCode) != "") {
+		return false
+	}
+	return true
 }
 
 // miniAppShop: "shop" lists what the Telegram account can buy (with token: the traffic
 // packages of that subscription too), "pay" opens an invoice for a new subscription
-// (token ""), one of the account's own, a traffic package for it (package_id), or the
-// priced trial (trial).
+// (token ""), one of the account's own, a traffic package for it (package_id), an extra
+// device slot (device), or the priced trial (trial).
 func (h *Handler) miniAppShop(w http.ResponseWriter, r *http.Request, rest string) {
 	var in shopRequest
 	tgID, users, fail, ok := h.mini(w, r, &in)
@@ -194,6 +202,12 @@ func (h *Handler) miniAppShop(w http.ResponseWriter, r *http.Request, rest strin
 	var err error
 	if in.Trial {
 		p, err = h.shop.TrialInvoice(ctx, tgID, billing.AdapterOf(in.Provider))
+	} else if in.Device {
+		if userID == 0 {
+			fail(http.StatusForbidden, billing.ErrNotYours.Error())
+			return
+		}
+		p, err = h.shop.DeviceInvoice(ctx, billing.DeviceRequest{TgID: tgID, UserID: userID, Provider: billing.AdapterOf(in.Provider)})
 	} else if in.PackageID != 0 {
 		p, err = h.shop.PackageInvoice(ctx, billing.PackageRequest{TgID: tgID, UserID: userID, PackageID: in.PackageID, Provider: billing.AdapterOf(in.Provider), PromoCode: in.PromoCode})
 	} else {

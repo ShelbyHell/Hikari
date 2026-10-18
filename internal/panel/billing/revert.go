@@ -106,6 +106,16 @@ func (s *Service) takeBack(ctx context.Context, q *db.Queries, p db.Payment) (rv
 		}
 		return rv, u, err
 	}
+	if p.Kind == KindDevice {
+		if u.DeviceLimit.Valid && u.DeviceLimit.Int64 > 1 {
+			par := userParams(u, s.d.Now().Unix())
+			par.DeviceLimit = sql.NullInt64{Int64: u.DeviceLimit.Int64 - 1, Valid: true}
+			if u, err = q.UpdateUser(ctx, par); err == nil {
+				rv.Action = "device"
+			}
+		}
+		return rv, u, err
+	}
 	return s.takeBackTariff(ctx, q, p, u, rv)
 }
 

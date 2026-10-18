@@ -4130,6 +4130,8 @@ export interface components {
              * @description Тариф пробного периода; 0 — выключить
              */
             trial_tariff_id?: number;
+            device_rub?: number;
+            device_stars?: number;
         };
         PatchSettingsInputBody: {
             /**
@@ -4304,6 +4306,8 @@ export interface components {
              * @description Цена пробного периода в Stars; 0 вместе с trial_rub — бесплатно
              */
             trial_stars: number;
+            device_rub?: number;
+            device_stars?: number;
             /**
              * Format: int64
              * @description Тариф пробного периода: один раз на Telegram-аккаунт без подписки и оплат, кнопка в приветствии бота; null — пробного периода нет. Работает и при выключенной продаже
