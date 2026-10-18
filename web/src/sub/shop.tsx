@@ -206,28 +206,28 @@ export function Shop({
           {opened ? null : <p className="text-xs text-[var(--ink-500)]">{t("sub.shopGoHint")}</p>}
         </div>
       ) : null}
-      {data.device && (field === "tariff_id" || field === "package_id") && !offer ? (
-        <div className="mt-3">
-          <p className="mb-2 text-xs text-[var(--ink-500)]">{t("sub.deviceBuyHint")}</p>
-          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (data.device.stars && data.providers.stars ? 1 : 0) + (data.device.rub ? 1 : 0))}, minmax(0, 1fr))` }}>
-            {data.device.stars && data.providers.stars && (
-              <Button variant="primary" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay("stars")}>
-                <span className="text-[13px] font-semibold">⭐ {data.device.stars}</span>
-                <span className="text-[11px] opacity-80">{t("sub.shopStars")}</span>
-              </Button>
-            )}
-            {data.device.rub && data.addons && data.addons.length > 0 ? (() => {
-              const firstAddon = data.addons[0];
-              return (
-                <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(firstAddon.provider as Provider)}>
-                  <span className="text-[13px] font-semibold">{rubles(data.device.rub)}</span>
-                  <span className="text-[11px] opacity-80">{firstAddon.name}</span>
-                </Button>
-              );
-            })() : null}
-          </div>
-        </div>
-      ) : null}
+      {data.device && (field === "tariff_id" || field === "package_id") && !offer ? (() => {
+          const addon = data.device.rub && data.addons && data.addons.length > 0 ? data.addons[0] : null;
+          return (
+            <div className="mt-3">
+              <p className="mb-2 text-xs text-[var(--ink-500)]">{t("sub.deviceBuyHint")}</p>
+              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(2, (data.device.stars && data.providers.stars ? 1 : 0) + (data.device.rub ? 1 : 0))}, minmax(0, 1fr))` }}>
+                {data.device.stars && data.providers.stars && (
+                  <Button variant="primary" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay("stars")}>
+                    <span className="text-[13px] font-semibold">⭐ {data.device.stars}</span>
+                    <span className="text-[11px] opacity-80">{t("sub.shopStars")}</span>
+                  </Button>
+                )}
+                {addon && (
+                  <Button variant="glass" className="flex-col gap-0 py-2" style={{ height: "auto" }} onClick={() => void pay(addon.provider as Provider)}>
+                    <span className="text-[13px] font-semibold">{rubles(data.device.rub)}</span>
+                    <span className="text-[11px] opacity-80">{addon.name}</span>
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })() : null}
       {error ? (
         <p className="mt-3 text-xs text-[var(--berry-600)]" role="alert">
           {error}
