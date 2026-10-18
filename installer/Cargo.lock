@@ -777,6 +777,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "hikari-installer"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "base64 0.23.1",
+ "clap",
+ "ed25519-dalek",
+ "libc",
+ "qrcode",
+ "ratatui",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "ureq",
+]
+
+[[package]]
 name = "http"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1090,24 +1108,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
 dependencies = [
  "autocfg",
-]
-
-[[package]]
-name = "hikari-installer"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "base64 0.23.1",
- "clap",
- "ed25519-dalek",
- "libc",
- "qrcode",
- "ratatui",
- "rustix",
- "serde",
- "serde_json",
- "sha2 0.11.0",
- "ureq",
 ]
 
 [[package]]

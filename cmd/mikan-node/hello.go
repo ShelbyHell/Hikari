@@ -51,7 +51,7 @@ func helloLoop(ctx context.Context, key nodetls.Key, dataDir string, log *slog.L
 func helloOnce() {
 	now := time.Now().UTC()
 	var s nodehello.Status
-	key, err := nodetls.DecodeKey(os.Getenv("MIKAN_NODE_JOIN"))
+	key, err := nodetls.DecodeKey(nodeJoinRaw())
 	if err != nil {
 		s = nodehello.Status{Result: nodehello.Result{Code: nodehello.NoPanelURL, Error: err.Error()}}
 	} else {

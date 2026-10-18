@@ -86,7 +86,7 @@ fn ensure_room(root: &Path, postgres: bool) -> Result<()> {
 
 /// What a restore may put back, below /opt/Hikari: the settings, and the data of the panel
 /// and the node. Anything else in an archive is not a hikari backup.
-const TOP: [&str; 2] = [".env", "compose.yaml"];
+const TOP: [&str; 3] = ["config.json", ".env", "compose.yaml"];
 
 /// The backups' directory, private.
 fn backups_dir(root: &Path) -> Result<PathBuf> {
@@ -218,7 +218,10 @@ pub fn backup_as(kind: &str, say: &mut dyn FnMut(&str)) -> Result<PathBuf> {
     let dir = backups_dir(root)?;
     let postgres = !install.node && install.env.get("MIKAN_DATABASE_URL").is_some();
     ensure_room(root, postgres)?;
-    let mut members: Vec<String> = TOP.iter().map(|s| (*s).to_owned()).collect();
+    let mut members: Vec<String> = TOP.iter().filter(|s| exists(root, s)).map(|s| (*s).to_owned()).collect();
+    if exists(root, "secrets") {
+        members.push("secrets".into());
+    }
     let panel = if install.node {
         None
     } else {
@@ -279,9 +282,10 @@ fn allowed_name(name: &str) -> bool {
         return false;
     }
     TOP.contains(&n)
-        || ["data", "data/panel", "data/node", "addons", "addons/state.json"].contains(&n)
+        || ["data", "data/panel", "data/node", "addons", "addons/state.json", "secrets"].contains(&n)
         || n.starts_with("data/panel/")
         || n.starts_with("data/node/")
+        || n.starts_with("secrets/")
 }
 
 /// Judges the two listings of an archive (`tar -tzf`, names; `tar -tvzf`, with types).
@@ -374,26 +378,26 @@ fn verify_tree(dir: &Path, depth: usize) -> Result<()> {
 /// What an unpacked archive puts back: (where it is, where it goes below /opt/mikan).
 fn plan(stage: &Path) -> Result<Vec<(PathBuf, &'static str)>> {
     let items = plan_items(stage);
-    if !items.iter().any(|(_, r)| *r == ".env") {
-        bail!("the archive has no .env: it is not a hikari backup");
+    if !items.iter().any(|(_, r)| *r == ".env" || *r == "config.json") {
+        bail!("the archive has neither config.json nor .env: it is not a hikari backup");
     }
     Ok(items)
 }
 
-/// What an archive without .env puts back: the panel's PostgreSQL dump alone, as the panel
+/// What an archive without configuration puts back: the panel's PostgreSQL dump alone, as the panel
 /// sends it to Telegram. The server's settings, certificates, adapters and node data stay
 /// as they are.
 fn plan_database(stage: &Path) -> Result<Vec<(PathBuf, &'static str)>> {
     let items: Vec<_> = plan_items(stage).into_iter().filter(|(_, r)| *r == RESTORE_DUMP).collect();
     if items.is_empty() {
-        bail!("the archive has neither .env nor the panel's PostgreSQL dump: it is not a hikari backup");
+        bail!("the archive has neither configuration nor the panel's PostgreSQL dump: it is not a hikari backup");
     }
     Ok(items)
 }
 
 fn plan_items(stage: &Path) -> Vec<(PathBuf, &'static str)> {
     let mut items = Vec::new();
-    for rel in [".env", "compose.yaml", "data/panel/tls", "data/node", "addons/state.json", "data/panel/addons"] {
+    for rel in ["config.json", ".env", "compose.yaml", "secrets", "data/panel/tls", "data/node", "addons/state.json", "data/panel/addons"] {
         if fs::symlink_metadata(stage.join(rel)).is_ok() {
             items.push((stage.join(rel), rel));
         }
@@ -515,15 +519,17 @@ fn swap(root: &Path, items: &[(PathBuf, &str)]) -> Result<()> {
 /// --no-db-snapshot`).
 pub fn archive_stopped(root: &Path, kind: &str, dump: bool) -> Result<PathBuf> {
     let dir = backups_dir(root)?;
-    let postgres = EnvFile::load(root.join(".env"))?.get("MIKAN_DATABASE_URL").is_some();
+    let postgres = EnvFile::load(root)?.get("MIKAN_DATABASE_URL").is_some();
     let pg = dump && postgres;
     ensure_room(root, pg)?;
     if pg {
         dump_postgres(&Dir::open(root, "data/panel", false)?.context("data/panel is missing")?)?;
     }
     let members: Vec<String> = [
+        "config.json",
         ".env",
         "compose.yaml",
+        "secrets",
         SQLITE,
         SQLITE_WAL,
         SQLITE_SHM,
@@ -584,9 +590,9 @@ pub fn restore(file: &Path, no_db_snapshot: bool, say: &mut dyn FnMut(&str)) -> 
     let stage = Stage::new(root)?;
     extract(file, &stage.0)?;
     verify_tree(&stage.0, 0)?;
-    let items = if fs::symlink_metadata(stage.0.join(".env")).is_ok() {
+    let items = if fs::symlink_metadata(stage.0.join("config.json")).is_ok() || fs::symlink_metadata(stage.0.join(".env")).is_ok() {
         let mut items = plan(&stage.0)?;
-        let mut archived = EnvFile::load(stage.0.join(".env"))?;
+        let mut archived = EnvFile::load(&stage.0)?;
         if (archived.get("MIKAN_MODE") == Some("node")) != install.node {
             bail!(
                 "the backup is a {}'s, this server is a {}",

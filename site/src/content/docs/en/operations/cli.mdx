@@ -23,7 +23,7 @@ Running `hikari` with no arguments opens a menu in the terminal: status, updates
 
 The panel runs `hikari doctor` and `hikari restart` on its own server, and on a node's server over the node API, without SSH: it writes a request file into its data directory and a systemd unit (`hikari-doctor-request.path`, `hikari-restart-request.path`, installed by the installer and by `hikari update`) runs the command and returns the report. A server installed before 0.5.1.1 needs one `hikari update` for that. The logs of the panel and of the nodes are shown in the panel as well, with tokens, keys, passwords and subscription links cut out. All of it is on the [Diagnostics](/Hikari/en/operations/diagnostics/) page.
 
-`hikari support <code>` is for the case when the panel is down or the node is out of the panel's reach. Take the code from your support ticket, run the command as root: it collects the same report as `hikari doctor --json`, `hikari status` and the last 300 lines of the containers' logs, cuts the secrets out and sends one JSON document to the support desk (`MIKAN_SUPPORT_URL` points it elsewhere). `.env`, keys and certificates are not read and not sent. `--dry-run` prints what would be sent and sends nothing.
+`hikari support <code>` is for the case when the panel is down or the node is out of the panel's reach. Take the code from your support ticket, run the command as root: it collects the same report as `hikari doctor --json`, `hikari status` and the last 300 lines of the containers' logs, cuts the secrets out and sends one JSON document to the support desk (`MIKAN_SUPPORT_URL` points it elsewhere). Secrets, keys and certificates are not read and not sent. `--dry-run` prints what would be sent and sends nothing.
 
 ## Access
 

@@ -22,7 +22,7 @@ pub struct Install {
 
 impl Install {
     pub fn load() -> Result<Self> {
-        let env = EnvFile::load(Path::new(DIR).join(".env")).map_err(|e| {
+        let env = EnvFile::load(Path::new(DIR)).map_err(|e| {
             let missing = e.root_cause().downcast_ref::<std::io::Error>().is_some_and(|io| io.kind() == std::io::ErrorKind::NotFound);
             // Only a missing file means "not installed": a .env that cannot be read says why.
             if missing { anyhow!("Hikari is not installed here: run `hikari install`") } else { e }

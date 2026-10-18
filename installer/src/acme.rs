@@ -95,7 +95,7 @@ pub fn manual_text(front: Front, domain: &str, port: u16) -> String {
         "Add this {place}
 
 {block}
-Then set MIKAN_ACME_LISTEN={} in {}/.env and run: hikari restart",
+Then set MIKAN_ACME_LISTEN={} in {}/config.json and run: hikari restart",
         listen(port),
         crate::DIR
     )
@@ -732,7 +732,7 @@ mod tests {
     fn the_manual_rule_names_the_port_and_the_env_line() {
         let text = manual_text(Front::Nginx, "node.example.com", 18080);
         assert!(text.contains("server_name node.example.com;") && text.contains("proxy_pass http://127.0.0.1:18080;"), "{text}");
-        assert!(text.contains("MIKAN_ACME_LISTEN=127.0.0.1:18080 in /opt/mikan/.env"), "{text}");
+        assert!(text.contains("MIKAN_ACME_LISTEN=127.0.0.1:18080 in /opt/mikan/config.json"), "{text}");
         let text = manual_text(Front::Caddy, "node.example.com", 18080);
         assert!(text.contains("http://node.example.com {") && text.contains("reverse_proxy 127.0.0.1:18080"), "{text}");
     }

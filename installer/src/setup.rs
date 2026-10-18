@@ -22,7 +22,7 @@ use crate::{DIR, acme, docker, hello, host, panelfs, release};
 const UNFINISHED: &str = ".installing";
 
 fn unfinished(root: &Path) -> bool {
-    root.join(".env").exists() && root.join(UNFINISHED).exists()
+    crate::envfile::is_installed(root) && root.join(UNFINISHED).exists()
 }
 
 /// The flags of `hikari install`; the installer asks for what they leave out.
@@ -664,8 +664,7 @@ fn write_files(plan: &Plan, image: &str, version: &str, api_port: Option<u16>, a
 /// where the panel answers Let's Encrypt when a web server holds port 80.
 fn write_files_in(root: &Path, plan: &Plan, image: &str, version: &str, api_port: Option<u16>, acme_port: Option<u16>) -> Result<()> {
     use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
-    let env_path = root.join(".env");
-    if env_path.exists() && !(plan.resume && unfinished(root)) {
+    if crate::envfile::is_installed(root) && !(plan.resume && unfinished(root)) {
         bail!("Hikari is already installed in {}", root.display());
     }
     fs::create_dir_all(root)?;
@@ -678,7 +677,14 @@ fn write_files_in(root: &Path, plan: &Plan, image: &str, version: &str, api_port
         }
         Err(e) => return Err(e.into()),
     }
-    let mut env = if plan.resume { EnvFile::load(&env_path)? } else { EnvFile::new(&env_path) };
+    match fs::DirBuilder::new().mode(0o700).create(root.join("secrets")) {
+        Ok(()) => {}
+        Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+            fs::set_permissions(root.join("secrets"), fs::Permissions::from_mode(0o700))?
+        }
+        Err(e) => return Err(e.into()),
+    }
+    let mut env = if plan.resume { EnvFile::load(root)? } else { EnvFile::new(root) };
     env.set("MIKAN_IMAGE", image)?;
     env.set("MIKAN_VERSION", version)?;
     env.set("MIKAN_UFW", if plan.firewall { "1" } else { "0" })?;
@@ -801,9 +807,9 @@ pub fn install(opts: Options) -> Result<()> {
     let root = Path::new(DIR);
     if unfinished(root) {
         crate::out("An earlier install did not finish: continuing it.");
-        return plain(opts, Some(EnvFile::load(root.join(".env"))?));
+        return plain(opts, Some(EnvFile::load(root)?));
     }
-    if root.join(".env").exists() {
+    if crate::envfile::is_installed(root) {
         if crate::tui::interactive() && !opts.yes {
             return crate::tui::menu();
         }

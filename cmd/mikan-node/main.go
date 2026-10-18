@@ -15,6 +15,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -93,7 +94,7 @@ func run() error {
 	go serve(ln)
 	log.Info("node started", "version", version, "socket", sock)
 	// A remote node also serves the Node API over TCP to its panel (see nodetls).
-	if raw := os.Getenv("MIKAN_NODE_JOIN"); raw != "" {
+	if raw := nodeJoinRaw(); raw != "" {
 		key, err := nodetls.DecodeKey(raw)
 		if err != nil {
 			return fmt.Errorf("MIKAN_NODE_JOIN: %w", err)
@@ -135,11 +136,25 @@ func envOr(key, def string) string {
 	return def
 }
 
+func nodeJoinRaw() string {
+	if raw := os.Getenv("MIKAN_NODE_JOIN"); raw != "" {
+		return raw
+	}
+	f := os.Getenv("MIKAN_NODE_JOIN_FILE")
+	if f == "" {
+		f = "/run/secrets/node_join"
+	}
+	if b, err := os.ReadFile(f); err == nil {
+		return strings.TrimSpace(string(b))
+	}
+	return ""
+}
+
 // printJoinKey prints one field of the join key in MIKAN_NODE_JOIN for the installer:
 // the port of the node's API for "key-port", its address for "key-host". A key that does
 // not decode stops the installer with the reason.
 func printJoinKey(field string) {
-	key, err := nodetls.DecodeKey(os.Getenv("MIKAN_NODE_JOIN"))
+	key, err := nodetls.DecodeKey(nodeJoinRaw())
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "hikari-node:", err)
 		os.Exit(1)

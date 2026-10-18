@@ -9,7 +9,9 @@ import (
 	"hash/fnv"
 	"io/fs"
 	"math/rand/v2"
+	"net/url"
 	"os"
+	"strings"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -47,13 +49,22 @@ type Store struct {
 // since the store opened.
 func (s *Store) Conflicts() uint64 { return s.conflicts.Load() }
 
-// DatabaseURL is MIKAN_DATABASE_URL, the panel's PostgreSQL.
+// DatabaseURL is MIKAN_DATABASE_URL, or constructed from MIKAN_DATABASE_PASSWORD_FILE / /run/secrets/db_password.
 func DatabaseURL() (string, error) {
-	dsn := os.Getenv("MIKAN_DATABASE_URL")
-	if dsn == "" {
-		return "", errNoDatabaseURL
+	if dsn := os.Getenv("MIKAN_DATABASE_URL"); dsn != "" {
+		return dsn, nil
 	}
-	return dsn, nil
+	pwFile := os.Getenv("MIKAN_DATABASE_PASSWORD_FILE")
+	if pwFile == "" {
+		pwFile = "/run/secrets/db_password"
+	}
+	if b, err := os.ReadFile(pwFile); err == nil {
+		pw := strings.TrimSpace(string(b))
+		if pw != "" {
+			return fmt.Sprintf("postgresql://mikan:%s@localhost/mikan?host=/run/postgresql", url.QueryEscape(pw)), nil
+		}
+	}
+	return "", errNoDatabaseURL
 }
 
 var errNoDatabaseURL = errors.New("MIKAN_DATABASE_URL is required; run the current Hikari installer to set up PostgreSQL")

@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.2-rc.9
+### en
+- **Secure secrets handling & `.env` removal**. Host-level and container-level secrets (database password, node join token) are now fully decoupled from environment variables. Sensitive data is stored in `/opt/mikan/secrets/` with strict permissions (`0700` directory, `0600` files) and mounted into containers via native Docker Compose `secrets`, preventing secrets from leaking via `docker inspect` or `/proc/<pid>/environ`. Non-sensitive configuration is stored in `/opt/mikan/config.json`. Existing installations with `.env` are automatically migrated on startup.
+### ru
+- **Безопасное хранение секретов и отказ от `.env`**. Пароль базы данных и токен подключения ноды полностью отвязаны от переменных окружения как на хосте, так и внутри контейнеров. Конфиденциальные данные хранятся в `/opt/mikan/secrets/` со строгими правами (`0700` для директории, `0600` для файлов) и монтируются в контейнеры через стандартные секреты Docker Compose (`secrets:`), предотвращая утечку через `docker inspect` и окружение процессов `/proc/<pid>/environ`. Несекретные настройки перенесены в `/opt/mikan/config.json`. Существующие серверы с `.env` автоматически мигрируются при первом запуске.
+
 ## 0.5.1.2-rc.8
 ### en
 - **Buy extra device place in bot and Mini App**. A subscription owner can now purchase one additional device slot (+1 device) without renewing the plan. The admin sets the price in Telegram Stars and/or rubles (Payments → Sales rules → Device price). The button appears in the bot's "Devices" screen and in the Mini App's shop when the user has a device limit. Payment applies atomically: `device_limit` increases by 1, term and traffic stay unchanged.

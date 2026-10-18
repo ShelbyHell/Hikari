@@ -25,7 +25,7 @@ pub fn interactive() -> bool {
 
 /// `hikari` without a command: the installer on a fresh server, the menu on an installed one.
 pub fn start() -> Result<()> {
-    let installed = Path::new(crate::DIR).join(".env").exists();
+    let installed = crate::envfile::is_installed(Path::new(crate::DIR));
     if !interactive() {
         if installed {
             bail!("the menu needs a terminal; the commands are in Hikari --help");

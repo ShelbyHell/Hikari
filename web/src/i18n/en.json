@@ -2425,7 +2425,7 @@
       "eventTLS": "TLS certificate problem",
       "eventUpdate": "Update failed or rolled back",
       "backup": "Backups to Telegram",
-      "backupSub": "Once a day the panel's database (clients, plans, settings) goes to your chat, encrypted with a password. The .env file, certificates and node keys are not included.",
+      "backupSub": "Once a day the panel's database (clients, plans, settings) goes to your chat, encrypted with a password. Server secrets, certificates and node keys are not included.",
       "backupOn": "Send a backup every day",
       "backupNoChat": "Connect the admin chat above: backups go there.",
       "backupHour": "What time to send (UTC)",

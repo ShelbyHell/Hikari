@@ -47,7 +47,7 @@ pub const PANEL_COMPOSE: &str = concat!(
     r#"name: mikan
 
 x-hardening: &hardening
-  image: ${MIKAN_IMAGE}
+  image: ${MIKAN_IMAGE:-ghcr.io/shelbyhell/hikari:latest}
   network_mode: host
   restart: unless-stopped
   user: "65532:65532"
@@ -79,9 +79,10 @@ services:
     environment:
       MIKAN_DATA_DIR: /data/panel
       MIKAN_NODE_SOCKET: /run/mikan/node.sock
-      MIKAN_PANEL_LISTEN: 0.0.0.0:${PANEL_PORT}
+      MIKAN_PANEL_LISTEN: 0.0.0.0:${PANEL_PORT:-21355}
       MIKAN_ACME_LISTEN: "${MIKAN_ACME_LISTEN:-:80}"
-      MIKAN_DATABASE_URL: ${MIKAN_DATABASE_URL}
+    secrets:
+      - db_password
     volumes: ["./data/panel:/data/panel", "run:/run/mikan", "pg-run:/run/postgresql:ro"]
     mem_limit: 1g
     pids_limit: 512
@@ -104,9 +105,11 @@ services:
     environment:
       POSTGRES_USER: mikan
       POSTGRES_DB: mikan
-      POSTGRES_PASSWORD: ${MIKAN_POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_INITDB_ARGS: --auth-local=scram-sha-256 --auth-host=scram-sha-256
     command: ["postgres", "-c", "listen_addresses=", "-c", "unix_socket_directories=/run/postgresql", "-c", "unix_socket_permissions=0777", "-c", "max_connections=50"]
+    secrets:
+      - db_password
     volumes: ["pg-data:/var/lib/postgresql", "pg-run:/run/postgresql"]
     shm_size: 256m
     mem_limit: 1g
@@ -121,6 +124,10 @@ services:
     logging:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
+
+secrets:
+  db_password:
+    file: ./secrets/db_password
 
 volumes:
   run: {}
@@ -137,7 +144,7 @@ pub const NODE_COMPOSE: &str = r#"name: mikan
 
 services:
   node:
-    image: ${MIKAN_IMAGE}
+    image: ${MIKAN_IMAGE:-ghcr.io/shelbyhell/hikari:latest}
     network_mode: host
     restart: unless-stopped
     user: "65532:65532"
@@ -153,10 +160,16 @@ services:
     environment:
       MIKAN_DATA_DIR: /data/node
       MIKAN_NODE_SOCKET: /run/mikan/node.sock
-      MIKAN_NODE_JOIN: ${MIKAN_NODE_JOIN}
+      MIKAN_NODE_JOIN_FILE: /run/secrets/node_join
       MIKAN_ACME_LISTEN: "${MIKAN_ACME_LISTEN:-:80}"
+    secrets:
+      - node_join
     volumes: ["./data/node:/data/node", "run:/run/mikan"]
     pids_limit: 1024
+
+secrets:
+  node_join:
+    file: ./secrets/node_join
 
 volumes:
   run: {}
