@@ -3,6 +3,22 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.3
+### en
+- **Full Docker secrets & `config.json` transition**: Sensitive data (PostgreSQL database password, node join token) is fully decoupled from environment variables. Secrets are kept in `/opt/mikan/secrets/` with strict permissions (`0700` directory, `0600` files) and mounted into containers via native Docker Compose `secrets`. Non-sensitive configuration is stored in `/opt/mikan/config.json`. Existing installations with `.env` are automatically migrated on startup.
+- **DNS at the exit on nodes (Exit DNS)**: Nodes sniff visited website domains directly from TLS/HTTP/QUIC handshakes instead of relying on client-resolved IPs, solving geo-detection issues for Xray-based clients (Happ, v2RayTun, v2rayNG). Outbound resolver presets (node's host resolver, Cloudflare, Google, Quad9, or custom list) are dynamically applied on Apply. Configured in panel under Settings → Routing → DNS at the exit (`exit_dns`), enabled by default.
+- **Reachability check from Russia via Globalping**: Direct reachability probes from home/mobile providers and data centers across Russia with European control probes and clear verdicts. Replaces check-host.net in panel.
+- **Extra device purchase**: Subscription owners can buy additional device slots directly in the Telegram bot and Mini App.
+- **Dedicated certificate management for subscription domain**: Dedicated certificate lifecycle and custom certificate drawer for `sub_domain`.
+- **Telegram Admin bot**: Direct management of clients, plans, and nodes via `/admin`.
+### ru
+- **Безопасное хранение секретов и отказ от `.env`**: Пароль базы данных и токен подключения ноды полностью отвязаны от переменных окружения и файла `.env`. Секреты сохраняются в `/opt/mikan/secrets/` со строгими правами (`0700` для директории, `0600` для файлов) и монтируются в контейнеры через нативные секреты Docker Compose (`secrets:`). Несекретные настройки перенесены в `/opt/mikan/config.json`. Существующие серверы с `.env` автоматически мигрируются при первом запуске.
+- **DNS на выходе на нодах (Exit DNS)**: Ноды определяют домен посещаемого сайта непосредственно из рукопожатий соединений (TLS, HTTP, QUIC на портах 443, 8443, 80, 8080–8880) вместо подключения по IP, отрезолвленному клиентом, что решает проблему ложного гео-определения в приложениях на Xray (Happ, v2RayTun, v2rayNG). Поддерживаются DoH-пресеты (DNS ноды, Cloudflare, Google, Quad9 или свой список DNS). Настройка в панели: «Настройки → Маршрутизация → DNS на выходе» (`exit_dns`), включена по умолчанию.
+- **Проверка доступности из России через Globalping**: Проверка доступности портов ноды из мобильных и домашних сетей РФ и дата-центров с контролем из Европы.
+- **Докупка устройств в боте и Mini App**: Покупка дополнительных слотов устройств без продления тарифа в Telegram-боте и Mini App.
+- **Управление сертификатом для домена подписки**: Отдельный изолированный жизненный цикл сертификата для `sub_domain`.
+- **Админ-бот в Telegram**: Управление клиентами, тарифами и мониторинг нод через команду `/admin`.
+
 ## 0.5.1.2-rc.11
 ### en
 - **Full Docker secrets & `config.json` transition polish**:
