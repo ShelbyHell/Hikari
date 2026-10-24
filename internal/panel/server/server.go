@@ -17,6 +17,7 @@ import (
 type Server struct {
 	paths     atomic.Pointer[settings.Paths]
 	subDomain atomic.Pointer[string]
+	sniDomain atomic.Pointer[string]
 	admin     http.Handler
 	sub       http.Handler
 	legacy    http.Handler // the old panel's links (settings.Paths.Legacy); nil: none
@@ -54,6 +55,16 @@ func (s *Server) SetSubDomain(d string) {
 	s.subDomain.Store(&d)
 }
 
+// SetSNIDomain sets the SNI domain: requests on this domain do not serve the admin
+// panel or subscriptions, keeping secret paths hidden on it.
+func (s *Server) SetSNIDomain(d string) {
+	if d == "" {
+		s.sniDomain.Store(nil)
+		return
+	}
+	s.sniDomain.Store(&d)
+}
+
 // SetHSTS makes the answers tell browsers to use HTTPS for this host from now on, while on
 // says so. Only for a panel that serves TLS itself, and only while its certificate is one
 // browsers trust: a browser that remembers HSTS offers no way past a certificate warning,
@@ -76,15 +87,22 @@ func (s *Server) SubOnly() http.Handler {
 }
 
 func (s *Server) serve(w http.ResponseWriter, r *http.Request, admin bool) {
+	subAllowed := true
+	host := r.Host
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
 	if admin {
 		if sub := s.subDomain.Load(); sub != nil && *sub != "" {
-			host := r.Host
-			if h, _, err := net.SplitHostPort(host); err == nil {
-				host = h
-			}
 			if strings.EqualFold(host, *sub) {
 				admin = false
 			}
+		}
+	}
+	if sni := s.sniDomain.Load(); sni != nil && *sni != "" {
+		if strings.EqualFold(host, *sni) {
+			admin = false
+			subAllowed = false
 		}
 	}
 	SecurityHeaders(w.Header())
@@ -102,7 +120,7 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request, admin bool) {
 	switch {
 	case admin && seg != "" && paths.Admin != "" && secure.Equal(seg, paths.Admin):
 		s.forward(w, r, s.admin, seg, rest, p)
-	case seg != "" && paths.Sub != "" && secure.Equal(seg, paths.Sub):
+	case subAllowed && seg != "" && paths.Sub != "" && secure.Equal(seg, paths.Sub):
 		s.forward(w, r, s.sub, seg, rest, p)
 	case s.legacy != nil && paths.Legacy != "" && strings.HasPrefix(p, "/"+paths.Legacy+"/"):
 		// The old panel's links: on every port, as the old panel had them on its own.

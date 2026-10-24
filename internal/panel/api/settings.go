@@ -33,6 +33,7 @@ type SettingsView struct {
 	PublicHost   string      `json:"public_host"`
 	Domain       string      `json:"domain"`
 	SubDomain    string      `json:"sub_domain" doc:"Свой домен или поддомен для ссылок подписки; пусто — домен или адрес панели"`
+	SNIDomain    string      `json:"sni_domain" doc:"Свой домен или поддомен для SNI и подключений; пусто — домен или адрес панели"`
 	PanelPort    int         `json:"panel_port"`
 	SubPort      int         `json:"sub_port" doc:"Отдельный порт подписок; 0 — порт панели. Порт панели отдаёт подписки в любом случае"`
 	SubPortError string      `json:"sub_port_error,omitempty" doc:"sub_port_busy — сохранённый порт занят на сервере, подписки пока идут через порт панели"`
@@ -61,6 +62,7 @@ type SettingsView struct {
 	DefaultLang string              `json:"default_lang" enum:"auto,ru,en" doc:"Язык админки и страницы подписки, пока человек не выбрал свой; auto — по языку браузера. На нём же названия по умолчанию: группа автовыбора и меню ненастроенного бота"`
 	Certificate    acme.Status  `json:"certificate"`
 	SubCertificate *acme.Status `json:"sub_certificate,omitempty" doc:"Сертификат для ссылки подписки (sub_domain)"`
+	SNICertificate *acme.Status `json:"sni_certificate,omitempty" doc:"Сертификат для SNI (sni_domain)"`
 	// The certificate authority of the panel and its nodes.
 	ACMECA      string `json:"acme_ca" enum:"letsencrypt,zerossl,google" doc:"Центр сертификации панели и нод: letsencrypt, zerossl (нужен e-mail) или google (нужен ключ EAB). IP-адреса всегда получают сертификат Let's Encrypt"`
 	ACMEEmail   string `json:"acme_email" doc:"E-mail для центра сертификации; ZeroSSL привязывает к нему аккаунт"`
@@ -100,6 +102,7 @@ type patchSettingsBody = struct {
 	PublicHost    *string              `json:"public_host,omitempty" maxLength:"253"`
 	Domain        *string              `json:"domain,omitempty" maxLength:"253"`
 	SubDomain     *string              `json:"sub_domain,omitempty" maxLength:"253" doc:"Свой домен или поддомен для ссылок подписки; пусто — сбросить"`
+	SNIDomain     *string              `json:"sni_domain,omitempty" maxLength:"253" doc:"Свой домен или поддомен для SNI и подключений; пусто — сбросить"`
 	QuietHourUTC  *int                 `json:"quiet_hour_utc,omitempty" minimum:"0" maximum:"23"`
 	SubGroupMain  *string              `json:"sub_group_main,omitempty" maxLength:"200"`
 	SubGroupAuto  *string              `json:"sub_group_auto,omitempty" maxLength:"200"`
@@ -170,6 +173,7 @@ func (h *handlers) readSettings(ctx context.Context) (SettingsView, error) {
 	get(settings.KeyPublicHost, &v.PublicHost)
 	get(settings.KeyDomain, &v.Domain)
 	get(settings.KeySubDomain, &v.SubDomain)
+	get(settings.KeySNIDomain, &v.SNIDomain)
 	get(settings.KeyGroupMain, &v.SubGroupMain)
 	get(settings.KeyGroupAuto, &v.SubGroupAuto)
 	get(settings.KeyRouting, &v.SubRouting)
@@ -272,6 +276,10 @@ func (h *handlers) readSettings(ctx context.Context) (SettingsView, error) {
 	if h.d.SubCert != nil {
 		st := h.d.SubCert()
 		v.SubCertificate = &st
+	}
+	if h.d.SNICert != nil {
+		st := h.d.SNICert()
+		v.SNICertificate = &st
 	}
 	if v.ACMECA, err = acme.ChosenCA(ctx, h.d.Settings); err != nil {
 		return v, err
@@ -481,6 +489,27 @@ func (h *handlers) updateSettings(ctx context.Context, in *patchSettingsInput) (
 			}
 		}
 	}
+	if (b.SNIDomain != nil || b.PublicHost != nil) && len(details) == 0 {
+		cur, err := h.d.Settings.String(ctx, settings.KeySNIDomain)
+		if err != nil {
+			return nil, err
+		}
+		sniDom := cur
+		if b.SNIDomain != nil {
+			sniDom = strings.TrimSpace(*b.SNIDomain)
+		}
+		if sniDom != "" && (sniDom != cur || b.PublicHost != nil) {
+			host := ""
+			if b.PublicHost != nil {
+				host = strings.TrimSpace(*b.PublicHost)
+			} else if host, err = h.d.Settings.String(ctx, settings.KeyPublicHost); err != nil {
+				return nil, err
+			}
+			if d := h.domainHere(ctx, "body.sni_domain", sniDom, dnscheck.Own(host)); d != nil {
+				details = append(details, d)
+			}
+		}
+	}
 	if len(details) > 0 {
 		return nil, fieldErrs(details...)
 	}
@@ -533,6 +562,9 @@ func (h *handlers) updateSettings(ctx context.Context, in *patchSettingsInput) (
 	}
 	if (b.SubDomain != nil || caChanged) && h.d.RenewSubCert != nil {
 		h.d.RenewSubCert()
+	}
+	if (b.SNIDomain != nil || caChanged) && h.d.RenewSNICert != nil {
+		h.d.RenewSNICert()
 	}
 	// Another CA reissues the nodes' certificates too; a new e-mail or key may let a failed
 	// order through.

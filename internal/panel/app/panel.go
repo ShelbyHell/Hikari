@@ -202,6 +202,8 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 		deps.SetCert, deps.ClearCert = o.Certs.SetCustom, o.Certs.ClearCustom
 		deps.SubCert, deps.RenewSubCert, deps.RenewSubCertNow = o.Certs.SubStatus, o.Certs.RenewSub, o.Certs.RenewSubNow
 		deps.SetSubCert, deps.ClearSubCert = o.Certs.SetCustomSub, o.Certs.ClearCustomSub
+		deps.SNICert, deps.RenewSNICert, deps.RenewSNICertNow = o.Certs.SNIStatus, o.Certs.RenewSNI, o.Certs.RenewSNINow
+		deps.SetSNICert, deps.ClearSNICert = o.Certs.SetCustomSNI, o.Certs.ClearCustomSNI
 	}
 	if o.NodesACME != nil {
 		deps.RenewNodeCert, deps.WakeNodeCerts = o.NodesACME.Renew, o.NodesACME.Wake
@@ -348,9 +350,9 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 		if err != nil {
 			return subs.Config{}, err
 		}
-		var domainName, publicHost, subDomain, routing, fingerprint, rules string
+		var domainName, publicHost, subDomain, sniDomain, routing, fingerprint, rules string
 		var groups subs.Groups
-		for key, dst := range map[string]*string{settings.KeyDomain: &domainName, settings.KeyPublicHost: &publicHost, settings.KeySubDomain: &subDomain, settings.KeyGroupMain: &groups.Main, settings.KeyGroupAuto: &groups.Auto,
+		for key, dst := range map[string]*string{settings.KeyDomain: &domainName, settings.KeyPublicHost: &publicHost, settings.KeySubDomain: &subDomain, settings.KeySNIDomain: &sniDomain, settings.KeyGroupMain: &groups.Main, settings.KeyGroupAuto: &groups.Auto,
 			settings.KeyRouting: &routing, settings.KeyFingerprint: &fingerprint, settings.KeyRules: &rules} {
 			if *dst, err = set.String(ctx, key); err != nil {
 				return subs.Config{}, err
@@ -359,6 +361,9 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 		direct := []string{publicHost, domainName}
 		if subDomain != "" {
 			direct = append(direct, subDomain)
+		}
+		if sniDomain != "" {
+			direct = append(direct, sniDomain)
 		}
 		cfg := subs.Config{Brand: brand, SupportURL: support, Groups: groups, Routing: subs.ParseRouting(routing), Fingerprint: fingerprint,
 			Direct: direct, Lang: lang, Rules: subs.ServedRules(rules, groups.WithDefaults(lang))}
@@ -414,7 +419,13 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 			if n.Enabled == 0 {
 				continue
 			}
-			sn := subs.Node{ID: n.ID, Name: n.Name, Endpoint: subs.Endpoint{Host: ep.Host, SNI: domainName}}
+			host := ep.Host
+			sni := domainName
+			if sniDomain != "" {
+				host = sniDomain
+				sni = sniDomain
+			}
+			sn := subs.Node{ID: n.ID, Name: n.Name, Endpoint: subs.Endpoint{Host: host, SNI: sni}}
 			if n.Address != "" {
 				sn.Endpoint = subs.Endpoint{Host: domain.NodeHost(n), SNI: n.Domain}
 				cfg.Direct = append(cfg.Direct, n.PublicHost, n.Domain)
@@ -497,8 +508,13 @@ func (p *Panel) Apply(ctx context.Context) (settings.Paths, error) {
 	if err != nil {
 		return paths, err
 	}
+	sniDom, err := p.reload.String(ctx, settings.KeySNIDomain)
+	if err != nil {
+		return paths, err
+	}
 	p.server.SetPaths(paths)
 	p.server.SetSubDomain(subDom)
+	p.server.SetSNIDomain(sniDom)
 	p.spa.SetPrefix(paths.Admin)
 	p.spa.SetLang(lang)
 	if p.subPage != nil {

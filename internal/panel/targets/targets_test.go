@@ -146,6 +146,16 @@ func TestScan(t *testing.T) {
 		if err != nil || got.SelfSteal == nil || !got.SelfSteal.OK || len(asked) != 1 || asked[0].Dest != "127.0.0.1:"+strconv.Itoa(1) || asked[0].SNI != "vpn.example.com" {
 			t.Fatalf("asked for: %+v %v %+v", got, err, asked)
 		}
+
+		// When sni_domain is set, self-steal uses sni_domain instead of domain
+		if err := settings.Set(ctx, d.Settings, settings.KeySNIDomain, "sni.example.com"); err != nil {
+			t.Fatal(err)
+		}
+		asked = nil
+		got, err = d.Scan(ctx, ScanRequest{Node: local, SelfSteal: true})
+		if err != nil || got.SelfSteal == nil || !got.SelfSteal.OK || len(asked) != 1 || asked[0].Dest != "127.0.0.1:"+strconv.Itoa(1) || asked[0].SNI != "sni.example.com" {
+			t.Fatalf("asked with sni_domain: %+v %v %+v", got, err, asked)
+		}
 		// A remote node has no panel's domain: its own public address is scanned.
 		asked = nil
 		scanned = nil

@@ -9,6 +9,7 @@ import { t, type Key } from "../../../i18n";
 import { SETTINGS_PARTS, SETTINGS_TABS, type SettingsSearch } from "../../search";
 import { AboutCard } from "./about";
 import { AutoCard, LanguageCard, ServiceCard, UpdatesCard } from "./general";
+import { SniDomainCard } from "./sni-domain";
 import { ServerCheckCard } from "../node-check";
 import { GoalsCard } from "./goals";
 import { ImportCard, LegacyLinksCard } from "./import";
@@ -74,6 +75,7 @@ export function SettingsPage() {
               tab === "general" ? (
                 <>
                   <ServiceCard s={s} />
+                  <SniDomainCard s={s} />
                   <LanguageCard s={s} />
                   <ThemeCard />
                 </>

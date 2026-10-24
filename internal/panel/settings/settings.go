@@ -28,6 +28,9 @@ const (
 	// KeySubDomain is a domain or subdomain of its own for subscriptions; empty or unset:
 	// the panel's domain (KeyDomain) or public host (KeyPublicHost).
 	KeySubDomain = "sub_domain"
+	// KeySNIDomain is a domain or subdomain of its own for SNI and client connections; empty or unset:
+	// the panel's domain (KeyDomain) or public host (KeyPublicHost).
+	KeySNIDomain = "sni_domain"
 	KeyACMEEmail = "acme_email"
 	// KeyACMECA is the certificate authority of the panel and its nodes (acme.ValidCA);
 	// unset: Let's Encrypt. KeyACMEEABKID and KeyACMEEABHMAC are Google Trust Services'

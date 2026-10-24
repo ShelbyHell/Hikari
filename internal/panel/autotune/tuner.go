@@ -319,14 +319,18 @@ func (t *Tuner) load(ctx context.Context) (*world, error) {
 	if w.events, err = q.ListInboundEventsSince(ctx, w.now.Add(-w.eventsWindow).Unix()); err != nil {
 		return nil, err
 	}
-	var panelDomain string
+	var panelDomain, sniDomain string
 	if panelDomain, err = t.set.String(ctx, settings.KeyDomain); err != nil {
+		return nil, err
+	}
+	if sniDomain, err = t.set.String(ctx, settings.KeySNIDomain); err != nil {
 		return nil, err
 	}
 	if w.panelHost, err = t.set.String(ctx, settings.KeyPublicHost); err != nil {
 		return nil, err
 	}
 	own(panelDomain)
+	own(sniDomain)
 	own(w.panelHost)
 	if w.panelPort, _, err = settings.Get[int](ctx, t.set, settings.KeyPanelPort); err != nil {
 		return nil, err

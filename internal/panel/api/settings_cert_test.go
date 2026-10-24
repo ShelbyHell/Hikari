@@ -28,6 +28,7 @@ type certAPI struct {
 	renewed    int
 	woken      int
 	subRenewed int
+	sniRenewed int
 }
 
 func newCertAPI(t *testing.T) *certAPI {
@@ -59,6 +60,7 @@ func newCertAPI(t *testing.T) *certAPI {
 		Users: domain.NewUsers(st, pool, noChanges{}, clock), Pool: pool, Changes: noChanges{},
 		Settings: c.set, RenewCert: func() { c.renewed++ }, WakeNodeCerts: func() { c.woken++ },
 		RenewSubCert: func() { c.subRenewed++ },
+		RenewSNICert: func() { c.sniRenewed++ },
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -99,8 +101,9 @@ func TestAddressChangeRenewsTheCertificate(t *testing.T) {
 	c.ok(`{"public_host":"203.0.113.10"}`)
 	c.ok(`{"domain":""}`)
 	c.ok(`{"sub_domain":""}`)
-	if c.renewed != 2 || c.subRenewed != 1 || c.woken != 0 {
-		t.Fatalf("an address and domain renewed panel cert (%d), sub_domain renewed sub cert (%d), node wakes %d", c.renewed, c.subRenewed, c.woken)
+	c.ok(`{"sni_domain":""}`)
+	if c.renewed != 2 || c.subRenewed != 1 || c.sniRenewed != 1 || c.woken != 0 {
+		t.Fatalf("an address and domain renewed panel cert (%d), sub_domain renewed sub cert (%d), sni_domain renewed sni cert (%d), node wakes %d", c.renewed, c.subRenewed, c.sniRenewed, c.woken)
 	}
 }
 

@@ -170,8 +170,12 @@ func (d Deps) Scan(ctx context.Context, req ScanRequest) (Scan, error) {
 	res.IP = ip
 	// Self-steal: the SNI is the server's own domain and matches its IP, the target is the
 	// panel with its Let's Encrypt certificate.
-	if local && domain != "" && req.SelfSteal {
-		r := d.check(ctx, net.JoinHostPort("127.0.0.1", strconv.Itoa(PanelPort(ctx, d.Settings))), domain)
+	sni := domain
+	if sniDom, err := d.Settings.String(ctx, settings.KeySNIDomain); err == nil && sniDom != "" {
+		sni = sniDom
+	}
+	if local && sni != "" && req.SelfSteal {
+		r := d.check(ctx, net.JoinHostPort("127.0.0.1", strconv.Itoa(PanelPort(ctx, d.Settings))), sni)
 		res.SelfSteal = &r
 	}
 	// Past the /24 only when the admin allowed it: many more connections, and up to

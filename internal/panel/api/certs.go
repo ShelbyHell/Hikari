@@ -76,6 +76,12 @@ func (h *handlers) registerCerts() {
 		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt}, h.setSubCertificate)
 	huma.Register(h.api, huma.Operation{OperationID: "clear-sub-certificate", Method: http.MethodDelete, Path: "/api/v1/settings/sub-certificate", Summary: "Убрать свой сертификат для ссылки подписки: вернётся автоматический",
 		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt, DefaultStatus: http.StatusNoContent}, h.clearSubCertificate)
+	huma.Register(h.api, huma.Operation{OperationID: "renew-sni-certificate", Method: http.MethodPost, Path: "/api/v1/settings/sni-certificate/renew",
+		Summary: "Получить сертификат для SNI сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт)", Tags: tags}, h.renewSNICertificate)
+	huma.Register(h.api, huma.Operation{OperationID: "set-sni-certificate", Method: http.MethodPut, Path: "/api/v1/settings/sni-certificate", Summary: "Поставить свой сертификат для SNI",
+		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt}, h.setSNICertificate)
+	huma.Register(h.api, huma.Operation{OperationID: "clear-sni-certificate", Method: http.MethodDelete, Path: "/api/v1/settings/sni-certificate", Summary: "Убрать свой сертификат для SNI: вернётся автоматический",
+		Tags: tags, Metadata: sessionOnly, Extensions: sessionOnlyExt, DefaultStatus: http.StatusNoContent}, h.clearSNICertificate)
 	nodeTags := []string{"node"}
 	huma.Register(h.api, huma.Operation{OperationID: "set-node-certificate", Method: http.MethodPut, Path: "/api/v1/nodes/{id}/certificate", Summary: "Поставить ноде свой сертификат",
 		Tags: nodeTags, Metadata: sessionOnly, Extensions: sessionOnlyExt}, h.setNodeCertificate)
@@ -160,6 +166,43 @@ func (h *handlers) clearSubCertificate(ctx context.Context, _ *struct{}) (*struc
 		return nil, err
 	}
 	h.audit(ctx, sessionOf(ctx).AdminID, "settings.sub_certificate", "", "", map[string]any{"kind": "automatic"})
+	return nil, nil
+}
+
+func (h *handlers) renewSNICertificate(ctx context.Context, _ *struct{}) (*certificateOutput, error) {
+	if h.d.RenewSNICertNow == nil {
+		return nil, huma.Error409Conflict("acme_disabled")
+	}
+	h.audit(ctx, sessionOf(ctx).AdminID, "settings.renew_sni_certificate", "", "", nil)
+	st, _ := h.d.RenewSNICertNow(ctx, renewWait)
+	return &certificateOutput{Body: st}, nil
+}
+
+func (h *handlers) setSNICertificate(ctx context.Context, in *certInput) (*settingsOutput, error) {
+	if h.d.SetSNICert == nil {
+		return nil, huma.Error409Conflict("acme_disabled")
+	}
+	if err := h.d.SetSNICert(ctx, []byte(in.Body.Cert), []byte(in.Body.Key)); err != nil {
+		sni, _ := h.d.Settings.String(ctx, settings.KeySNIDomain)
+		return nil, certError(err, sni)
+	}
+	st := h.d.SNICert()
+	h.audit(ctx, sessionOf(ctx).AdminID, "settings.sni_certificate", "", "", map[string]any{"kind": "custom", "names": st.Names, "not_after": st.NotAfter})
+	v, err := h.readSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &settingsOutput{Body: v}, nil
+}
+
+func (h *handlers) clearSNICertificate(ctx context.Context, _ *struct{}) (*struct{}, error) {
+	if h.d.ClearSNICert == nil {
+		return nil, huma.Error409Conflict("acme_disabled")
+	}
+	if err := h.d.ClearSNICert(); err != nil {
+		return nil, err
+	}
+	h.audit(ctx, sessionOf(ctx).AdminID, "settings.sni_certificate", "", "", map[string]any{"kind": "automatic"})
 	return nil, nil
 }
 

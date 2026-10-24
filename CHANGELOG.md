@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.1
+### en
+- **Dedicated domain and certificate management for SNI (`sni_domain`)**: Ability to separate panel, subscriptions, and traffic across three distinct domains (panel, subscription, and SNI). The SNI domain is used for REALITY camouflage and node TLS protocols while completely isolating admin access and subscriptions.
+### ru
+- **Отдельный домен и сертификат для SNI (`sni_domain`)**: Возможность разместить проект на трех независимых доменах: панель управления, подписка и SNI (маскировка REALITY, TLS-протоколы и подключения клиентов). Домен SNI изолирован от панели управления и подписок.
+
 ## 0.5.1.3
 ### en
 - **Full Docker secrets & `config.json` transition**: Sensitive data (PostgreSQL database password, node join token) is fully decoupled from environment variables. Secrets are kept in `/opt/mikan/secrets/` with strict permissions (`0700` directory, `0600` files) and mounted into containers via native Docker Compose `secrets`. Non-sensitive configuration is stored in `/opt/mikan/config.json`. Existing installations with `.env` are automatically migrated on startup.

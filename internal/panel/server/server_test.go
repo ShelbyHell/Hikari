@@ -15,6 +15,7 @@ func TestSubDomainRoutes(t *testing.T) {
 	s := New(admin, sub)
 	s.SetPaths(settings.Paths{Admin: "admin-path", Sub: "sub-path"})
 	s.SetSubDomain("sub.example.com")
+	s.SetSNIDomain("sni.example.com")
 
 	get := func(host, path string) (int, string) {
 		req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -48,5 +49,16 @@ func TestSubDomainRoutes(t *testing.T) {
 	}
 	if code, _ := get("sub.example.com:8443", "/admin-path/"); code != http.StatusNotFound {
 		t.Fatalf("admin on sub_domain:8443: want 404, got %d", code)
+	}
+
+	// 5. Admin and sub paths on sni_domain -> 404 (Both hidden on SNI domain)
+	if code, _ := get("sni.example.com", "/admin-path/"); code != http.StatusNotFound {
+		t.Fatalf("admin on sni_domain: want 404, got %d", code)
+	}
+	if code, _ := get("sni.example.com", "/sub-path/"); code != http.StatusNotFound {
+		t.Fatalf("sub on sni_domain: want 404, got %d", code)
+	}
+	if code, _ := get("sni.example.com:443", "/sub-path/"); code != http.StatusNotFound {
+		t.Fatalf("sub on sni_domain:443: want 404, got %d", code)
 	}
 }

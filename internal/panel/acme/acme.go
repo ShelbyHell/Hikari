@@ -93,6 +93,18 @@ type Manager struct {
 	subCur        *attempt
 	subWake       chan struct{}
 	subServedHost string
+
+	// Dedicated certificate management solely for the SNI domain.
+	sniDir        string
+	sniCustomDir  string
+	sniCustomMod  time.Time
+	sniJournal    *journal
+	sniStatus     atomic.Pointer[Status]
+	sniOrderMu    sync.Mutex
+	sniAttMu      sync.Mutex
+	sniCur        *attempt
+	sniWake       chan struct{}
+	sniServedHost string
 }
 
 type attempt struct {
@@ -108,19 +120,25 @@ func New(dataDir string, holder *tlscert.Holder, fallback *tls.Certificate, set 
 	}
 	root := filepath.Join(dataDir, "tls", "acme")
 	subRoot := filepath.Join(dataDir, "tls", "sub-acme")
+	sniRoot := filepath.Join(dataDir, "tls", "sni-acme")
 	m := &Manager{
 		dir: root, iss: newIssuer(root, set), holder: holder, fallback: fallback,
 		set: set, log: log, now: now, wake: make(chan struct{}, 1),
 		subWake:   make(chan struct{}, 1),
+		sniWake:   make(chan struct{}, 1),
 		challenge: acmechallenge.New(listen),
 		customDir: filepath.Join(dataDir, "tls", "custom"),
 		journal:   newJournal(root),
 		subDir:    subRoot,
 		subCustomDir: filepath.Join(dataDir, "tls", "sub-custom"),
 		subJournal:   newJournal(subRoot),
+		sniDir:    sniRoot,
+		sniCustomDir: filepath.Join(dataDir, "tls", "sni-custom"),
+		sniJournal:   newJournal(sniRoot),
 	}
 	m.status.Store(&Status{Kind: "self-signed", WantCA: CALetsEncrypt, CheckedAt: now()})
 	m.subStatus.Store(&Status{Kind: "self-signed", WantCA: CALetsEncrypt, CheckedAt: now()})
+	m.sniStatus.Store(&Status{Kind: "self-signed", WantCA: CALetsEncrypt, CheckedAt: now()})
 	return m
 }
 
@@ -148,6 +166,16 @@ func (m *Manager) SubStatus() Status {
 	return st
 }
 
+// SNIStatus is the certificate for the SNI domain now, with Ordering set while an order runs.
+func (m *Manager) SNIStatus() Status {
+	st := *m.sniStatus.Load()
+	m.sniAttMu.Lock()
+	st.Ordering = m.sniCur != nil
+	m.sniAttMu.Unlock()
+	st.Attempts = m.sniJournal.List()
+	return st
+}
+
 // OnChange sets what is called after Public changes: a certificate issued, renewed,
 // uploaded or dropped. It is called outside the manager's locks and must not block.
 func (m *Manager) OnChange(f func()) {
@@ -161,6 +189,7 @@ func (m *Manager) OnChange(f func()) {
 func (m *Manager) Load(ctx context.Context) {
 	m.settle(ctx)
 	m.settleSub(ctx)
+	m.settleSNI(ctx)
 }
 
 // announce calls onChange when Public is not the certificate last announced.
@@ -168,6 +197,9 @@ func (m *Manager) announce() {
 	key := ""
 	if c := m.Public(); c != nil {
 		key = nodetls.PinOfDER(c.Leaf.Raw)
+	}
+	if c := m.PublicSNI(); c != nil {
+		key += ";" + nodetls.PinOfDER(c.Leaf.Raw)
 	}
 	m.annMu.Lock()
 	if key == m.announced {
@@ -211,6 +243,40 @@ func (m *Manager) Public() *tls.Certificate {
 	return c
 }
 
+// SNITrusted says whether the panel serves a certificate browsers trust for the SNI domain.
+func (m *Manager) SNITrusted() bool {
+	st := m.sniStatus.Load()
+	if st == nil {
+		return false
+	}
+	if !st.NotAfter.IsZero() && !m.now().Before(st.NotAfter) {
+		return false
+	}
+	switch st.Kind {
+	case "acme":
+		return true
+	case "custom":
+		return st.Trusted && st.Error == ""
+	}
+	return false
+}
+
+// PublicSNI is the certificate for the SNI domain when clients trust it without a pin.
+func (m *Manager) PublicSNI() *tls.Certificate {
+	if !m.SNITrusted() {
+		return nil
+	}
+	sni, _ := m.sniIdentifier(context.Background())
+	if sni == "" {
+		return nil
+	}
+	c, err := m.holder.Get(&tls.ClientHelloInfo{ServerName: sni})
+	if err != nil || c == nil || c.Leaf == nil || !m.now().Before(c.Leaf.NotAfter) {
+		return nil
+	}
+	return c
+}
+
 // Served is the leaf the panel serves now, whatever it is; nil before any.
 func (m *Manager) Served() *x509.Certificate {
 	c, err := m.holder.Get(nil)
@@ -232,6 +298,14 @@ func (m *Manager) Renew() {
 func (m *Manager) RenewSub() {
 	select {
 	case m.subWake <- struct{}{}:
+	default:
+	}
+}
+
+// RenewSNI asks the background loop to try the SNI certificate now.
+func (m *Manager) RenewSNI() {
+	select {
+	case m.sniWake <- struct{}{}:
 	default:
 	}
 }
@@ -271,6 +345,24 @@ func (m *Manager) RenewSubNow(ctx context.Context, wait time.Duration) (st Statu
 	case <-ctx.Done():
 	}
 	return m.SubStatus(), false
+}
+
+// RenewSNINow tries the SNI certificate now and waits up to wait for the outcome.
+func (m *Manager) RenewSNINow(ctx context.Context, wait time.Duration) (st Status, done bool) {
+	finished := make(chan struct{})
+	go func() {
+		m.sniAttemptOnce(context.WithoutCancel(ctx))
+		close(finished)
+	}()
+	t := time.NewTimer(wait)
+	defer t.Stop()
+	select {
+	case <-finished:
+		return m.SNIStatus(), true
+	case <-t.C:
+	case <-ctx.Done():
+	}
+	return m.SNIStatus(), false
 }
 
 // attemptOnce runs ensure, or waits for the one under way and shares its outcome.
@@ -314,6 +406,26 @@ func (m *Manager) subAttemptOnce(ctx context.Context) (failed bool) {
 	return a.failed
 }
 
+func (m *Manager) sniAttemptOnce(ctx context.Context) (failed bool) {
+	m.sniAttMu.Lock()
+	if a := m.sniCur; a != nil {
+		m.sniAttMu.Unlock()
+		<-a.done
+		return a.failed
+	}
+	a := &attempt{done: make(chan struct{})}
+	m.sniCur = a
+	m.sniAttMu.Unlock()
+	defer func() {
+		m.sniAttMu.Lock()
+		m.sniCur = nil
+		m.sniAttMu.Unlock()
+		close(a.done)
+	}()
+	a.failed = m.ensureSNI(ctx)
+	return a.failed
+}
+
 // How often the certificate is looked after, and how soon after an order that failed. A
 // six-day certificate for an IP leaves two days to renew in: a port 80 that was busy once
 // must not cost the next six hours.
@@ -327,6 +439,8 @@ func (m *Manager) Run(ctx context.Context) {
 	defer next.Stop()
 	subNext := time.NewTimer(checkEvery)
 	defer subNext.Stop()
+	sniNext := time.NewTimer(checkEvery)
+	defer sniNext.Stop()
 	// certbot, acme.sh or Caddy renew a custom certificate in place: a changed file is
 	// served within half a minute, no restart.
 	watch := time.NewTicker(30 * time.Second)
@@ -358,8 +472,22 @@ func (m *Manager) Run(ctx context.Context) {
 		}
 		subNext.Reset(d)
 	}
+	sniLater := func(failed bool) {
+		d := checkEvery
+		if failed {
+			d = retryAfter
+		}
+		if !sniNext.Stop() {
+			select {
+			case <-sniNext.C:
+			default:
+			}
+		}
+		sniNext.Reset(d)
+	}
 	later(m.attemptOnce(ctx))
 	subLater(m.subAttemptOnce(ctx))
+	sniLater(m.sniAttemptOnce(ctx))
 	for {
 		select {
 		case <-ctx.Done():
@@ -372,12 +500,19 @@ func (m *Manager) Run(ctx context.Context) {
 			subLater(m.subAttemptOnce(ctx))
 		case <-m.subWake:
 			subLater(m.subAttemptOnce(ctx))
+		case <-sniNext.C:
+			sniLater(m.sniAttemptOnce(ctx))
+		case <-m.sniWake:
+			sniLater(m.sniAttemptOnce(ctx))
 		case <-watch.C:
 			if m.customChanged() {
 				later(m.attemptOnce(ctx))
 			}
 			if m.subCustomChanged() {
 				subLater(m.subAttemptOnce(ctx))
+			}
+			if m.sniCustomChanged() {
+				sniLater(m.sniAttemptOnce(ctx))
 			}
 		}
 	}
@@ -393,6 +528,12 @@ func (m *Manager) subCustomChanged() bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return !tlscert.CustomModTime(m.subCustomDir).Equal(m.subCustomMod)
+}
+
+func (m *Manager) sniCustomChanged() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return !tlscert.CustomModTime(m.sniCustomDir).Equal(m.sniCustomMod)
 }
 
 // SetCustom installs the admin's own certificate: checked, kept, served at once. It has
@@ -461,6 +602,36 @@ func (m *Manager) ClearCustomSub() error {
 	return nil
 }
 
+// SetCustomSNI installs the admin's own certificate for the SNI domain: checked, kept, served at once.
+func (m *Manager) SetCustomSNI(ctx context.Context, certPEM, keyPEM []byte) error {
+	cert, err := tlscert.ParseCustom(certPEM, keyPEM, m.now())
+	if err != nil {
+		return err
+	}
+	sni, err := m.sniIdentifier(ctx)
+	if err != nil {
+		return err
+	}
+	if sni != "" && !tlscert.Covers(cert.Leaf, sni) {
+		return tlscert.ErrWrongHost
+	}
+	if err := tlscert.SaveCustom(m.sniCustomDir, cert); err != nil {
+		return err
+	}
+	m.settleSNI(ctx)
+	m.announce()
+	return nil
+}
+
+// ClearCustomSNI removes the custom certificate for the SNI domain.
+func (m *Manager) ClearCustomSNI() error {
+	if err := tlscert.RemoveCustom(m.sniCustomDir); err != nil {
+		return err
+	}
+	m.RenewSNI()
+	return nil
+}
+
 func (m *Manager) identifiers(ctx context.Context) (primary string, extra []string, err error) {
 	d, err := m.set.String(ctx, settings.KeyDomain)
 	if err != nil {
@@ -479,6 +650,14 @@ func (m *Manager) subIdentifier(ctx context.Context) (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(sub), nil
+}
+
+func (m *Manager) sniIdentifier(ctx context.Context) (string, error) {
+	sni, err := m.set.String(ctx, settings.KeySNIDomain)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(sni), nil
 }
 
 func (m *Manager) identifier(ctx context.Context) (string, error) {
@@ -747,5 +926,127 @@ func (m *Manager) ensureSub(ctx context.Context) (orderFailed bool) {
 	m.log.Info("acme: sub certificate installed", "identifier", sub, "ca", ca)
 	m.subJournal.Add(Attempt{At: m.now(), CA: ca})
 	m.settleSub(ctx)
+	return false
+}
+
+// settleSNI serves the best certificate for the SNI domain and says whether a new one has to
+// be ordered. It does no network.
+func (m *Manager) settleSNI(ctx context.Context) (sni string, ca string, order bool) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	now := m.now()
+	sni, err := m.sniIdentifier(ctx)
+	st := &Status{Kind: "self-signed", Identifier: sni, CheckedAt: now}
+	defer func() { m.sniStatus.Store(st) }()
+	if err != nil {
+		st.Error, st.ErrorDetail = CodeUnknown, err.Error()
+		return sni, "", false
+	}
+	if sni == "" {
+		if m.sniServedHost != "" {
+			m.holder.DeleteNamed(m.sniServedHost)
+			m.sniServedHost = ""
+		}
+		return "", "", false
+	}
+	chosen, err := ChosenCA(ctx, m.set)
+	if err != nil {
+		st.Error, st.ErrorDetail = CodeUnknown, err.Error()
+		return sni, "", false
+	}
+	ca = EffectiveCA(chosen, sni)
+	st.WantCA = ca
+
+	m.sniCustomMod = tlscert.CustomModTime(m.sniCustomDir)
+	if tlscert.HasCustom(m.sniCustomDir) {
+		cert, err := tlscert.LoadCustom(m.sniCustomDir, now)
+		if err == nil {
+			info := tlscert.Describe(cert, sni, now)
+			if m.sniServedHost != "" && m.sniServedHost != sni {
+				m.holder.DeleteNamed(m.sniServedHost)
+			}
+			m.holder.SetNamed(sni, cert)
+			m.sniServedHost = sni
+			st.Kind, st.NotAfter, st.Issuer, st.Names, st.Trusted = "custom", cert.Leaf.NotAfter, info.Issuer, info.Names, info.Trusted
+			if !tlscert.Covers(cert.Leaf, sni) {
+				st.Error = "custom_wrong_host"
+			}
+			return sni, ca, false
+		}
+		why := "custom_invalid"
+		if errors.Is(err, tlscert.ErrExpired) {
+			why = "custom_expired"
+		}
+		m.log.Warn("tls: the custom sni certificate is not used", "err", err)
+		defer func() { st.Error = why }()
+	}
+
+	if isPrivate(sni) {
+		if m.sniServedHost != "" {
+			m.holder.DeleteNamed(m.sniServedHost)
+			m.sniServedHost = ""
+		}
+		st.Error = "no_public_host"
+		return sni, ca, false
+	}
+
+	if cert, have, err := loadPair(m.sniDir); err == nil && tlscert.Covers(cert.Leaf, sni) && now.Before(cert.Leaf.NotAfter) {
+		if m.sniServedHost != "" && m.sniServedHost != sni {
+			m.holder.DeleteNamed(m.sniServedHost)
+		}
+		m.holder.SetNamed(sni, cert)
+		m.sniServedHost = sni
+		info := tlscert.Describe(cert, sni, now)
+		st.Kind, st.NotAfter, st.CA, st.Issuer, st.Names, st.Trusted = "acme", cert.Leaf.NotAfter, have, info.Issuer, info.Names, true
+		if !needsRenewal(cert.Leaf, now) && have == ca {
+			return sni, ca, false
+		}
+	} else {
+		if m.sniServedHost != "" {
+			m.holder.DeleteNamed(m.sniServedHost)
+			m.sniServedHost = ""
+		}
+	}
+	return sni, ca, true
+}
+
+// ensureSNI orders a certificate from the CA solely for the SNI domain.
+func (m *Manager) ensureSNI(ctx context.Context) (orderFailed bool) {
+	sni, ca, need := m.settleSNI(ctx)
+	if !need || sni == "" {
+		return false
+	}
+	m.sniOrderMu.Lock()
+	defer m.sniOrderMu.Unlock()
+	if sni, ca, need = m.settleSNI(ctx); !need || sni == "" {
+		return false
+	}
+	certPEM, keyPEM, err := m.iss.obtain(ctx, sni, ca, serverProvider{m.challenge})
+	if err == nil {
+		err = savePair(m.sniDir, certPEM, keyPEM, ca)
+	}
+	if err != nil {
+		host, _ := m.set.String(ctx, settings.KeyPublicHost)
+		p := Classify(err, dnscheck.Own(host), m.now())
+		m.log.Warn("acme: sni certificate not obtained", "identifier", sni, "ca", ca, "code", p.Code, "holder", p.Holder, "err", err)
+		m.sniJournal.Add(Attempt{At: m.now(), CA: ca, Error: p.Code, Detail: p.Detail, Holder: p.Holder})
+		m.mu.Lock()
+		st := *m.sniStatus.Load()
+		if st.Kind == "custom" {
+			m.mu.Unlock()
+			return false
+		}
+		if st.Error == "" {
+			st.Error, st.ErrorDetail, st.Holder, st.RetryAt = p.Code, p.Detail, p.Holder, p.RetryAt
+		}
+		st.CheckedAt = m.now()
+		m.sniStatus.Store(&st)
+		m.mu.Unlock()
+		return true
+	}
+	m.log.Info("acme: sni certificate installed", "identifier", sni, "ca", ca)
+	m.sniJournal.Add(Attempt{At: m.now(), CA: ca})
+	m.settleSNI(ctx)
+	m.announce()
 	return false
 }

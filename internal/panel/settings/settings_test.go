@@ -118,5 +118,19 @@ func TestSubEndpoint(t *testing.T) {
 	if err != nil || ep.Host != "panel.example.com" || ep.Port != 2053 {
 		t.Fatalf("sub_domain reset: %+v %v", ep, err)
 	}
+
+	// SNIDomain set & reset
+	if err := Set(ctx, s, KeySNIDomain, "sni.example.com"); err != nil {
+		t.Fatal(err)
+	}
+	if v, err := s.String(ctx, KeySNIDomain); err != nil || v != "sni.example.com" {
+		t.Fatalf("sni_domain: %q %v", v, err)
+	}
+	if err := Set(ctx, s, KeySNIDomain, ""); err != nil {
+		t.Fatal(err)
+	}
+	if v, err := s.String(ctx, KeySNIDomain); err != nil || v != "" {
+		t.Fatalf("sni_domain reset: %q %v", v, err)
+	}
 }
 

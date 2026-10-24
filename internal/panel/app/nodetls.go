@@ -56,6 +56,9 @@ func NewNodeTLS(dataDir string, own *tlscert.NodeStore, panel *acme.Manager, nod
 // Host is where clients reach the node: the panel's address for its own node.
 func (x *NodeTLS) Host(ctx context.Context, n db.Node) string {
 	if n.Address == "" {
+		if sniDom, err := x.set.String(ctx, settings.KeySNIDomain); err == nil && sniDom != "" {
+			return sniDom
+		}
 		if ep, err := x.set.Endpoint(ctx); err == nil {
 			return ep.Host
 		}
@@ -92,6 +95,10 @@ func (x *NodeTLS) Pick(n db.Node) (TLSChoice, error) {
 		}
 	}
 	if n.Address == "" && x.panel != nil {
+		if cert := x.panel.PublicSNI(); cert != nil && tlscert.Covers(cert.Leaf, host) {
+			c.CA = x.panel.SNIStatus().CA
+			return use(cert, "panel", "")
+		}
 		if cert := x.panel.Public(); cert != nil && tlscert.Covers(cert.Leaf, host) {
 			c.CA = x.panel.Status().CA
 			return use(cert, "panel", "")
