@@ -6,14 +6,31 @@ import (
 	"net/netip"
 	"net/url"
 	"strings"
+
+	"mikan/internal/panel/dnscheck"
 )
 
-// ClientIP is the address a request came from: the last X-Forwarded-For entry when the
-// panel sits behind a proxy it trusts (the one the proxy appended), else the peer. An
-// IPv4 address comes as IPv4 even when the socket is dual-stack (::ffff:a.b.c.d), so it
-// reads the same to rate limits, to the nodes and to a provider's address list.
+// ClientIP is the address a request came from: CF-Connecting-IP or the last X-Forwarded-For
+// entry when the request comes from Cloudflare or the panel sits behind a proxy it trusts,
+// else the peer. An IPv4 address comes as IPv4 even when the socket is dual-stack
+// (::ffff:a.b.c.d), so it reads the same to rate limits, to the nodes and to a provider's
+// address list.
 func ClientIP(h http.Header, remoteAddr string, trustProxy bool) string {
-	if trustProxy {
+	host, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		host = remoteAddr
+	}
+	var peerIP netip.Addr
+	if ip, err := netip.ParseAddr(host); err == nil {
+		peerIP = ip.Unmap()
+	}
+	isCF := peerIP.IsValid() && dnscheck.Cloudflare(peerIP)
+	if trustProxy || isCF {
+		if cf := h.Get("CF-Connecting-IP"); cf != "" {
+			if ip, err := netip.ParseAddr(strings.TrimSpace(cf)); err == nil {
+				return ip.Unmap().String()
+			}
+		}
 		if xff := h.Get("X-Forwarded-For"); xff != "" {
 			parts := strings.Split(xff, ",")
 			if ip, err := netip.ParseAddr(strings.TrimSpace(parts[len(parts)-1])); err == nil {
@@ -21,12 +38,8 @@ func ClientIP(h http.Header, remoteAddr string, trustProxy bool) string {
 			}
 		}
 	}
-	host, _, err := net.SplitHostPort(remoteAddr)
-	if err != nil {
-		host = remoteAddr
-	}
-	if ip, err := netip.ParseAddr(host); err == nil {
-		return ip.Unmap().String()
+	if peerIP.IsValid() {
+		return peerIP.String()
 	}
 	return host
 }

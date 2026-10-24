@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.2
+### en
+- **Cloudflare Proxied support for all domains**: Added full support for Cloudflare Proxied (orange cloud) across panel domain, subscription domain, SNI domain, and node domains. DNS checks accept Cloudflare Anycast networks, requests coming from Cloudflare automatically trust and extract the real client IP from `CF-Connecting-IP`, Cloudflare Origin CA certificates are natively recognized as trusted, and cert checks display clean verification status without demanding grey cloud mode.
+### ru
+- **Поддержка Cloudflare Proxied для всех доменов**: Включена полная поддержка проксирования Cloudflare (оранжевое облако) для домена панели, домена подписки, SNI-домена и доменов нод. DNS-проверки теперь принимают Anycast-сети Cloudflare, входящие запросы через Cloudflare автоматически извлекают реальный IP клиента из `CF-Connecting-IP`, сертификаты Cloudflare Origin CA нативно признаются доверенными, а диагностика сертификатов подтверждает корректную работу без требования отключать прокси.
+
 ## 0.5.1.4-rc.1
 ### en
 - **Dedicated domain and certificate management for SNI (`sni_domain`)**: Ability to separate panel, subscriptions, and traffic across three distinct domains (panel, subscription, and SNI). The SNI domain is used for REALITY camouflage and node TLS protocols while completely isolating admin access and subscriptions.

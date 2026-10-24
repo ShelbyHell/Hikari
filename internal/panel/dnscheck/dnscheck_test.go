@@ -43,16 +43,17 @@ func fakeDoH(t *testing.T, records map[string][]string) string {
 
 func TestPointsTo(t *testing.T) {
 	url := fakeDoH(t, map[string][]string{
-		"vpn.example.com":   {"203.0.113.10"},
-		"dual.example.com":  {"203.0.113.10", "2001:db8::10"},
-		"other.example.com": {"198.51.100.7"},
-		"mixed.example.com": {"203.0.113.10", "198.51.100.7"},
-		"empty.example.com": {},
+		"vpn.example.com":        {"203.0.113.10"},
+		"dual.example.com":       {"203.0.113.10", "2001:db8::10"},
+		"cloudflare.example.com": {"104.21.32.1", "172.67.1.1"},
+		"other.example.com":      {"198.51.100.7"},
+		"mixed.example.com":      {"203.0.113.10", "198.51.100.7"},
+		"empty.example.com":      {},
 	})
 	c := &Checker{Resolvers: []string{url}, HTTP: http.DefaultClient}
 	own := []netip.Addr{netip.MustParseAddr("203.0.113.10"), netip.MustParseAddr("2001:db8::10")}
 	ctx := context.Background()
-	for _, ok := range []string{"vpn.example.com", "dual.example.com"} {
+	for _, ok := range []string{"vpn.example.com", "dual.example.com", "cloudflare.example.com"} {
 		if err := c.PointsTo(ctx, ok, own); err != nil {
 			t.Errorf("%s: %v", ok, err)
 		}

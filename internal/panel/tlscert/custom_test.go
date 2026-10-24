@@ -42,6 +42,38 @@ func issue(t *testing.T, key crypto.Signer, names []string, from, until time.Tim
 	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}), pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: kd})
 }
 
+func issueCloudflareOrigin(t *testing.T, key crypto.Signer, names []string, from, until time.Time) (certPEM, keyPEM []byte) {
+	t.Helper()
+	tmpl := &x509.Certificate{
+		SerialNumber: big.NewInt(time.Now().UnixNano()),
+		Subject:      pkix.Name{CommonName: names[0]},
+		NotBefore:    from,
+		NotAfter:     until,
+		KeyUsage:     x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+	}
+	for _, n := range names {
+		tmpl.DNSNames = append(tmpl.DNSNames, n)
+	}
+	ca := &x509.Certificate{
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: "Cloudflare Origin Certificate Authority", Organization: []string{"Cloudflare, Inc."}},
+		NotBefore:             from,
+		NotAfter:              until,
+		IsCA:                  true,
+		BasicConstraintsValid: true,
+	}
+	der, err := x509.CreateCertificate(rand.Reader, tmpl, ca, key.Public(), key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	kd, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der}), pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: kd})
+}
+
 func ecKey(t *testing.T) crypto.Signer {
 	k, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
@@ -65,6 +97,18 @@ func TestParseCustom(t *testing.T) {
 	}
 	if info := Describe(c, "vpn.example.com", now); info.Trusted || info.Issuer != "*.example.com" || len(info.Names) != 2 {
 		t.Fatalf("describe: %+v", info)
+	}
+	// Cloudflare Origin Certificate is trusted for covered hosts.
+	cfCertPEM, cfKeyPEM := issueCloudflareOrigin(t, ecKey(t), []string{"*.example.com"}, now.Add(-day), now.Add(90*day))
+	cfCert, err := ParseCustom(cfCertPEM, cfKeyPEM, now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if info := Describe(cfCert, "vpn.example.com", now); !info.Trusted {
+		t.Fatalf("Cloudflare Origin certificate should be trusted: %+v", info)
+	}
+	if info := Describe(cfCert, "other.org", now); info.Trusted {
+		t.Fatalf("Cloudflare Origin certificate should not be trusted for uncovered host: %+v", info)
 	}
 	// A key and a certificate given in one stream are told apart (hikari cert set).
 	both := append(append([]byte{}, good...), goodKey...)

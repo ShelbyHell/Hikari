@@ -144,8 +144,9 @@ func (c *Checker) doh(ctx context.Context, base, name, typ string) ([]netip.Addr
 	return out, nil
 }
 
-// PointsTo checks that every address of the domain is one of the server's: one address
-// elsewhere already sends some clients to another machine.
+// PointsTo checks that every address of the domain is one of the server's, or that the
+// domain is proxied through Cloudflare: one address elsewhere already sends some clients
+// to another machine.
 func (c *Checker) PointsTo(ctx context.Context, name string, own []netip.Addr) error {
 	if len(own) == 0 {
 		return ErrUnknownServer
@@ -153,6 +154,9 @@ func (c *Checker) PointsTo(ctx context.Context, name string, own []netip.Addr) e
 	found, err := c.Lookup(ctx, name)
 	if err != nil {
 		return err
+	}
+	if AllCloudflare(found) {
+		return nil
 	}
 	var foreign []netip.Addr
 	for _, a := range found {

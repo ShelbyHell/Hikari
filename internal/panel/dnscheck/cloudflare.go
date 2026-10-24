@@ -28,3 +28,17 @@ func Cloudflare(ip netip.Addr) bool {
 	}
 	return false
 }
+
+// AllCloudflare reports whether ips is non-empty and every address is one of Cloudflare's:
+// the domain is proxied through Cloudflare (orange cloud).
+func AllCloudflare(ips []netip.Addr) bool {
+	if len(ips) == 0 {
+		return false
+	}
+	for _, ip := range ips {
+		if !Cloudflare(ip) {
+			return false
+		}
+	}
+	return true
+}

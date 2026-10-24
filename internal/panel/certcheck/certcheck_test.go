@@ -167,17 +167,18 @@ func TestDNS(t *testing.T) {
 	own := []netip.Addr{netip.MustParseAddr("198.51.100.7")}
 	p := newPKI(t)
 	for _, c := range []struct {
-		dns  fakeDNS
-		code string
+		dns    fakeDNS
+		code   string
+		status string
 	}{
-		{fakeDNS{"vpn.example.com": {netip.MustParseAddr("198.51.100.7")}}, "dns_ok"},
-		{fakeDNS{"vpn.example.com": {netip.MustParseAddr("104.21.32.1")}}, "dns_cloudflare"},
-		{fakeDNS{"vpn.example.com": {netip.MustParseAddr("198.51.100.7"), netip.MustParseAddr("203.0.113.9")}}, "dns_elsewhere"},
-		{fakeDNS{}, "dns_none"},
+		{fakeDNS{"vpn.example.com": {netip.MustParseAddr("198.51.100.7")}}, "dns_ok", OK},
+		{fakeDNS{"vpn.example.com": {netip.MustParseAddr("104.21.32.1")}}, "dns_cloudflare", OK},
+		{fakeDNS{"vpn.example.com": {netip.MustParseAddr("198.51.100.7"), netip.MustParseAddr("203.0.113.9")}}, "dns_elsewhere", Fail},
+		{fakeDNS{}, "dns_none", Fail},
 	} {
 		r := checker(p, c.dns).Run(context.Background(), Input{Domain: "vpn.example.com", Host: "vpn.example.com", Own: own})
-		if got := find(t, r, "dns"); got.Code != c.code {
-			t.Errorf("%v: %s", c.dns, got.Code)
+		if got := find(t, r, "dns"); got.Code != c.code || got.Status != c.status {
+			t.Errorf("%v: code %s (want %s), status %s (want %s)", c.dns, got.Code, c.code, got.Status, c.status)
 		}
 	}
 	r := checker(p, fakeDNS{}).Run(context.Background(), Input{Host: "198.51.100.7", Own: own})

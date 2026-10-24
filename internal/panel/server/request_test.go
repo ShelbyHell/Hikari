@@ -7,21 +7,28 @@ import (
 
 func TestClientIP(t *testing.T) {
 	for _, c := range []struct {
-		xff, remote string
-		trust       bool
-		want        string
+		xff, cf, remote string
+		trust           bool
+		want            string
 	}{
-		{"", "198.51.100.7:5555", false, "198.51.100.7"},
-		{"", "[::ffff:198.51.100.7]:5555", false, "198.51.100.7"},
-		{"", "[2001:db8::1]:443", false, "2001:db8::1"},
-		{"10.0.0.1, 203.0.113.5", "127.0.0.1:1", true, "203.0.113.5"},
-		{"203.0.113.5", "127.0.0.1:1", false, "127.0.0.1"},       // not trusted: the peer
-		{"1.2.3.4, not-an-ip", "127.0.0.1:1", true, "127.0.0.1"}, // garbage: the peer
-		{"", "unix-socket", false, "unix-socket"},
+		{"", "", "198.51.100.7:5555", false, "198.51.100.7"},
+		{"", "", "[::ffff:198.51.100.7]:5555", false, "198.51.100.7"},
+		{"", "", "[2001:db8::1]:443", false, "2001:db8::1"},
+		{"10.0.0.1, 203.0.113.5", "", "127.0.0.1:1", true, "203.0.113.5"},
+		{"203.0.113.5", "", "127.0.0.1:1", false, "127.0.0.1"},       // not trusted: the peer
+		{"1.2.3.4, not-an-ip", "", "127.0.0.1:1", true, "127.0.0.1"}, // garbage: the peer
+		{"", "", "unix-socket", false, "unix-socket"},
+		{"", "203.0.113.88", "173.245.48.5:1234", false, "203.0.113.88"},       // Cloudflare peer: CF-Connecting-IP trusted automatically
+		{"203.0.113.88", "", "173.245.48.5:1234", false, "203.0.113.88"},       // Cloudflare peer: XFF trusted automatically
+		{"", "203.0.113.88", "198.51.100.7:5555", false, "198.51.100.7"},       // non-Cloudflare peer: CF-Connecting-IP ignored when not trusted
+		{"", "203.0.113.88", "198.51.100.7:5555", true, "203.0.113.88"},        // trusted proxy: CF-Connecting-IP trusted
 	} {
 		h := http.Header{}
 		if c.xff != "" {
 			h.Set("X-Forwarded-For", c.xff)
+		}
+		if c.cf != "" {
+			h.Set("CF-Connecting-IP", c.cf)
 		}
 		if got := ClientIP(h, c.remote, c.trust); got != c.want {
 			t.Errorf("%+v: %q", c, got)

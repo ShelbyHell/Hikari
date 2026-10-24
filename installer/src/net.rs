@@ -187,7 +187,7 @@ fn judge(
             note(Level::Error, format!("it also points to {}: remove that A record, some clients would go there", others.join(", ")));
         }
     } else if a.iter().all(|ip| cloudflare(*ip)) {
-        note(Level::Error, format!("{domain} is behind Cloudflare's proxy: turn the orange cloud off (DNS only) so it points to {server}"));
+        note(Level::Ok, format!("{domain} is proxied by Cloudflare"));
     } else {
         let list: Vec<String> = a.iter().map(ToString::to_string).collect();
         note(Level::Error, format!("{domain} points to {}, not to this server ({server}): fix the A record", list.join(", ")));
@@ -265,7 +265,7 @@ mod tests {
         let d = "vpn.example.com";
         assert_eq!(judge(d, SERVER, &[], &both(&[SERVER]), &[]).level(), Level::Ok);
         let proxied = judge(d, SERVER, &[], &both(&[Ipv4Addr::new(104, 21, 32, 1)]), &[]);
-        assert!(proxied.level() == Level::Error && proxied.notes[0].text.contains("Cloudflare"));
+        assert!(proxied.level() == Level::Ok && proxied.notes[0].text.contains("Cloudflare"));
         let elsewhere = judge(d, SERVER, &[], &both(&[Ipv4Addr::new(198, 51, 100, 7)]), &[]);
         assert!(elsewhere.level() == Level::Error && elsewhere.notes[0].text.contains("198.51.100.7"));
         assert!(judge(d, SERVER, &[], &both(&[]), &[]).notes[0].text.contains("no A record"));

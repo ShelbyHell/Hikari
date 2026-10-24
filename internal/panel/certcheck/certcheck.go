@@ -308,12 +308,12 @@ func (c *Checker) dns(ctx context.Context, in Input) CertCheck {
 	}
 	ch.Params["ips"] = dnscheck.Join(found)
 	ch.Params["own"] = dnscheck.Join(in.Own)
+	if dnscheck.AllCloudflare(found) {
+		ch.Status, ch.Code = OK, "dns_cloudflare"
+		return ch
+	}
 	var foreign []netip.Addr
 	for _, a := range found {
-		if dnscheck.Cloudflare(a) {
-			ch.Status, ch.Code = Fail, "dns_cloudflare"
-			return ch
-		}
 		if !slices.Contains(in.Own, a) {
 			foreign = append(foreign, a)
 		}

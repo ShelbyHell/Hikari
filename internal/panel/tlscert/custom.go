@@ -142,6 +142,20 @@ func Covers(leaf *x509.Certificate, host string) bool {
 	return host != "" && leaf.VerifyHostname(host) == nil
 }
 
+// isCloudflareOrigin reports whether the leaf certificate was issued by Cloudflare's
+// Origin Certificate Authority.
+func isCloudflareOrigin(leaf *x509.Certificate) bool {
+	if strings.Contains(leaf.Issuer.CommonName, "Cloudflare Origin") {
+		return true
+	}
+	for _, org := range leaf.Issuer.Organization {
+		if org == "Cloudflare, Inc." || org == "Cloudflare" {
+			return true
+		}
+	}
+	return false
+}
+
 // Describe reports on a certificate; host is where clients reach it ("" when unknown).
 func Describe(c *tls.Certificate, host string, now time.Time) Info {
 	leaf := c.Leaf
@@ -156,16 +170,20 @@ func Describe(c *tls.Certificate, host string, now time.Time) Info {
 		info.Issuer = leaf.Issuer.Organization[0]
 	}
 	if host != "" {
-		roots, err := x509.SystemCertPool()
-		if err == nil {
-			inter := x509.NewCertPool()
-			for _, der := range c.Certificate[1:] {
-				if ic, err := x509.ParseCertificate(der); err == nil {
-					inter.AddCert(ic)
+		if isCloudflareOrigin(leaf) && Covers(leaf, host) {
+			info.Trusted = true
+		} else {
+			roots, err := x509.SystemCertPool()
+			if err == nil {
+				inter := x509.NewCertPool()
+				for _, der := range c.Certificate[1:] {
+					if ic, err := x509.ParseCertificate(der); err == nil {
+						inter.AddCert(ic)
+					}
 				}
+				_, err = leaf.Verify(x509.VerifyOptions{Roots: roots, Intermediates: inter, DNSName: host, CurrentTime: now})
+				info.Trusted = err == nil
 			}
-			_, err = leaf.Verify(x509.VerifyOptions{Roots: roots, Intermediates: inter, DNSName: host, CurrentTime: now})
-			info.Trusted = err == nil
 		}
 	}
 	return info
