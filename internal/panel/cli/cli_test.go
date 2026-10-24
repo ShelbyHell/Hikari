@@ -280,3 +280,11 @@ func TestHealthProbeTakesTheOwnSite(t *testing.T) {
 		}
 	}
 }
+
+func TestDomainCmdValidation(t *testing.T) {
+	var out, errOut bytes.Buffer
+	err := domainCmd(context.Background(), nil, nil, t.TempDir(), []string{"invalid domain name"}, &out, &errOut)
+	if err == nil || !strings.Contains(err.Error(), "invalid domain") {
+		t.Fatalf("expected invalid domain error, got %v", err)
+	}
+}

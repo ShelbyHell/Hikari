@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
-import { ChevronDown, RefreshCw } from "lucide-react";
-import { useId, useLayoutEffect, useRef, useState, type FormEvent } from "react";
+import { ChevronDown, Copy, RefreshCw } from "lucide-react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { api, errorText, unwrap, type Schemas } from "../../../api/client";
 import { qk, useUpdates } from "../../../api/hooks";
 import { Confirm } from "../../../components/overlay";
@@ -11,6 +11,7 @@ import { Disclosure, FormActions } from "../../../components/layout";
 import { Button, Field, Pill, Skeleton } from "../../../components/ui";
 import { SwitchRow } from "../../../components/switch";
 import { getLocale, LOCALES, t } from "../../../i18n";
+import { useCopy } from "../../../lib/copy";
 import { useDraft } from "../../../lib/draft";
 import { fieldErrors } from "../../../lib/fields";
 import { inlineMarkdown } from "../../../lib/inline-md";
@@ -20,13 +21,51 @@ import { useSaveSettings } from "./shared";
 /** What the service is called, where it lives and where its people ask for help: the first things to fill in. */
 export function ServiceCard({ s }: { s: Schemas["SettingsView"] }) {
   const save = useSaveSettings();
+  const [confirmDomain, setConfirmDomain] = useState(false);
+  const [newAdminUrl, setNewAdminUrl] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(5);
+  const copyText = useCopy();
+
   // Saving another card replaces `s`: what is typed here stays.
   const { draft: form, setDraft: setForm, dirty, reset } = useDraft({ brand: s.brand, public_host: s.public_host, domain: s.domain, support_url: s.support_url, quiet_hour_utc: s.quiet_hour_utc });
   const errors = fieldErrors(save.error);
+
+  const domainChanged = (form.domain?.trim() ?? "") !== (s.domain ?? "");
+
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    save.mutate({ brand: form.brand, public_host: form.public_host, domain: form.domain, support_url: form.support_url, quiet_hour_utc: form.quiet_hour_utc });
+    if (domainChanged) {
+      setConfirmDomain(true);
+      return;
+    }
+    doSave();
   };
+
+  const doSave = () => {
+    const nextDomain = form.domain?.trim() ?? "";
+    save.mutate(
+      { brand: form.brand, public_host: form.public_host, domain: nextDomain, support_url: form.support_url, quiet_hour_utc: form.quiet_hour_utc },
+      {
+        onSuccess: (data) => {
+          if (domainChanged && data.admin_url) {
+            setNewAdminUrl(data.admin_url);
+            setCountdown(5);
+          }
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (!newAdminUrl) return;
+    if (countdown <= 0) {
+      window.location.assign(newAdminUrl);
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [newAdminUrl, countdown]);
+
   const set = (k: "brand" | "public_host" | "domain" | "support_url") => (e: React.ChangeEvent<HTMLInputElement>) => setForm((f) => ({ ...f, [k]: e.target.value }));
   return (
     <section className="card glass reveal">
@@ -36,6 +75,7 @@ export function ServiceCard({ s }: { s: Schemas["SettingsView"] }) {
             <h2 className="card-title">{t("settings.service")}</h2>
             <div className="card-sub">{t("settings.serviceSub")}</div>
           </div>
+          {s.domain ? <Pill tone="ok">{s.domain}</Pill> : null}
         </div>
         <Field label={t("settings.brand")} htmlFor="s-brand" hint={t("settings.brandHint")} error={errors.brand}>
           <input id="s-brand" className="input" value={form.brand} onChange={set("brand")} maxLength={40} aria-invalid={!!errors.brand} />
@@ -64,6 +104,43 @@ export function ServiceCard({ s }: { s: Schemas["SettingsView"] }) {
         </Disclosure>
         <FormActions dirty={dirty} saving={save.isPending} onReset={reset} />
       </form>
+      <Confirm
+        open={confirmDomain}
+        onOpenChange={setConfirmDomain}
+        title={t("settings.changeDomainTitle")}
+        text={
+          form.domain?.trim()
+            ? t("settings.changeDomainWarn", { from: s.domain || s.public_host, to: form.domain.trim() })
+            : t("settings.clearDomainWarn", { host: s.public_host })
+        }
+        confirm={t("settings.changeDomainConfirm")}
+        loading={save.isPending}
+        onConfirm={() => {
+          setConfirmDomain(false);
+          doSave();
+        }}
+      />
+      {newAdminUrl ? (
+        <Confirm
+          open={true}
+          onOpenChange={() => {}}
+          title={t("settings.domainChangedTitle")}
+          text={
+            <div className="space-y-3">
+              <p>{t("settings.domainChangedText")}</p>
+              <div className="link-field">
+                <span className="mono">{newAdminUrl}</span>
+                <button type="button" className="icon-btn" onClick={() => copyText(newAdminUrl, t("settings.adminLinkCopied"))} aria-label={t("settings.copyAdminLink")}>
+                  <Copy size={18} />
+                </button>
+              </div>
+              <p className="text-xs text-[var(--ink-500)]">{t("settings.domainChangedRedirect", { seconds: countdown })}</p>
+            </div>
+          }
+          confirm={t("settings.domainChangedGo")}
+          onConfirm={() => window.location.assign(newAdminUrl)}
+        />
+      ) : null}
     </section>
   );
 }

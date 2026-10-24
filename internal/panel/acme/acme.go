@@ -771,22 +771,31 @@ func (m *Manager) settle(ctx context.Context) (primary string, extra []string, c
 		st.Error = "no_public_host"
 		return primary, extra, ca, false
 	}
-	if cert, have, err := loadPair(m.dir); err == nil && tlscert.Covers(cert.Leaf, primary) && now.Before(cert.Leaf.NotAfter) {
-		m.holder.Set(cert) // kept serving while it is renewed, or ordered from another CA
-		info := tlscert.Describe(cert, primary, now)
-		st.Kind, st.NotAfter, st.CA, st.Issuer, st.Names, st.Trusted = "acme", cert.Leaf.NotAfter, have, info.Issuer, info.Names, true
-		coversAll := true
-		for _, x := range extra {
-			if !tlscert.Covers(cert.Leaf, x) {
-				coversAll = false
-				break
+	if cert, have, err := loadPair(m.dir); err == nil && now.Before(cert.Leaf.NotAfter) {
+		if tlscert.Covers(cert.Leaf, primary) {
+			m.holder.Set(cert) // kept serving while it is renewed, or ordered from another CA
+			info := tlscert.Describe(cert, primary, now)
+			st.Kind, st.NotAfter, st.CA, st.Issuer, st.Names, st.Trusted = "acme", cert.Leaf.NotAfter, have, info.Issuer, info.Names, true
+			coversAll := true
+			for _, x := range extra {
+				if !tlscert.Covers(cert.Leaf, x) {
+					coversAll = false
+					break
+				}
+			}
+			if !needsRenewal(cert.Leaf, now) && have == ca && coversAll {
+				return primary, extra, ca, false
+			}
+		} else {
+			// When a new domain or host is selected, keep serving the previous valid certificate
+			// so ongoing sessions on the previous address are not interrupted with self-signed warnings
+			// while the new certificate order is being fulfilled.
+			m.holder.Set(cert)
+			for _, name := range cert.Leaf.DNSNames {
+				m.holder.SetNamed(name, cert)
 			}
 		}
-		if !needsRenewal(cert.Leaf, now) && have == ca && coversAll {
-			return primary, extra, ca, false
-		}
-	}
-	if st.Kind == "self-signed" {
+	} else if st.Kind == "self-signed" {
 		m.useFallback()
 	}
 	return primary, extra, ca, true

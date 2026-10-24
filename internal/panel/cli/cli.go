@@ -37,6 +37,7 @@ Commands:
   admin url                     print the panel's link
   admin reset-password          set a new admin password (ends all sessions and revokes all API keys)
   admin reset-path              give the panel a new secret link
+  admin domain [DOMAIN]         show, change or remove the panel's domain (--clear to remove)
   admin disable-2fa             turn off the admin's 2FA
   admin backup FILE             write a consistent copy of the database while the panel runs
   database migrate              bring the database schema up to date while the panel is stopped
@@ -152,6 +153,8 @@ func adminCmd(ctx context.Context, args []string) error {
 		fmt.Println("New link (the old one stops working within 5 seconds):")
 		fmt.Println(u)
 		return nil
+	case "domain":
+		return domainCmd(ctx, st, set, cfg.DataDir, args[1:], os.Stdout, os.Stderr)
 	case "cert":
 		return certCmd(ctx, st, set, cfg.DataDir, args[1:], os.Stdin, os.Stdout)
 	case "node":
