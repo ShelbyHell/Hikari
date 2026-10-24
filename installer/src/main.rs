@@ -75,6 +75,12 @@ enum Cmd {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    /// View, change or remove the SNI domain
+    #[command(disable_help_flag = true)]
+    Sni {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
+    },
     /// Turn off the admin's 2FA (a lost phone)
     #[command(name = "disable-2fa")]
     Disable2fa,
@@ -207,6 +213,7 @@ fn main() -> ExitCode {
         Some(Cmd::ResetPassword) => ops::admin(&["reset-password"]),
         Some(Cmd::ResetPath) => ops::admin(&["reset-path"]),
         Some(Cmd::Domain { args }) => passthrough("domain", &args),
+        Some(Cmd::Sni { args }) => passthrough("sni", &args),
         Some(Cmd::Disable2fa) => ops::admin(&["disable-2fa"]),
         Some(Cmd::Node { args }) => passthrough("node", &args),
         Some(Cmd::Targets { args }) => passthrough("targets", &args),

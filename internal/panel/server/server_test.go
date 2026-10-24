@@ -14,6 +14,7 @@ func TestSubDomainRoutes(t *testing.T) {
 	sub := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { _, _ = io.WriteString(w, "sub") })
 	s := New(admin, sub)
 	s.SetPaths(settings.Paths{Admin: "admin-path", Sub: "sub-path"})
+	s.SetDomain("panel.example.com")
 	s.SetSubDomain("sub.example.com")
 	s.SetSNIDomain("sni.example.com")
 
@@ -60,5 +61,11 @@ func TestSubDomainRoutes(t *testing.T) {
 	}
 	if code, _ := get("sni.example.com:443", "/sub-path/"); code != http.StatusNotFound {
 		t.Fatalf("sub on sni_domain:443: want 404, got %d", code)
+	}
+
+	// 6. If sni_domain is mistakenly set to the same as panel domain, it never blocks admin on panel domain
+	s.SetSNIDomain("panel.example.com")
+	if code, body := get("panel.example.com", "/admin-path/"); code != http.StatusOK || body != "admin" {
+		t.Fatalf("admin on panel domain when sni_domain matches panel: %d %q", code, body)
 	}
 }

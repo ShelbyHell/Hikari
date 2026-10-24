@@ -16,6 +16,7 @@ import (
 // a panel from any other HTTPS endpoint.
 type Server struct {
 	paths     atomic.Pointer[settings.Paths]
+	domain    atomic.Pointer[string]
 	subDomain atomic.Pointer[string]
 	sniDomain atomic.Pointer[string]
 	admin     http.Handler
@@ -44,6 +45,15 @@ func New(admin, sub http.Handler) *Server {
 }
 
 func (s *Server) SetPaths(p settings.Paths) { s.paths.Store(&p) }
+
+// SetDomain sets the primary panel domain.
+func (s *Server) SetDomain(d string) {
+	if d == "" {
+		s.domain.Store(nil)
+		return
+	}
+	s.domain.Store(&d)
+}
 
 // SetSubDomain sets the subscription domain: requests for the admin panel on this domain
 // get the same 404 as any unknown path, so the secret admin path stays hidden on it.
@@ -92,14 +102,18 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request, admin bool) {
 	if h, _, err := net.SplitHostPort(host); err == nil {
 		host = h
 	}
+	panelDomain := ""
+	if d := s.domain.Load(); d != nil {
+		panelDomain = *d
+	}
 	if admin {
-		if sub := s.subDomain.Load(); sub != nil && *sub != "" {
+		if sub := s.subDomain.Load(); sub != nil && *sub != "" && !strings.EqualFold(*sub, panelDomain) {
 			if strings.EqualFold(host, *sub) {
 				admin = false
 			}
 		}
 	}
-	if sni := s.sniDomain.Load(); sni != nil && *sni != "" {
+	if sni := s.sniDomain.Load(); sni != nil && *sni != "" && !strings.EqualFold(*sni, panelDomain) {
 		if strings.EqualFold(host, *sni) {
 			admin = false
 			subAllowed = false

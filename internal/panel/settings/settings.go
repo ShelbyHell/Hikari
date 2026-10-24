@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -338,6 +339,13 @@ type Endpoint struct {
 func (e Endpoint) URL() string {
 	if e.Host == "" || e.Port <= 0 {
 		return ""
+	}
+	if e.Port == 443 {
+		host := e.Host
+		if strings.Contains(host, ":") && !strings.HasPrefix(host, "[") {
+			host = "[" + host + "]"
+		}
+		return "https://" + host
 	}
 	return "https://" + net.JoinHostPort(e.Host, strconv.Itoa(e.Port))
 }

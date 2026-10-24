@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.4
+### en
+- **Fixes for SNI domain & CLI `hikari sni`**: Fixed admin panel 404 lockout when SNI domain matches the panel domain, preserved direct node connection address in client configs so Cloudflare Proxied SNI domains don't break VPN protocols, added `hikari sni [DOMAIN] [--clear] [-f/--force]` to CLI, and cleanly omitted redundant `:443` in HTTPS subscription links.
+### ru
+- **Исправления домена SNI и команда `hikari sni`**: Устранена блокировка 404 веб-панели при совпадении домена SNI с доменом панели, адрес ноды для подключений клиентов сохраняется прямым (домены SNI за Cloudflare больше не обрывают VPN-протоколы), добавлена консольная команда `hikari sni [DOMAIN] [--clear] [-f/--force]` для управления и сброса домена SNI, и убран лишний `:443` в стандартных HTTPS-ссылках подписки.
+
 ## 0.5.1.4-rc.3
 ### en
 - **Full support for changing the panel domain**: Seamless domain changes and domain removal (switching back to IP) from both the web panel and the command line (`hikari domain [DOMAIN] [--clear]` / `admin domain`). When changing the domain in Settings, an interactive confirmation dialog prevents accidental lockouts, the new admin URL is displayed with a copy action, and an automatic countdown redirects the browser. In ACME management, previous valid certificates remain actively served during the transition until the new certificate is obtained, preventing abrupt self-signed TLS errors.

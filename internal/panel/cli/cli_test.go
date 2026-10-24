@@ -287,4 +287,8 @@ func TestDomainCmdValidation(t *testing.T) {
 	if err == nil || !strings.Contains(err.Error(), "invalid domain") {
 		t.Fatalf("expected invalid domain error, got %v", err)
 	}
+	err = sniCmd(context.Background(), nil, nil, t.TempDir(), []string{"invalid domain name"}, &out, &errOut)
+	if err == nil || !strings.Contains(err.Error(), "invalid domain") {
+		t.Fatalf("expected invalid domain error from sniCmd, got %v", err)
+	}
 }

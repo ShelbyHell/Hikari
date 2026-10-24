@@ -422,7 +422,6 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 			host := ep.Host
 			sni := domainName
 			if sniDomain != "" {
-				host = sniDomain
 				sni = sniDomain
 			}
 			sn := subs.Node{ID: n.ID, Name: n.Name, Endpoint: subs.Endpoint{Host: host, SNI: sni}}
@@ -504,6 +503,10 @@ func (p *Panel) Apply(ctx context.Context) (settings.Paths, error) {
 	if err != nil {
 		return paths, err
 	}
+	domainName, err := p.reload.String(ctx, settings.KeyDomain)
+	if err != nil {
+		return paths, err
+	}
 	subDom, err := p.reload.String(ctx, settings.KeySubDomain)
 	if err != nil {
 		return paths, err
@@ -513,6 +516,7 @@ func (p *Panel) Apply(ctx context.Context) (settings.Paths, error) {
 		return paths, err
 	}
 	p.server.SetPaths(paths)
+	p.server.SetDomain(domainName)
 	p.server.SetSubDomain(subDom)
 	p.server.SetSNIDomain(sniDom)
 	p.spa.SetPrefix(paths.Admin)

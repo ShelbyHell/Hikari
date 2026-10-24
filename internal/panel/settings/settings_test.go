@@ -59,6 +59,24 @@ func TestCachedSettings(t *testing.T) {
 	}
 }
 
+func TestEndpointURL(t *testing.T) {
+	for _, c := range []struct {
+		ep   Endpoint
+		want string
+	}{
+		{Endpoint{Host: "sub.example.com", Port: 443}, "https://sub.example.com"},
+		{Endpoint{Host: "sub.example.com", Port: 8443}, "https://sub.example.com:8443"},
+		{Endpoint{Host: "2001:db8::1", Port: 443}, "https://[2001:db8::1]"},
+		{Endpoint{Host: "2001:db8::1", Port: 2053}, "https://[2001:db8::1]:2053"},
+		{Endpoint{Host: "", Port: 443}, ""},
+		{Endpoint{Host: "sub.example.com", Port: 0}, ""},
+	} {
+		if got := c.ep.URL(); got != c.want {
+			t.Errorf("URL(%+v) = %q, want %q", c.ep, got, c.want)
+		}
+	}
+}
+
 func TestSubEndpoint(t *testing.T) {
 	ctx := context.Background()
 	st, err := storetest.Open(ctx, t.TempDir())
