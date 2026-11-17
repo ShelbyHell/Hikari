@@ -31,6 +31,22 @@ The **Cascade** button on a node card shows which nodes it sends traffic through
 
 There is also the **Where other nodes' traffic goes next** field: direct, through this node's WARP, or through one more node. This is how chains of three or more servers are built. The panel will not save loops, and a protocol cannot choose its own node as the exit.
 
+## Cascade rules
+
+**Cascade** button → the **Cascade rules** block decides that part of a node's traffic leaves through another node while the rest goes as usual (direct, through WARP, or whole through the chosen node). For example, on the entry node all traffic goes direct and `youtube.com` goes through the main node:
+
+```text
+DOMAIN-SUFFIX,youtube.com → Node 1
+```
+
+A rule has three fields:
+
+- **What to match** — a `TYPE,VALUE` rule: `DOMAIN-SUFFIX,example.com`, `DOMAIN-KEYWORD,example`, `DOMAIN,example.com`, `DOMAIN-REGEX,…`, `DST-PORT,25` or `DST-PORT,1000-2000`, `IP-CIDR,203.0.113.0/24`. The node itself carries no geodata, so `GEOSITE`/`GEOIP` are not supported here — use domains.
+- **Only this protocol** — when picked, the rule applies only to that connection of the node; "any protocol" applies to all of them, the relay entry included.
+- **Where to send** — another node of the panel. The node itself, loops, and chains longer than 8 hops are not saved.
+
+Rules are ordered: the **first match wins**. Use the arrows to change the order. A rule applies before a protocol's whole-traffic exit: if a protocol exits through node B and a rule sends `youtube.com` to node C, YouTube goes through C and the protocol's rest through B.
+
 ## Checking a cascade
 
 Open **Check node** on the entry node (A), see [Nodes](/Hikari/en/nodes/nodes/#check-node). The panel checks the entry → exit → internet path and shows where it breaks:

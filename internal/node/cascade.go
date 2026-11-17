@@ -51,6 +51,36 @@ func exitProxyConfig(e nodeapi.Exit) (map[string]any, error) {
 	return p, nil
 }
 
+// cascadeRules send matching traffic to the exits' nodes, before the inbounds' catch-all
+// exits apply: the first rule that matches wins. What does not parse, or names a listener
+// or an exit that is not there, is left out: mihomo refuses the whole config over one
+// rule it cannot parse.
+func cascadeRules(st nodeapi.DesiredState) []string {
+	present := listenerNames(st)
+	exits := map[string]bool{}
+	for _, e := range st.Exits {
+		if strings.HasPrefix(e.Name, "NODE-") && safeRuleValue(e.Name) {
+			exits[e.Name] = true
+		}
+	}
+	var r []string
+	for _, cr := range st.CascadeRules {
+		match, ok := nodeapi.CanonMatch(cr.Match)
+		if !ok || !exits[cr.Exit] || !safeRuleValue(cr.Exit) {
+			continue
+		}
+		rule := match
+		if cr.Inbound != "" {
+			if !present[cr.Inbound] || !safeRuleValue(cr.Inbound) {
+				continue
+			}
+			rule = "AND,((IN-NAME," + cr.Inbound + "),(" + match + "))"
+		}
+		r = append(r, rule+","+cr.Exit)
+	}
+	return r
+}
+
 // exitRules send the inbounds of each exit to that node. An inbound named by several
 // exits goes to the first.
 func exitRules(st nodeapi.DesiredState) []string {

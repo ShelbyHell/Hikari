@@ -31,6 +31,10 @@ type DesiredState struct {
 	// Exits are the other nodes this one sends chosen inbounds through (a cascade).
 	Relay *Relay `json:"relay,omitempty"`
 	Exits []Exit `json:"exits,omitempty"`
+	// CascadeRules send part of the traffic to the exits' nodes before the inbounds'
+	// whole-traffic exits apply: the first matching rule wins. Nodes older than them
+	// ignore them.
+	CascadeRules []CascadeRule `json:"cascade_rules,omitempty"`
 	// Torrent turns the torrent blocker on; nil: off. Nodes older than the blocker ignore it.
 	Torrent *TorrentBlock `json:"torrent,omitempty"`
 	// Filters keep users' traffic from places and strangers from the node; nil: none.
@@ -412,6 +416,15 @@ type Exit struct {
 
 // ExitName is the proxy name of node id as an exit.
 func ExitName(id int64) string { return "NODE-" + strconv.FormatInt(id, 10) }
+
+// CascadeRule sends the traffic a rule matches to another node's relay: Match is the
+// canonical "TYPE,VALUE" (nodeapi.CanonMatch), Inbound a local listener's name or empty
+// for any (the relay included), Exit the exit's proxy name, NODE-<id>.
+type CascadeRule struct {
+	Match   string `json:"match"`
+	Inbound string `json:"inbound,omitempty"`
+	Exit    string `json:"exit"`
+}
 
 // ProbeResult is the internet as seen through one outbound of the node.
 type ProbeResult = WarpStatus

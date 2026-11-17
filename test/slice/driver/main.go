@@ -697,9 +697,11 @@ func cascade() {
 		Local bool  `json:"local"`
 	}
 	p.call("GET", "/api/v1/nodes", nil, &nodes)
-	var remote int64
+	var remote, local int64
 	for _, n := range nodes {
-		if !n.Local {
+		if n.Local {
+			local = n.ID
+		} else {
 			remote = n.ID
 		}
 	}
@@ -782,6 +784,19 @@ func cascade() {
 	waitFor(node2IP)
 	p.call("PATCH", path, map[string]any{"outbound": "direct"}, nil)
 	waitFor(nodeIP)
+
+	// A cascade rule sends the matching traffic to node2 even with the inbound direct;
+	// the rule's match is the test target's name, so every check goes through node2.
+	var rule struct {
+		ID int64 `json:"id"`
+	}
+	rulesPath := "/api/v1/nodes/" + strconv.FormatInt(local, 10) + "/cascade/rules"
+	p.call("POST", rulesPath, map[string]any{"match": "DOMAIN-SUFFIX,target", "exit_node_id": remote}, &rule)
+	waitFor(node2IP)
+	log.Printf("cascade rule: the target sees node2 %s", node2IP)
+	p.call("DELETE", rulesPath+"/"+strconv.FormatInt(rule.ID, 10), nil, nil)
+	waitFor(nodeIP)
+	log.Print("cascade rule removed: the target sees node again")
 	log.Print("CASCADE OK")
 }
 

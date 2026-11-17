@@ -26,6 +26,43 @@ func (q *Queries) AddRelayUser(ctx context.Context, arg AddRelayUserParams) erro
 	return err
 }
 
+const createCascadeRule = `-- name: CreateCascadeRule :one
+INSERT INTO cascade_rules (node_id, inbound_id, match, exit_node_id, position, created_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, node_id, inbound_id, match, exit_node_id, position, created_at
+`
+
+type CreateCascadeRuleParams struct {
+	NodeID     int64
+	InboundID  sql.NullInt64
+	Match      string
+	ExitNodeID int64
+	Position   int64
+	CreatedAt  int64
+}
+
+func (q *Queries) CreateCascadeRule(ctx context.Context, arg CreateCascadeRuleParams) (CascadeRule, error) {
+	row := q.db.QueryRowContext(ctx, createCascadeRule,
+		arg.NodeID,
+		arg.InboundID,
+		arg.Match,
+		arg.ExitNodeID,
+		arg.Position,
+		arg.CreatedAt,
+	)
+	var i CascadeRule
+	err := row.Scan(
+		&i.ID,
+		&i.NodeID,
+		&i.InboundID,
+		&i.Match,
+		&i.ExitNodeID,
+		&i.Position,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const createNodeRelay = `-- name: CreateNodeRelay :one
 INSERT INTO node_relays (node_id, port, config, created_at) VALUES ($1, $2, $3, $4)
 ON CONFLICT (node_id) DO UPDATE SET node_id = excluded.node_id
@@ -53,6 +90,44 @@ func (q *Queries) CreateNodeRelay(ctx context.Context, arg CreateNodeRelayParams
 		&i.Config,
 		&i.Outbound,
 		&i.ExitNodeID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const deleteCascadeRule = `-- name: DeleteCascadeRule :exec
+DELETE FROM cascade_rules WHERE id = $1 AND node_id = $2
+`
+
+type DeleteCascadeRuleParams struct {
+	ID     int64
+	NodeID int64
+}
+
+func (q *Queries) DeleteCascadeRule(ctx context.Context, arg DeleteCascadeRuleParams) error {
+	_, err := q.db.ExecContext(ctx, deleteCascadeRule, arg.ID, arg.NodeID)
+	return err
+}
+
+const getCascadeRule = `-- name: GetCascadeRule :one
+SELECT id, node_id, inbound_id, match, exit_node_id, position, created_at FROM cascade_rules WHERE id = $1 AND node_id = $2
+`
+
+type GetCascadeRuleParams struct {
+	ID     int64
+	NodeID int64
+}
+
+func (q *Queries) GetCascadeRule(ctx context.Context, arg GetCascadeRuleParams) (CascadeRule, error) {
+	row := q.db.QueryRowContext(ctx, getCascadeRule, arg.ID, arg.NodeID)
+	var i CascadeRule
+	err := row.Scan(
+		&i.ID,
+		&i.NodeID,
+		&i.InboundID,
+		&i.Match,
+		&i.ExitNodeID,
+		&i.Position,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -90,6 +165,76 @@ func (q *Queries) GetRelayUser(ctx context.Context, arg GetRelayUserParams) (str
 	var uuid string
 	err := row.Scan(&uuid)
 	return uuid, err
+}
+
+const listCascadeRules = `-- name: ListCascadeRules :many
+SELECT id, node_id, inbound_id, match, exit_node_id, position, created_at FROM cascade_rules WHERE node_id = $1 ORDER BY position, id
+`
+
+func (q *Queries) ListCascadeRules(ctx context.Context, nodeID int64) ([]CascadeRule, error) {
+	rows, err := q.db.QueryContext(ctx, listCascadeRules, nodeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []CascadeRule{}
+	for rows.Next() {
+		var i CascadeRule
+		if err := rows.Scan(
+			&i.ID,
+			&i.NodeID,
+			&i.InboundID,
+			&i.Match,
+			&i.ExitNodeID,
+			&i.Position,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listCascadeRulesByExit = `-- name: ListCascadeRulesByExit :many
+SELECT id, node_id, inbound_id, match, exit_node_id, position, created_at FROM cascade_rules WHERE exit_node_id = $1 ORDER BY node_id, position, id
+`
+
+func (q *Queries) ListCascadeRulesByExit(ctx context.Context, exitNodeID int64) ([]CascadeRule, error) {
+	rows, err := q.db.QueryContext(ctx, listCascadeRulesByExit, exitNodeID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []CascadeRule{}
+	for rows.Next() {
+		var i CascadeRule
+		if err := rows.Scan(
+			&i.ID,
+			&i.NodeID,
+			&i.InboundID,
+			&i.Match,
+			&i.ExitNodeID,
+			&i.Position,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listNodeRelays = `-- name: ListNodeRelays :many
@@ -153,6 +298,21 @@ func (q *Queries) ListRelayUsers(ctx context.Context, exitNodeID int64) ([]Relay
 	return items, nil
 }
 
+const setCascadeRulePosition = `-- name: SetCascadeRulePosition :exec
+UPDATE cascade_rules SET position = $1 WHERE id = $2 AND node_id = $3
+`
+
+type SetCascadeRulePositionParams struct {
+	Position int64
+	ID       int64
+	NodeID   int64
+}
+
+func (q *Queries) SetCascadeRulePosition(ctx context.Context, arg SetCascadeRulePositionParams) error {
+	_, err := q.db.ExecContext(ctx, setCascadeRulePosition, arg.Position, arg.ID, arg.NodeID)
+	return err
+}
+
 const setInboundExit = `-- name: SetInboundExit :exec
 UPDATE inbounds SET exit_node_id = $1, outbound = $2 WHERE id = $3
 `
@@ -195,4 +355,39 @@ type SetNodeRelayRouteParams struct {
 func (q *Queries) SetNodeRelayRoute(ctx context.Context, arg SetNodeRelayRouteParams) error {
 	_, err := q.db.ExecContext(ctx, setNodeRelayRoute, arg.Outbound, arg.ExitNodeID, arg.NodeID)
 	return err
+}
+
+const updateCascadeRule = `-- name: UpdateCascadeRule :one
+UPDATE cascade_rules SET match = $1, inbound_id = $2, exit_node_id = $3
+WHERE id = $4 AND node_id = $5
+RETURNING id, node_id, inbound_id, match, exit_node_id, position, created_at
+`
+
+type UpdateCascadeRuleParams struct {
+	Match      string
+	InboundID  sql.NullInt64
+	ExitNodeID int64
+	ID         int64
+	NodeID     int64
+}
+
+func (q *Queries) UpdateCascadeRule(ctx context.Context, arg UpdateCascadeRuleParams) (CascadeRule, error) {
+	row := q.db.QueryRowContext(ctx, updateCascadeRule,
+		arg.Match,
+		arg.InboundID,
+		arg.ExitNodeID,
+		arg.ID,
+		arg.NodeID,
+	)
+	var i CascadeRule
+	err := row.Scan(
+		&i.ID,
+		&i.NodeID,
+		&i.InboundID,
+		&i.Match,
+		&i.ExitNodeID,
+		&i.Position,
+		&i.CreatedAt,
+	)
+	return i, err
 }

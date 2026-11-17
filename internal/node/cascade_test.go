@@ -122,3 +122,43 @@ func TestRelayBypassesAccounting(t *testing.T) {
 }
 
 func mustAddr(s string) netip.Addr { return netip.MustParseAddr(s) }
+
+// Cascade rules come before the inbounds' whole-traffic exit rules, a rule with an
+// inbound is AND-ed with IN-NAME, and what does not parse or does not exist is left out:
+// one bad rule would fail mihomo's whole config.
+func TestCascadeRules(t *testing.T) {
+	st := cascadeState(t)
+	st.CascadeRules = []nodeapi.CascadeRule{
+		{Match: "domain-suffix,YouTube.COM", Exit: nodeapi.ExitName(3)},                            // canonicalized, no inbound
+		{Match: "DST-PORT, 25-53", Inbound: "in-anytls", Exit: nodeapi.ExitName(3)},                // AND-ed with the listener
+		{Match: "IP-CIDR,203.0.113.7", Inbound: "in-gone", Exit: nodeapi.ExitName(3)},               // listener is not there
+		{Match: "GEOSITE,youtube", Exit: nodeapi.ExitName(3)},                                       // not a kind the node carries
+		{Match: "DOMAIN-SUFFIX,evil.com,DIRECT", Exit: nodeapi.ExitName(3)},                        // a target in the match
+		{Match: "DOMAIN-SUFFIX,ok.example", Exit: nodeapi.ExitName(99)},                            // exit is not there
+		{Match: "DOMAIN-SUFFIX,ok.example", Exit: "NODE-3,REJECT"},                                  // a target in the exit name
+	}
+	raw, _, err := buildConfig(st, proto.Cert{CertPath: "/tmp/c.pem", KeyPath: "/tmp/k.pem"}, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg struct {
+		Rules []string `json:"rules"`
+	}
+	if err := json.Unmarshal(raw, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	got := strings.Join(cfg.Rules, "\n")
+	want := "DOMAIN-SUFFIX,youtube.com,NODE-3\nAND,((IN-NAME,in-anytls),(DST-PORT,25-53)),NODE-3\nIN-NAME,mikan~relay,NODE-3"
+	if !strings.Contains(got, want) {
+		t.Fatalf("rules:\n%s\nwant to contain:\n%s", got, want)
+	}
+	for _, bad := range []string{"in-gone", "GEOSITE", "evil.com", "NODE-99", "NODE-3,REJECT"} {
+		if strings.Contains(got, bad) {
+			t.Fatalf("rule with %q got through:\n%s", bad, got)
+		}
+	}
+	// The rules must come before the catch-all IN-NAME ones, or they would never match.
+	if strings.Index(got, "DOMAIN-SUFFIX,youtube.com,NODE-3") > strings.Index(got, "IN-NAME,mikan~relay,NODE-3") {
+		t.Fatalf("a cascade rule comes after the catch-all exit rule:\n%s", got)
+	}
+}

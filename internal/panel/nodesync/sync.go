@@ -221,7 +221,7 @@ func (s *Syncer) desiredPin(ctx context.Context) (st nodeapi.DesiredState, pin s
 	if st.Warp, err = s.warp(ctx, n, inbounds); err != nil {
 		return st, "", err
 	}
-	if st.Relay, st.Exits, err = s.cascade(ctx, n, inbounds); err != nil {
+	if st.Relay, st.Exits, st.CascadeRules, err = s.cascade(ctx, n, inbounds); err != nil {
 		return st, "", err
 	}
 	if s.local {
@@ -817,11 +817,12 @@ func stateKey(st nodeapi.DesiredState) string {
 		W *nodeapi.Warp
 		R *nodeapi.Relay
 		E []nodeapi.Exit
+		C []nodeapi.CascadeRule
 		B *nodeapi.TorrentBlock
 		F *nodeapi.Filters
 		H *nodeapi.Shaping
 		D *nodeapi.ExitDNS
-	}{st.Inbounds, st.Slots, st.TLS, st.SelfStealPort, st.Warp, st.Relay, st.Exits, st.Torrent, st.Filters, st.Shaping, st.DNS})
+	}{st.Inbounds, st.Slots, st.TLS, st.SelfStealPort, st.Warp, st.Relay, st.Exits, st.CascadeRules, st.Torrent, st.Filters, st.Shaping, st.DNS})
 	sum := sha256.Sum256(raw)
 	return hex.EncodeToString(sum[:])
 }
@@ -886,29 +887,30 @@ func (m *Manager) Warp(ctx context.Context, id int64, force bool) (nodeapi.WarpS
 }
 
 // cascade is the node's part in cascades: its relay listener when other nodes leave
-// through it, and the other nodes it sends inbounds (and its own relay) to. Keys and
-// relays are made by the API when an exit is chosen; a missing one leaves that exit out,
-// and the inbounds behind it fail instead of going direct.
-func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) (*nodeapi.Relay, []nodeapi.Exit, error) {
+// through it, the other nodes it sends inbounds (and its own relay) to, and its cascade
+// rules (part of a listener's traffic to yet another node). Keys and relays are made by
+// the API when an exit is chosen; a missing one leaves that exit out, and the inbounds
+// behind it fail instead of going direct.
+func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) (*nodeapi.Relay, []nodeapi.Exit, []nodeapi.CascadeRule, error) {
 	q := s.m.st.Q
 	if n.Enabled == 0 {
-		return nil, nil, nil
+		return nil, nil, nil, nil
 	}
 	var relay *nodeapi.Relay
 	own, err := q.GetNodeRelay(ctx, n.ID)
 	hasRelay := err == nil
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if hasRelay {
 		users, err := q.ListRelayUsers(ctx, n.ID)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 		if len(users) > 0 {
 			t, err := proto.Parse(own.Config)
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, nil, err
 			}
 			relay = &nodeapi.Relay{Port: own.Port, Config: t.JSON()}
 			for _, u := range users {
@@ -916,14 +918,21 @@ func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) 
 			}
 		}
 	}
-	// Which listeners go to which exit, in the order exits first appear.
+	// Which listeners go to which exit, in the order exits first appear. A cascade rule's
+	// exit is registered too (with no listener name), so the relay and key exist for it.
+	rulesRows, err := q.ListCascadeRules(ctx, n.ID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
 	routes := map[int64][]string{}
 	var order []int64
 	add := func(exit int64, name string) {
 		if _, ok := routes[exit]; !ok {
 			order = append(order, exit)
 		}
-		routes[exit] = append(routes[exit], name)
+		if name != "" {
+			routes[exit] = append(routes[exit], name)
+		}
 	}
 	for _, in := range inbounds {
 		if in.NodeID == n.ID && in.Enabled != 0 && in.ExitNodeID.Valid {
@@ -932,6 +941,9 @@ func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) 
 	}
 	if relay != nil && own.ExitNodeID.Valid {
 		add(own.ExitNodeID.Int64, nodeapi.RelayListener)
+	}
+	for _, r := range rulesRows {
+		add(r.ExitNodeID, "")
 	}
 	var exits []nodeapi.Exit
 	for _, id := range order {
@@ -944,7 +956,27 @@ func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) 
 		e.Inbounds = routes[id]
 		exits = append(exits, e)
 	}
-	return relay, exits, nil
+	// The rules, in their order; one whose inbound is not this node's is left to the node
+	// to drop (the listener may be off), and its match is checked there once more.
+	names := map[int64]string{}
+	for _, in := range inbounds {
+		if in.NodeID == n.ID {
+			names[in.ID] = in.Name
+		}
+	}
+	var rules []nodeapi.CascadeRule
+	for _, r := range rulesRows {
+		cr := nodeapi.CascadeRule{Match: r.Match, Exit: nodeapi.ExitName(r.ExitNodeID)}
+		if r.InboundID.Valid {
+			name, ok := names[r.InboundID.Int64]
+			if !ok {
+				continue
+			}
+			cr.Inbound = name
+		}
+		rules = append(rules, cr)
+	}
+	return relay, exits, rules, nil
 }
 
 // exitTo is the outbound from node src to node id's relay.

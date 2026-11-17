@@ -76,9 +76,32 @@ func TestCascadeChain(t *testing.T) {
 		t.Fatalf("self: %v", err)
 	}
 
+	// A's cascade rules: one for its inbound, one for any listener, one with another
+	// node's inbound (left out of the state).
+	if _, err := q.CreateCascadeRule(ctx, db.CreateCascadeRuleParams{NodeID: a.id, InboundID: nullID(mine.ID), Match: "DOMAIN-SUFFIX,youtube.com", ExitNodeID: nb.ID, Position: 1, CreatedAt: time.Now().Unix()}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := q.CreateCascadeRule(ctx, db.CreateCascadeRuleParams{NodeID: a.id, Match: "DST-PORT,25-53", ExitNodeID: nb.ID, Position: 2, CreatedAt: time.Now().Unix()}); err != nil {
+		t.Fatal(err)
+	}
+	var foreign db.Inbound
+	for _, in := range ins {
+		if in.NodeID == nb.ID {
+			foreign = in
+			break
+		}
+	}
+	if _, err := q.CreateCascadeRule(ctx, db.CreateCascadeRuleParams{NodeID: a.id, InboundID: nullID(foreign.ID), Match: "IP-CIDR,203.0.113.0/24", ExitNodeID: nb.ID, Position: 3, CreatedAt: time.Now().Unix()}); err != nil {
+		t.Fatal(err)
+	}
+
 	da, _ := a.desired(ctx)
 	if da.Relay != nil || len(da.Exits) != 1 || da.Exits[0].Name != nodeapi.ExitName(nb.ID) || len(da.Exits[0].Inbounds) != 1 || da.Exits[0].Inbounds[0] != mine.Name {
 		t.Fatalf("A: relay %v exits %+v", da.Relay, da.Exits)
+	}
+	if len(da.CascadeRules) != 2 || da.CascadeRules[0].Match != "DOMAIN-SUFFIX,youtube.com" || da.CascadeRules[0].Inbound != mine.Name ||
+		da.CascadeRules[0].Exit != nodeapi.ExitName(nb.ID) || da.CascadeRules[1].Match != "DST-PORT,25-53" || da.CascadeRules[1].Inbound != "" {
+		t.Fatalf("A: cascade rules %+v", da.CascadeRules)
 	}
 	var proxy map[string]any
 	_ = json.Unmarshal(da.Exits[0].Proxy, &proxy)

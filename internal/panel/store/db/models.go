@@ -125,6 +125,16 @@ type BoundDevice struct {
 	Name      string
 }
 
+type CascadeRule struct {
+	ID         int64
+	NodeID     int64
+	InboundID  sql.NullInt64
+	Match      string
+	ExitNodeID int64
+	Position   int64
+	CreatedAt  int64
+}
+
 type Device struct {
 	UserID    int64
 	Ip        string

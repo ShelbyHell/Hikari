@@ -956,6 +956,59 @@ export interface paths {
         patch: operations["update-node-cascade"];
         trace?: never;
     };
+    "/api/v1/nodes/{id}/cascade/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Правила каскада ноды: что на какую ноду уходит */
+        get: operations["list-cascade-rules"];
+        put?: never;
+        /** Добавить правило каскада */
+        post: operations["create-cascade-rule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nodes/{id}/cascade/rules/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Порядок правил каскада: первое подходящее выигрывает */
+        put: operations["order-cascade-rules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/nodes/{id}/cascade/rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Удалить правило каскада */
+        delete: operations["delete-cascade-rule"];
+        options?: never;
+        head?: never;
+        /** Изменить правило каскада */
+        patch: operations["update-cascade-rule"];
+        trace?: never;
+    };
     "/api/v1/nodes/{id}/certificate": {
         parameters: {
             query?: never;
@@ -2811,6 +2864,31 @@ export interface components {
             /** @description Ноды, которые выходят через эту */
             sources: components["schemas"]["CascadeHop"][];
         };
+        CascadeRuleView: {
+            /** @description Имя ноды выхода */
+            exit_name: string;
+            /**
+             * Format: int64
+             * @description Нода, через которую уходит подходящий трафик
+             */
+            exit_node_id: number;
+            /** Format: int64 */
+            id: number;
+            /** @description Имя подключения */
+            inbound?: string;
+            /**
+             * Format: int64
+             * @description Подключение этой ноды; пусто — любой слушатель, служебный вход включительно
+             */
+            inbound_id?: number;
+            /** @description Каноническое правило без цели: DOMAIN-SUFFIX,example.com, DST-PORT,25-53, IP-CIDR,203.0.113.0/24 */
+            match: string;
+            /**
+             * Format: int64
+             * @description Порядок правил
+             */
+            position: number;
+        };
         CascadeView: {
             /** @description Ноды, через которые эта нода выпускает трафик */
             exits: components["schemas"]["CascadeExit"][];
@@ -2958,6 +3036,20 @@ export interface components {
             prefix: string;
             /** @enum {string} */
             scope: "read" | "full";
+        };
+        CreateCascadeRuleInputBody: {
+            /**
+             * Format: int64
+             * @description Куда отправлять: другая нода панели
+             */
+            exit_node_id: number;
+            /**
+             * Format: int64
+             * @description Только трафик этого подключения ноды; пусто — любой слушатель
+             */
+            inbound_id?: number;
+            /** @description Что ловить: TYPE,VALUE — DOMAIN-SUFFIX,example.com, DOMAIN-KEYWORD,example, DST-PORT,25, IP-CIDR,203.0.113.0/24, DOMAIN-REGEX,… */
+            match: string;
         };
         CreateExternalSubInputBody: {
             /** @description Включена ли подписка; по умолчанию да */
@@ -3863,6 +3955,10 @@ export interface components {
             traffic_100: boolean;
             traffic_90: boolean;
         };
+        OrderCascadeRulesInputBody: {
+            /** @description Все правила ноды, каждая один раз, в новом порядке */
+            ids: number[];
+        };
         OrderFoldersInputBody: {
             /** @description Все папки, каждая один раз, в том порядке, в каком их показывает список */
             ids: number[];
@@ -4105,6 +4201,16 @@ export interface components {
             hour?: number;
             /** @description Пароль, которым шифруется файл: от 20 символов. Файл остаётся в истории чата навсегда; без пароля его не открыть */
             password?: string;
+        };
+        PatchCascadeRuleInputBody: {
+            /** Format: int64 */
+            exit_node_id?: number;
+            /**
+             * Format: int64
+             * @description 0 — любой слушатель
+             */
+            inbound_id?: number;
+            match?: string;
         };
         PatchExternalServerInputBody: {
             enabled?: boolean;
@@ -8046,6 +8152,171 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CascadeView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "list-cascade-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CascadeRuleView"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "create-cascade-rule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCascadeRuleInputBody"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CascadeRuleView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "order-cascade-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OrderCascadeRulesInputBody"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "delete-cascade-rule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                rule_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "update-cascade-rule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+                rule_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchCascadeRuleInputBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CascadeRuleView"];
                 };
             };
             /** @description Error */

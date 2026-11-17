@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.5
+### en
+- **Cascade rules per node**: On a node's Cascade page, rules now route part of the traffic to another node — `DOMAIN-SUFFIX,youtube.com → Node 1` — before the whole-protocol exit applies. The first matching rule wins; rules can be scoped to one protocol or apply to any listener. On the node they become mihomo rules (`AND,((IN-NAME,…),(…)),NODE-<id>`) ahead of the catch-all `IN-NAME` exits. New API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
+### ru
+- **Правила каскада на ноде**: На странице «Каскад» ноды теперь можно задать правила, по которым часть трафика уходит через другую ноду — например `DOMAIN-SUFFIX,youtube.com → Нода 1` — раньше, чем сработает выход целого протокола. Выигрывает первое подходящее правило; правило можно ограничить одним протоколом или распространить на любой слушатель. На ноде правила становятся правилами mihomo (`AND,((IN-NAME,…),(…)),NODE-<id>`) перед catch-all `IN-NAME`. Новое API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
+
 ## 0.5.1.4-rc.4
 ### en
 - **Fixes for SNI domain & CLI `hikari sni`**: Fixed admin panel 404 lockout when SNI domain matches the panel domain, preserved direct node connection address in client configs so Cloudflare Proxied SNI domains don't break VPN protocols, added `hikari sni [DOMAIN] [--clear] [-f/--force]` to CLI, and cleanly omitted redundant `:443` in HTTPS subscription links.

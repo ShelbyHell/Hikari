@@ -150,11 +150,12 @@ func UseExit(ctx context.Context, q *db.Queries, src, exit int64, now time.Time,
 }
 
 // ExitUse is what leaves the internet through a node: inbounds of other nodes, enabled
-// or not, and nodes whose relay goes on through it. Deleting the node would quietly send
-// their traffic straight out.
+// or not, nodes whose relay goes on through it, and cascade rules pointing at it.
+// Deleting the node would quietly send their traffic straight out.
 type ExitUse struct {
 	Inbounds []db.Inbound
 	Relays   []int64 // the nodes whose relay leaves through it
+	Rules    []db.CascadeRule
 }
 
 // ExitUsesOf lists what leaves through node id.
@@ -177,6 +178,10 @@ func ExitUsesOf(ctx context.Context, q *db.Queries, id int64) (ExitUse, error) {
 		if r.ExitNodeID.Valid && r.ExitNodeID.Int64 == id {
 			u.Relays = append(u.Relays, r.NodeID)
 		}
+	}
+	u.Rules, err = q.ListCascadeRulesByExit(ctx, id)
+	if err != nil {
+		return u, err
 	}
 	return u, nil
 }
