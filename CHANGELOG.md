@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.6
+### en
+- **Cascade rules moved to Routing**: The per-node cascade rules panel (added in rc.5) is now the third view of Settings → Routing — "Node cascade" (`/settings?tab=routing&part=cascade`) — with a node picker, instead of a block in the node's Cascade drawer. The drawer keeps the exits and relay overview and links to the new place.
+### ru
+- **Правила каскада переехали в «Маршрутизацию»**: Панель правил каскада на ноде (добавленная в rc.5) стала третьим видом раздела «Настройки → Маршрутизация» — «Каскад нод» (`/settings?tab=routing&part=cascade`) с выбором ноды, вместо блока в drawer'е «Каскад» ноды. В drawer'е остались обзор выходов и ретрансляции со ссылкой на новое место.
+
 ## 0.5.1.4-rc.5
 ### en
 - **Cascade rules per node**: In Settings → Routing → Node cascade, rules now route part of a node's traffic to another node — `DOMAIN-SUFFIX,youtube.com → Node 1` — before the whole-protocol exit applies. The first matching rule wins; rules can be scoped to one protocol or apply to any listener. On the node they become mihomo rules (`AND,((IN-NAME,…),(…)),NODE-<id>`) ahead of the catch-all `IN-NAME` exits. New API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
