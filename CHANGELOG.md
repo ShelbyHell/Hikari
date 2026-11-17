@@ -5,9 +5,9 @@ the signed manifest, and the panel shows the one in its language.
 
 ## 0.5.1.4-rc.5
 ### en
-- **Cascade rules per node**: On a node's Cascade page, rules now route part of the traffic to another node — `DOMAIN-SUFFIX,youtube.com → Node 1` — before the whole-protocol exit applies. The first matching rule wins; rules can be scoped to one protocol or apply to any listener. On the node they become mihomo rules (`AND,((IN-NAME,…),(…)),NODE-<id>`) ahead of the catch-all `IN-NAME` exits. New API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
+- **Cascade rules per node**: In Settings → Routing → Node cascade, rules now route part of a node's traffic to another node — `DOMAIN-SUFFIX,youtube.com → Node 1` — before the whole-protocol exit applies. The first matching rule wins; rules can be scoped to one protocol or apply to any listener. On the node they become mihomo rules (`AND,((IN-NAME,…),(…)),NODE-<id>`) ahead of the catch-all `IN-NAME` exits. New API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
 ### ru
-- **Правила каскада на ноде**: На странице «Каскад» ноды теперь можно задать правила, по которым часть трафика уходит через другую ноду — например `DOMAIN-SUFFIX,youtube.com → Нода 1` — раньше, чем сработает выход целого протокола. Выигрывает первое подходящее правило; правило можно ограничить одним протоколом или распространить на любой слушатель. На ноде правила становятся правилами mihomo (`AND,((IN-NAME,…),(…)),NODE-<id>`) перед catch-all `IN-NAME`. Новое API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
+- **Правила каскада на ноде**: В «Настройки → Маршрутизация → Каскад нод» теперь можно задать правила ноды, по которым часть трафика уходит через другую ноду — например `DOMAIN-SUFFIX,youtube.com → Нода 1` — раньше, чем сработает выход целого протокола. Выигрывает первое подходящее правило; правило можно ограничить одним протоколом или распространить на любой слушатель. На ноде правила становятся правилами mihomo (`AND,((IN-NAME,…),(…)),NODE-<id>`) перед catch-all `IN-NAME`. Новое API: `GET/POST /api/v1/nodes/{id}/cascade/rules`, `PATCH/DELETE …/rules/{rule_id}`, `PUT …/rules/order`.
 
 ## 0.5.1.4-rc.4
 ### en

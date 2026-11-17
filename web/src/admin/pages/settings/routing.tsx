@@ -7,6 +7,7 @@ import { SwitchRow } from "../../../components/switch";
 import { Button, ErrorState, Field, Pill, Segmented, Skeleton } from "../../../components/ui";
 import { t, useLocale } from "../../../i18n";
 import { useDraft } from "../../../lib/draft";
+import { CascadeRulesPanel } from "./cascade-rules";
 import { RulesEditor } from "./rules";
 import { useSaveSettings } from "./shared";
 import { TemplateCard } from "./template";
@@ -14,7 +15,7 @@ import { TemplateCard } from "./template";
 type Routes = Schemas["Routes"];
 type DNS = NonNullable<Routes["dns"]>;
 type List = NonNullable<Routes["lists"]>[number];
-type View = "simple" | "yaml";
+type View = "simple" | "yaml" | "cascade";
 
 // As many own lists as the server takes (subs.MaxLists).
 const MAX_LISTS = 30;
@@ -161,11 +162,22 @@ export function RoutingSection({ s, view, onView }: { s: Schemas["SettingsView"]
         options={[
           { value: "simple", label: t("settings.routesViewSimple") },
           { value: "yaml", label: t("settings.routesViewYaml") },
+          { value: "cascade", label: t("settings.routesViewCascade") },
         ]}
       />
       {s.sub_template.trim() ? <Pill tone="warn">{t("settings.routesYamlOn")}</Pill> : null}
     </div>
   );
+  // The cascade rules of the nodes are the third way the traffic is routed: not into the
+  // client's profile, but out of a node through another node.
+  if (view === "cascade") {
+    return (
+      <>
+        {views}
+        <CascadeRulesPanel />
+      </>
+    );
+  }
   // The own profile's text lives here, so switching between the simple mode and it keeps it.
   const [yaml, setYaml] = useState(s.sub_template);
   const starter = () => unwrap(api.POST("/api/v1/settings/routes/preview", { body: { sub_routing: draft.mode, sub_routes: draft.routes, starter: true } })).then((r) => r.profile);

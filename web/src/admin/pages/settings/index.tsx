@@ -22,7 +22,7 @@ import { HappCard } from "./happ";
 import { SubPageSettings, type SubPagePart } from "./sub-page";
 
 type Tab = SettingsSearch["tab"];
-type RoutingPart = "simple" | "yaml";
+type RoutingPart = "simple" | "yaml" | "cascade";
 
 const ICONS = { general: Globe, subscription: Link2, page: LayoutTemplate, routing: Route, security: ShieldCheck, system: Cpu, import: ArrowDownToLine } as const;
 
@@ -46,7 +46,7 @@ export function SettingsPage() {
   const navigate = useNavigate({ from: "/settings" });
   const go = (next: Tab, nextPart?: string) => void navigate({ search: { tab: next, part: nextPart }, replace: true });
   // The routing opens where it is in use: the own YAML once there is one.
-  const routingPart: RoutingPart = part === "simple" || part === "yaml" ? part : settings.data?.sub_template.trim() ? "yaml" : "simple";
+  const routingPart: RoutingPart = part === "simple" || part === "yaml" || part === "cascade" ? part : settings.data?.sub_template.trim() ? "yaml" : "simple";
   const pagePart: SubPagePart = (part as SubPagePart | undefined) ?? "look";
   const shownPart = tab === "page" ? pagePart : undefined;
   const wide = tab === "page" || tab === "routing";

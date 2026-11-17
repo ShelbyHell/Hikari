@@ -90,7 +90,7 @@ export function createAppRouter(queryClient: QueryClient) {
       if (s.tab === "routing" && s.part === "torrent") return { tab: "routing", part: "torrent" };
       const tab = SETTINGS_TABS.includes(s.tab as SettingsSearch["tab"]) ? (s.tab as SettingsSearch["tab"]) : "general";
       // The routing has no parts in the list beside it, but its view is in the URL.
-      if (tab === "routing") return { tab, part: s.part === "simple" || s.part === "yaml" ? s.part : undefined };
+      if (tab === "routing") return { tab, part: s.part === "simple" || s.part === "yaml" || s.part === "cascade" ? s.part : undefined };
       const parts: readonly string[] | undefined = (SETTINGS_PARTS as Record<string, readonly string[]>)[tab];
       return { tab, part: parts && typeof s.part === "string" && parts.includes(s.part) ? s.part : undefined };
     },

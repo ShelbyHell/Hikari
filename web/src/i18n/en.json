@@ -1395,6 +1395,7 @@
     "routesPreviewAgain": "Refresh",
     "routesViewSimple": "Simple",
     "routesViewYaml": "Own YAML",
+    "routesViewCascade": "Node cascade",
     "routesYamlLive": "Clash apps get your own YAML now (the Own YAML view): the settings below do not reach them. Stash and apps not on mihomo get the simple profile.",
     "template": "Own Clash profile",
     "templateSub": "A whole mihomo config: DNS, fake-ip, TUN, sniffer, your groups and rules. The panel adds the client's servers itself.",
@@ -2821,7 +2822,10 @@
     "ruleMoved": "Rule order saved",
     "ruleUp": "Move up",
     "ruleDown": "Move down",
-    "ruleDelete": "Delete rule"
+    "ruleDelete": "Delete rule",
+    "nodePick": "Node",
+    "rulesNodeHint": "This node's rules: part of its traffic leaves through another panel node, the rest goes as usual. The first matching rule wins.",
+    "rulesMoved": "Cascade rules live in Settings → Routing → Node cascade."
   },
   "pools": {
     "title": "Traffic pools",
