@@ -19,6 +19,26 @@ type RuleJson = { match: string; inbound_id?: number; exit_node_id: number };
 const serialize = (rules: Rule[]) =>
   JSON.stringify(rules.map((r) => ({ match: r.match, ...(r.inbound_id ? { inbound_id: r.inbound_id } : {}), exit_node_id: r.exit_node_id })), null, 2) + "\n";
 
+// A pasted mihomo rule list ("- DOMAIN-SUFFIX,example.com", optionally a YAML
+// "payload:" document) becomes cascade rules with the chosen exit. The match is
+// validated and canonicalized on the server, exactly like the JSON form's.
+function parseRuleLines(text: string, exitNodeId: number, badLine: (line: number) => string): { rules?: RuleJson[]; error?: string } {
+  const rules: RuleJson[] = [];
+  const lines = text.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    let s = lines[i]!.trim();
+    if (!s || s.startsWith("#") || s === "payload:") continue;
+    if (s.startsWith("-")) s = s.slice(1).trim();
+    // Quoted YAML entries are welcome too.
+    if ((s.startsWith("'") && s.endsWith("'")) || (s.startsWith('"') && s.endsWith('"'))) s = s.slice(1, -1).trim();
+    const [typ, ...rest] = s.split(",");
+    const val = rest.join(",").trim();
+    if (!typ?.trim() || !val) return { error: badLine(i + 1) };
+    rules.push({ match: `${typ.trim()},${val}`, exit_node_id: exitNodeId });
+  }
+  return { rules };
+}
+
 export function CascadeRulesPanel() {
   const nodes = useNodes();
   // The local node first; the admin may pick any other.
@@ -39,6 +59,10 @@ function Editor({ nodeId, nodes, onPick, picked }: { nodeId: number; nodes: NonN
   const [text, setText] = useState("");
   const [dirty, setDirty] = useState(false);
   const [parseError, setParseError] = useState("");
+  const [listExit, setListExit] = useState(0);
+  // The ids the editor refers to, so the admin does not have to look them up elsewhere.
+  const mine = (inbounds.data ?? []).filter((i) => i.node_id === nodeId);
+  const others = nodes.filter((n) => n.id !== nodeId);
   // The server's list feeds the editor until the admin starts typing; a successful save
   // refreshes it with the canonical matches the panel stored.
   useEffect(() => {
@@ -58,6 +82,22 @@ function Editor({ nodeId, nodes, onPick, picked }: { nodeId: number; nodes: NonN
   const fields = fieldErrors(save.error);
 
   const apply = () => {
+    const trimmed = text.trim();
+    if (trimmed && !trimmed.startsWith("[")) {
+      // Not JSON: a mihomo rule list. Every line takes the exit picked below.
+      if (!listExit) {
+        setParseError(t("cascade.rulesListExitNeeded"));
+        return;
+      }
+      const { rules: parsed, error } = parseRuleLines(text, listExit, (line) => t("cascade.rulesListBadLine", { line }));
+      if (error) {
+        setParseError(error);
+        return;
+      }
+      setParseError("");
+      save.mutate(parsed ?? []);
+      return;
+    }
     let body: RuleJson[];
     try {
       body = JSON.parse(text || "[]");
@@ -80,8 +120,6 @@ function Editor({ nodeId, nodes, onPick, picked }: { nodeId: number; nodes: NonN
   };
 
   // The ids the JSON refers to, so the admin does not have to look them up elsewhere.
-  const mine = (inbounds.data ?? []).filter((i) => i.node_id === nodeId);
-  const others = nodes.filter((n) => n.id !== nodeId);
   const legend = [
     ...others.map((n) => `exit_node_id ${n.id} = ${nodeLabel(n)}`),
     ...mine.map((i) => `inbound_id ${i.id} = ${i.display_name || i.name}`),
@@ -134,6 +172,21 @@ function Editor({ nodeId, nodes, onPick, picked }: { nodeId: number; nodes: NonN
         )
       ) : null}
       {legend ? <pre className="mt-2 whitespace-pre-wrap text-xs text-[var(--ink-400)]">{legend}</pre> : null}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <label className="flex items-center gap-2 text-xs text-[var(--ink-500)]">
+          {t("cascade.rulesListExit")}
+          <select className="input" value={listExit} onChange={(e) => setListExit(Number(e.target.value))} aria-label={t("cascade.rulesListExit")}>
+            <option value={0} disabled>
+              {t("inbounds.exitPick")}
+            </option>
+            {others.map((n) => (
+              <option key={n.id} value={n.id} disabled={!n.enabled}>
+                {nodeLabel(n)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       <div className="mt-3 flex items-center gap-2">
         <Button variant="primary" size="sm" loading={save.isPending} disabled={!dirty} onClick={apply}>
           <Save size={14} aria-hidden /> {t("cascade.rulesJsonApply")}

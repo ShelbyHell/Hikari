@@ -296,7 +296,7 @@ type replaceCascadeRulesInput struct {
 		Match      string `json:"match" maxLength:"600"`
 		InboundID  *int64 `json:"inbound_id,omitempty" minimum:"1"`
 		ExitNodeID int64  `json:"exit_node_id" minimum:"1"`
-	} `json:"body" maxItems:"200"`
+	} `json:"body" maxItems:"1000"`
 }
 
 // ruleViews maps the rows to the view with the names the panel shows; inbound and node

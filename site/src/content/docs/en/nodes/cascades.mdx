@@ -54,6 +54,8 @@ The whole set is edited as **one JSON array**; the array order is the rule order
 ]
 ```
 
+You can also **paste a ready mihomo/YAML rule list** (e.g. from a rule-provider): `- DOMAIN-SUFFIX,youtube.com`, `DOMAIN-KEYWORD,youtube`, `IP-CIDR,172.110.32.0/21`, `IP-CIDR6,2620:120:e000::/40`; empty lines, `#comments` and a `payload:` header are skipped. For such a list pick a node in **"Exit for rule lists"** — every line becomes a rule with that exit.
+
 Saving is atomic: if any rule fails validation the whole list is rejected and the previous rules stay. A rule applies before a protocol's whole-traffic exit: if a protocol exits through node B and a rule sends `youtube.com` to node C, YouTube goes through C and the protocol's rest through B.
 
 ## Checking a cascade

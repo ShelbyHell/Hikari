@@ -2826,12 +2826,15 @@
     "nodePick": "Нода",
     "rulesNodeHint": "Правила этой ноды: часть её трафика уходит через другую ноду панели, остальное — как обычно. Выигрывает первое подходящее правило.",
     "rulesMoved": "Правила каскада живут в «Настройки → Маршрутизация → Каскад нод».",
-    "rulesJsonHint": "Весь набор — один JSON-массив, порядок правил = порядок в списке. Поля: match (TYPE,VALUE — обязательное), exit_node_id (нода выхода — обязательное), inbound_id (только этот протокол; опустите — любой слушатель). Ниже — шпаргалка по id.",
+    "rulesJsonHint": "Два формата: JSON-массив ([{\"match\":\"…\",\"exit_node_id\":2}], поля match, необязательный inbound_id, exit_node_id) или вставленный список mihomo/YAML вида «- DOMAIN-SUFFIX,youtube.com» — каждая строка станет правилом с нодой выхода, выбранной ниже. Порядок в списке = порядок правил, пустые строки и #комментарии игнорируются. Шпаргалка по id — ниже.",
     "rulesJsonApply": "Применить",
     "rulesJsonReset": "Сбросить изменения",
     "rulesJsonSaved": "Правила сохранены",
     "rulesJsonBad": "Невалидный JSON: {err}",
-    "rulesJsonArray": "Ожидается JSON-массив правил, например [{\"match\":\"DOMAIN-SUFFIX,youtube.com\",\"exit_node_id\":2}]"
+    "rulesJsonArray": "Ожидается JSON-массив правил, например [{\"match\":\"DOMAIN-SUFFIX,youtube.com\",\"exit_node_id\":2}]",
+    "rulesListExit": "Выход для правил списком",
+    "rulesListExitNeeded": "Выберите ноду выхода для правил списком (поле «Выход для правил списком» ниже).",
+    "rulesListBadLine": "Строка {line} не похожа на правило TYPE,VALUE: уберите её или приведите к виду DOMAIN-SUFFIX,example.com."
   },
   "pools": {
     "title": "Пулы трафика",

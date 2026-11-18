@@ -2826,12 +2826,15 @@
     "nodePick": "Node",
     "rulesNodeHint": "This node's rules: part of its traffic leaves through another panel node, the rest goes as usual. The first matching rule wins.",
     "rulesMoved": "Cascade rules live in Settings → Routing → Node cascade.",
-    "rulesJsonHint": "The whole set is one JSON array; the list order is the rule order. Fields: match (TYPE,VALUE — required), exit_node_id (the exit node — required), inbound_id (this listener only; omit for any listener). The ids are listed below.",
+    "rulesJsonHint": "Two formats: a JSON array ([{\"match\":\"…\",\"exit_node_id\":2}]; fields match, optional inbound_id, exit_node_id), or a pasted mihomo/YAML rule list like \"- DOMAIN-SUFFIX,youtube.com\" — every line becomes a rule with the exit picked below. List order is rule order; empty lines and #comments are skipped. The ids are listed below.",
     "rulesJsonApply": "Apply",
     "rulesJsonReset": "Reset changes",
     "rulesJsonSaved": "Rules saved",
     "rulesJsonBad": "Invalid JSON: {err}",
-    "rulesJsonArray": "Expected a JSON array of rules, e.g. [{\"match\":\"DOMAIN-SUFFIX,youtube.com\",\"exit_node_id\":2}]"
+    "rulesJsonArray": "Expected a JSON array of rules, e.g. [{\"match\":\"DOMAIN-SUFFIX,youtube.com\",\"exit_node_id\":2}]",
+    "rulesListExit": "Exit for rule lists",
+    "rulesListExitNeeded": "Pick the exit node for the pasted list (the \"Exit for rule lists\" field below).",
+    "rulesListBadLine": "Line {line} is not a TYPE,VALUE rule: remove it or write it as DOMAIN-SUFFIX,example.com."
   },
   "pools": {
     "title": "Traffic pools",

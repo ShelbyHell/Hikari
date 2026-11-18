@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.9
+### en
+- **Paste a mihomo rule list into the cascade editor**: Settings → Routing → Node cascade now also accepts a plain mihomo/YAML list (`- DOMAIN-SUFFIX,youtube.com`, `DOMAIN-KEYWORD,…`, `IP-CIDR,…`, `IP-CIDR6,…`, `payload:` and #comments are handled) next to the JSON array. Every line becomes a rule with the exit picked in "Exit for rule lists". The bulk replace endpoint accepts up to 1000 rules now.
+### ru
+- **Вставка списка mihomo в редактор каскада**: «Настройки → Маршрутизация → Каскад нод» принимает теперь не только JSON-массив, но и обычный список mihomo/YAML (`- DOMAIN-SUFFIX,youtube.com`, `DOMAIN-KEYWORD,…`, `IP-CIDR,…`, `IP-CIDR6,…`; `payload:` и #комментарии обрабатываются). Каждая строка становится правилом с нодой из «Выход для правил списком». Эндпоинт замены списка принимает до 1000 правил.
+
 ## 0.5.1.4-rc.8
 ### en
 - **mihomo core 1.19.34**: The nodes' core is updated from 1.19.32 to 1.19.34 (with its bumped sing, sing-tun, utls, wireguard and other companions).
