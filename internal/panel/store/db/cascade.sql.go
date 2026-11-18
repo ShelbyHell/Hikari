@@ -109,6 +109,15 @@ func (q *Queries) DeleteCascadeRule(ctx context.Context, arg DeleteCascadeRulePa
 	return err
 }
 
+const deleteNodeCascadeRules = `-- name: DeleteNodeCascadeRules :exec
+DELETE FROM cascade_rules WHERE node_id = $1
+`
+
+func (q *Queries) DeleteNodeCascadeRules(ctx context.Context, nodeID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteNodeCascadeRules, nodeID)
+	return err
+}
+
 const getCascadeRule = `-- name: GetCascadeRule :one
 SELECT id, node_id, inbound_id, match, exit_node_id, position, created_at FROM cascade_rules WHERE id = $1 AND node_id = $2
 `

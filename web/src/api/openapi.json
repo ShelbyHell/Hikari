@@ -3000,6 +3000,30 @@
         ],
         "type": "object"
       },
+      "Item": {
+        "additionalProperties": false,
+        "properties": {
+          "exit_node_id": {
+            "format": "int64",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "inbound_id": {
+            "format": "int64",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "match": {
+            "maxLength": 600,
+            "type": "string"
+          }
+        },
+        "required": [
+          "match",
+          "exit_node_id"
+        ],
+        "type": "object"
+      },
       "JobState": {
         "additionalProperties": false,
         "properties": {
@@ -12466,6 +12490,65 @@
           }
         },
         "summary": "Добавить правило каскада",
+        "tags": [
+          "node"
+        ],
+        "x-session-only": true
+      },
+      "put": {
+        "operationId": "replace-cascade-rules",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "items": {
+                  "$ref": "#/components/schemas/Item"
+                },
+                "maxItems": 200,
+                "type": "array"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CascadeRuleView"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Заменить все правила каскада ноды списком из JSON-редактора",
         "tags": [
           "node"
         ],

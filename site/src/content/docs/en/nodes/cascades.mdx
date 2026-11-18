@@ -41,11 +41,20 @@ DOMAIN-SUFFIX,youtube.com → Node 1
 
 A rule has three fields:
 
-- **What to match** — a `TYPE,VALUE` rule: `DOMAIN-SUFFIX,example.com`, `DOMAIN-KEYWORD,example`, `DOMAIN,example.com`, `DOMAIN-REGEX,…`, `DST-PORT,25` or `DST-PORT,1000-2000`, `IP-CIDR,203.0.113.0/24`. The node itself carries no geodata, so `GEOSITE`/`GEOIP` are not supported here — use domains.
-- **Only this protocol** — when picked, the rule applies only to that connection of the node; "any protocol" applies to all of them, the relay entry included.
-- **Where to send** — another node of the panel. The node itself, loops, and chains longer than 8 hops are not saved.
+- **`match`** — what to match, a `TYPE,VALUE` rule: `DOMAIN-SUFFIX,example.com`, `DOMAIN-KEYWORD,example`, `DOMAIN,example.com`, `DOMAIN-REGEX,…`, `DST-PORT,25` or `DST-PORT,1000-2000`, `IP-CIDR,203.0.113.0/24`. The node itself carries no geodata, so `GEOSITE`/`GEOIP` are not supported here — use domains.
+- **`inbound_id`** — optional: when set, the rule applies only to that connection of the node; absent, it applies to every listener, the relay entry included. `null`/absent = any listener.
+- **`exit_node_id`** — where to send: the id of another panel node. The node itself, loops, and chains longer than 8 hops are not saved.
 
-Rules are ordered: the **first match wins**. Use the arrows to change the order. A rule applies before a protocol's whole-traffic exit: if a protocol exits through node B and a rule sends `youtube.com` to node C, YouTube goes through C and the protocol's rest through B.
+The whole set is edited as **one JSON array**; the array order is the rule order and the **first match wins**. The panel lists the node and listener ids next to the editor. Example:
+
+```json
+[
+  { "match": "DOMAIN-SUFFIX,youtube.com", "exit_node_id": 1 },
+  { "match": "DST-PORT,25", "inbound_id": 3, "exit_node_id": 2 }
+]
+```
+
+Saving is atomic: if any rule fails validation the whole list is rejected and the previous rules stay. A rule applies before a protocol's whole-traffic exit: if a protocol exits through node B and a rule sends `youtube.com` to node C, YouTube goes through C and the protocol's rest through B.
 
 ## Checking a cascade
 

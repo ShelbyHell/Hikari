@@ -73,6 +73,7 @@ func (h *handlers) registerCascade() {
 	huma.Register(h.api, huma.Operation{OperationID: "get-node-cascade", Method: http.MethodGet, Path: "/api/v1/nodes/{id}/cascade", Summary: "Каскад ноды: выходы и служебный вход", Tags: tags}, h.getCascade)
 	huma.Register(h.api, huma.Operation{OperationID: "update-node-cascade", Metadata: sessionOnly, Extensions: sessionOnlyExt, Method: http.MethodPatch, Path: "/api/v1/nodes/{id}/cascade", Summary: "Куда нода выпускает трафик других нод", Tags: tags}, h.patchCascade)
 	huma.Register(h.api, huma.Operation{OperationID: "list-cascade-rules", Method: http.MethodGet, Path: "/api/v1/nodes/{id}/cascade/rules", Summary: "Правила каскада ноды: что на какую ноду уходит", Tags: tags}, h.listCascadeRules)
+	huma.Register(h.api, huma.Operation{OperationID: "replace-cascade-rules", Metadata: sessionOnly, Extensions: sessionOnlyExt, Method: http.MethodPut, Path: "/api/v1/nodes/{id}/cascade/rules", Summary: "Заменить все правила каскада ноды списком из JSON-редактора", Tags: tags}, h.replaceCascadeRules)
 	huma.Register(h.api, huma.Operation{OperationID: "create-cascade-rule", Metadata: sessionOnly, Extensions: sessionOnlyExt, Method: http.MethodPost, Path: "/api/v1/nodes/{id}/cascade/rules", Summary: "Добавить правило каскада", Tags: tags, DefaultStatus: http.StatusCreated}, h.createCascadeRule)
 	huma.Register(h.api, huma.Operation{OperationID: "update-cascade-rule", Metadata: sessionOnly, Extensions: sessionOnlyExt, Method: http.MethodPatch, Path: "/api/v1/nodes/{id}/cascade/rules/{rule_id}", Summary: "Изменить правило каскада", Tags: tags}, h.patchCascadeRule)
 	huma.Register(h.api, huma.Operation{OperationID: "delete-cascade-rule", Metadata: sessionOnly, Extensions: sessionOnlyExt, Method: http.MethodDelete, Path: "/api/v1/nodes/{id}/cascade/rules/{rule_id}", Summary: "Удалить правило каскада", Tags: tags, DefaultStatus: http.StatusNoContent}, h.deleteCascadeRule)
@@ -287,6 +288,17 @@ type orderCascadeRulesInput struct {
 	}
 }
 
+// replaceCascadeRulesInput is the whole rule set of the JSON editor: the list replaces
+// what the node had, in the order of the list (the first matching rule wins).
+type replaceCascadeRulesInput struct {
+	ID   int64 `path:"id" minimum:"1"`
+	Body []struct {
+		Match      string `json:"match" maxLength:"600"`
+		InboundID  *int64 `json:"inbound_id,omitempty" minimum:"1"`
+		ExitNodeID int64  `json:"exit_node_id" minimum:"1"`
+	} `json:"body" maxItems:"200"`
+}
+
 // ruleViews maps the rows to the view with the names the panel shows; inbound and node
 // names come from the same lists getCascade uses.
 func (h *handlers) ruleViews(ctx context.Context, q *db.Queries, rows []db.CascadeRule) ([]CascadeRuleView, error) {
@@ -460,6 +472,63 @@ func (h *handlers) deleteCascadeRule(ctx context.Context, in *cascadeRuleInput) 
 	h.d.Changes.SlotsChanged()
 	h.audit(ctx, sessionOf(ctx).AdminID, "node.cascadeRule.del", "node", strconv.FormatInt(in.ID, 10), map[string]any{"rule_id": in.RuleID})
 	return nil, nil
+}
+
+// replaceCascadeRules swaps the node's whole rule set for the one the admin sent (the
+// JSON editor in Settings → Routing). Everything validates first and the swap is one
+// transaction, so a bad rule leaves the old set intact and the nodes are not re-synced
+// for nothing. Exits are registered exactly like a single create does.
+func (h *handlers) replaceCascadeRules(ctx context.Context, in *replaceCascadeRulesInput) (*cascadeRulesOutput, error) {
+	if _, err := h.getNode(ctx, in.ID); err != nil {
+		return nil, err
+	}
+	var rows []db.CascadeRule
+	err := h.d.Store.Tx(ctx, func(q *db.Queries) error {
+		exits := map[int64]bool{}
+		for i := range in.Body {
+			b := &in.Body[i]
+			match, _, err := h.checkRuleInput(ctx, q, in.ID, b.Match, b.InboundID)
+			if err != nil {
+				return err
+			}
+			b.Match = match
+			if !exits[b.ExitNodeID] {
+				if err := domain.UseExit(ctx, q, in.ID, b.ExitNodeID, h.d.Now(), h.hostOf); err != nil {
+					return err
+				}
+				exits[b.ExitNodeID] = true
+			}
+		}
+		if err := q.DeleteNodeCascadeRules(ctx, in.ID); err != nil {
+			return err
+		}
+		rows = nil
+		for i, b := range in.Body {
+			var inbound sql.NullInt64
+			if b.InboundID != nil && *b.InboundID != 0 {
+				inbound = sql.NullInt64{Int64: *b.InboundID, Valid: true}
+			}
+			row, err := q.CreateCascadeRule(ctx, db.CreateCascadeRuleParams{
+				NodeID: in.ID, InboundID: inbound, Match: b.Match, ExitNodeID: b.ExitNodeID,
+				Position: int64(i) + 1, CreatedAt: h.d.Now().Unix(),
+			})
+			if err != nil {
+				return err
+			}
+			rows = append(rows, row)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, cascadeError(err, "exit_node_id")
+	}
+	h.d.Changes.SlotsChanged()
+	h.audit(ctx, sessionOf(ctx).AdminID, "node.cascadeRule.replace", "node", strconv.FormatInt(in.ID, 10), map[string]any{"count": len(rows)})
+	views, err := h.ruleViews(ctx, h.d.Store.Q, rows)
+	if err != nil {
+		return nil, err
+	}
+	return &cascadeRulesOutput{Body: views}, nil
 }
 
 // orderCascadeRules sets the order of the node's rules: the list must be every rule once,

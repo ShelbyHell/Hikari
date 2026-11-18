@@ -52,3 +52,6 @@ UPDATE cascade_rules SET position = $1 WHERE id = $2 AND node_id = $3;
 
 -- name: DeleteCascadeRule :exec
 DELETE FROM cascade_rules WHERE id = $1 AND node_id = $2;
+
+-- name: DeleteNodeCascadeRules :exec
+DELETE FROM cascade_rules WHERE node_id = $1;

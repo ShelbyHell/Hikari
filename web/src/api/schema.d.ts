@@ -965,7 +965,8 @@ export interface paths {
         };
         /** Правила каскада ноды: что на какую ноду уходит */
         get: operations["list-cascade-rules"];
-        put?: never;
+        /** Заменить все правила каскада ноды списком из JSON-редактора */
+        put: operations["replace-cascade-rules"];
         /** Добавить правило каскада */
         post: operations["create-cascade-rule"];
         delete?: never;
@@ -3508,6 +3509,13 @@ export interface components {
             enabled: boolean;
             /** @description Сети и адреса. Другие ноды панели (каскад) проверку не проходят: их пускают всегда */
             networks: string[];
+        };
+        Item: {
+            /** Format: int64 */
+            exit_node_id: number;
+            /** Format: int64 */
+            inbound_id?: number;
+            match: string;
         };
         JobState: {
             /** Format: int64 */
@@ -8175,6 +8183,41 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CascadeRuleView"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "replace-cascade-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Item"][];
+            };
+        };
         responses: {
             /** @description OK */
             200: {

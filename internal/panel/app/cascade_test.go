@@ -245,4 +245,30 @@ func TestCascadeRulesOverHTTP(t *testing.T) {
 	if strings.Contains(string(body), "DST-PORT") || !strings.Contains(string(body), "IP-CIDR") {
 		t.Fatalf("after delete: %s", body)
 	}
+
+	// Replace (the JSON editor): a bad rule leaves the old set intact; a valid list
+	// replaces it whole, in the order sent; an empty list clears the rules.
+	if resp, _ := h.do(http.MethodPut, rules(1), []map[string]any{{"match": "not a rule", "exit_node_id": b.ID}}, csrf); resp.StatusCode != http.StatusUnprocessableEntity {
+		t.Fatalf("replace bad: %d", resp.StatusCode)
+	}
+	resp, body = h.do(http.MethodGet, rules(1), nil, nil)
+	if !strings.Contains(string(body), "IP-CIDR") {
+		t.Fatalf("after failed replace: %s", body)
+	}
+	resp, body = h.do(http.MethodPut, rules(1), []map[string]any{
+		{"match": "domain-suffix,YouTube.COM", "inbound_id": own, "exit_node_id": b.ID},
+		{"match": "DST-PORT,25-53", "exit_node_id": b.ID},
+	}, csrf)
+	if resp.StatusCode != http.StatusOK || strings.Index(string(body), `"match":"DOMAIN-SUFFIX,youtube.com"`) > strings.Index(string(body), `"match":"DST-PORT,25-53"`) || strings.Contains(string(body), "IP-CIDR") {
+		t.Fatalf("replace: %d %s", resp.StatusCode, body)
+	}
+	if resp, body := h.do(http.MethodGet, rules(1), nil, nil); resp.StatusCode != http.StatusOK || strings.Contains(string(body), "IP-CIDR") || !strings.Contains(string(body), `"position":2`) {
+		t.Fatalf("list after replace: %s", body)
+	}
+	if resp, _ := h.do(http.MethodPut, rules(1), []map[string]any{}, csrf); resp.StatusCode != http.StatusOK {
+		t.Fatalf("replace empty: %d", resp.StatusCode)
+	}
+	if resp, body := h.do(http.MethodGet, rules(1), nil, nil); resp.StatusCode != http.StatusOK || strings.Contains(string(body), "youtube") {
+		t.Fatalf("after clear: %s", body)
+	}
 }

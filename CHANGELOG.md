@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.7
+### en
+- **Cascade rules as JSON**: Settings → Routing → Node cascade is now a JSON editor: the whole rule set of a node is one array (`match`, optional `inbound_id`, `exit_node_id`), its order is the rule order. Saving is atomic — one invalid rule rejects the whole list and keeps the previous rules. New API: `PUT /api/v1/nodes/{id}/cascade/rules` replaces the node's rules in one transaction. The single-rule POST/PATCH/DELETE and the order endpoint remain.
+### ru
+- **Правила каскада в JSON**: «Настройки → Маршрутизация → Каскад нод» теперь — JSON-редактор: весь набор правил ноды — один массив (`match`, необязательный `inbound_id`, `exit_node_id`), его порядок — порядок правил. Сохранение атомарно: одно невалидное правило отклоняет весь список, прежние правила остаются. Новое API: `PUT /api/v1/nodes/{id}/cascade/rules` заменяет правила ноды одной транзакцией. Поштучные POST/PATCH/DELETE и эндпоинт порядка сохранены.
+
 ## 0.5.1.4-rc.6
 ### en
 - **Cascade rules moved to Routing**: The per-node cascade rules panel (added in rc.5) is now the third view of Settings → Routing — "Node cascade" (`/settings?tab=routing&part=cascade`) — with a node picker, instead of a block in the node's Cascade drawer. The drawer keeps the exits and relay overview and links to the new place.

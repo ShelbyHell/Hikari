@@ -2825,7 +2825,13 @@
     "ruleDelete": "Delete rule",
     "nodePick": "Node",
     "rulesNodeHint": "This node's rules: part of its traffic leaves through another panel node, the rest goes as usual. The first matching rule wins.",
-    "rulesMoved": "Cascade rules live in Settings → Routing → Node cascade."
+    "rulesMoved": "Cascade rules live in Settings → Routing → Node cascade.",
+    "rulesJsonHint": "The whole set is one JSON array; the list order is the rule order. Fields: match (TYPE,VALUE — required), exit_node_id (the exit node — required), inbound_id (this listener only; omit for any listener). The ids are listed below.",
+    "rulesJsonApply": "Apply",
+    "rulesJsonReset": "Reset changes",
+    "rulesJsonSaved": "Rules saved",
+    "rulesJsonBad": "Invalid JSON: {err}",
+    "rulesJsonArray": "Expected a JSON array of rules, e.g. [{\"match\":\"DOMAIN-SUFFIX,youtube.com\",\"exit_node_id\":2}]"
   },
   "pools": {
     "title": "Traffic pools",
