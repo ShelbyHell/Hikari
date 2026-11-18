@@ -128,9 +128,17 @@ func mustAddr(s string) netip.Addr { return netip.MustParseAddr(s) }
 // one bad rule would fail mihomo's whole config.
 func TestCascadeRules(t *testing.T) {
 	st := cascadeState(t)
+	st.RuleProviders = []nodeapi.RuleProvider{
+		{Name: "mikan-ai", Behavior: "classical", Format: "yaml", URL: "https://example.com/ai.yaml"},
+		{Name: "mikan-telegram-ip", Behavior: "ipcidr", Format: "yaml", URL: "https://example.com/tg.yaml"},
+	}
 	st.CascadeRules = []nodeapi.CascadeRule{
 		{Match: "domain-suffix,YouTube.COM", Exit: nodeapi.ExitName(3)},                            // canonicalized, no inbound
 		{Match: "DST-PORT, 25-53", Inbound: "in-anytls", Exit: nodeapi.ExitName(3)},                // AND-ed with the listener
+		{Match: "RULE-SET,mikan-ai", Exit: nodeapi.ExitName(3)},                                     // rule set present in providers
+		{Match: "RULE-SET,mikan-telegram-ip,no-resolve", Exit: nodeapi.ExitName(3)},                // rule set with no-resolve
+		{Match: "RULE-SET,mikan-ai", Inbound: "in-anytls", Exit: nodeapi.ExitName(3)},              // rule set with inbound
+		{Match: "RULE-SET,missing-set", Exit: nodeapi.ExitName(3)},                                  // provider is not there
 		{Match: "IP-CIDR,203.0.113.7", Inbound: "in-gone", Exit: nodeapi.ExitName(3)},               // listener is not there
 		{Match: "GEOSITE,youtube", Exit: nodeapi.ExitName(3)},                                       // not a kind the node carries
 		{Match: "DOMAIN-SUFFIX,evil.com,DIRECT", Exit: nodeapi.ExitName(3)},                        // a target in the match
@@ -142,17 +150,28 @@ func TestCascadeRules(t *testing.T) {
 		t.Fatal(err)
 	}
 	var cfg struct {
-		Rules []string `json:"rules"`
+		Rules         []string                  `json:"rules"`
+		RuleProviders map[string]map[string]any `json:"rule-providers"`
 	}
 	if err := json.Unmarshal(raw, &cfg); err != nil {
 		t.Fatal(err)
 	}
 	got := strings.Join(cfg.Rules, "\n")
-	want := "DOMAIN-SUFFIX,youtube.com,NODE-3\nAND,((IN-NAME,in-anytls),(DST-PORT,25-53)),NODE-3\nIN-NAME,mikan~relay,NODE-3"
+	want := "DOMAIN-SUFFIX,youtube.com,NODE-3\nAND,((IN-NAME,in-anytls),(DST-PORT,25-53)),NODE-3\nRULE-SET,mikan-ai,NODE-3\nRULE-SET,mikan-telegram-ip,NODE-3,no-resolve\nAND,((IN-NAME,in-anytls),(RULE-SET,mikan-ai)),NODE-3\nIN-NAME,mikan~relay,NODE-3"
 	if !strings.Contains(got, want) {
 		t.Fatalf("rules:\n%s\nwant to contain:\n%s", got, want)
 	}
-	for _, bad := range []string{"in-gone", "GEOSITE", "evil.com", "NODE-99", "NODE-3,REJECT"} {
+	if cfg.RuleProviders == nil || cfg.RuleProviders["mikan-ai"] == nil || cfg.RuleProviders["mikan-telegram-ip"] == nil {
+		t.Fatalf("rule-providers not rendered in config: %+v", cfg.RuleProviders)
+	}
+	parsed, err := executor.ParseWithBytes(raw)
+	if err != nil {
+		t.Fatalf("mihomo refuses config with rule-providers: %v", err)
+	}
+	if len(parsed.RuleProviders) != 2 {
+		t.Fatalf("parsed rule providers count: %d, want 2", len(parsed.RuleProviders))
+	}
+	for _, bad := range []string{"missing-set", "in-gone", "GEOSITE", "evil.com", "NODE-99", "NODE-3,REJECT"} {
 		if strings.Contains(got, bad) {
 			t.Fatalf("rule with %q got through:\n%s", bad, got)
 		}

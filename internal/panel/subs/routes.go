@@ -202,6 +202,51 @@ var mrsSince = Version{1, 18, 7}
 // listProvider is the profile's name of an own list: apart from the panel's ("mikan-").
 func listProvider(name string) string { return "own-" + name }
 
+// FindProvider looks up a rule provider by name across custom routes lists and built-in sets.
+func FindProvider(name string, routes Routes) (Provider, bool) {
+	for _, l := range routes.Lists {
+		if l.Name == name || listProvider(l.Name) == name {
+			p := Provider{Name: name, Behavior: l.Behavior, Format: l.Format, URL: l.URL}
+			if l.Format == "mrs" {
+				p.Since = mrsSince
+			}
+			return p, true
+		}
+	}
+	for _, s := range Services {
+		for _, pr := range s.Providers {
+			if pr.Name == name {
+				return pr, true
+			}
+		}
+	}
+	for _, d := range DirectSets {
+		for _, pr := range d.Providers {
+			if pr.Name == name {
+				return pr, true
+			}
+		}
+	}
+	for _, pr := range blockedLists {
+		if pr.Name == name {
+			return pr, true
+		}
+	}
+	if strings.HasPrefix(name, "https://") || strings.HasPrefix(name, "http://") {
+		format := "yaml"
+		behavior := "classical"
+		if strings.HasSuffix(name, ".mrs") {
+			format = "mrs"
+			behavior = "domain"
+		} else if strings.HasSuffix(name, ".text") || strings.HasSuffix(name, ".txt") {
+			format = "text"
+			behavior = "domain"
+		}
+		return Provider{Name: name, Behavior: behavior, Format: format, URL: name}, true
+	}
+	return Provider{}, false
+}
+
 var listName = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{0,31}$`)
 
 // checkLists refuses a list that would break the profiles: a name taken or unfit for a

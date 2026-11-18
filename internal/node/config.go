@@ -110,8 +110,47 @@ func buildConfig(st nodeapi.DesiredState, cert proto.Cert, allowPrivate bool) (r
 		"rules":             rules(st, allowPrivate),
 		"listeners":         listeners,
 	}
+	if rps := ruleProviders(st); len(rps) > 0 {
+		cfg["rule-providers"] = rps
+	}
 	raw, err = json.Marshal(cfg)
 	return raw, rejected, err
+}
+
+func ruleProviders(st nodeapi.DesiredState) map[string]any {
+	if len(st.RuleProviders) == 0 {
+		return nil
+	}
+	out := make(map[string]any, len(st.RuleProviders))
+	for _, rp := range st.RuleProviders {
+		if rp.Name == "" || rp.URL == "" {
+			continue
+		}
+		ext := rp.Format
+		if ext == "" {
+			ext = "yaml"
+		}
+		interval := rp.Interval
+		if interval <= 0 {
+			interval = 86400
+		}
+		behavior := rp.Behavior
+		if behavior == "" {
+			behavior = "classical"
+		}
+		out[rp.Name] = map[string]any{
+			"type":     "http",
+			"behavior": behavior,
+			"format":   ext,
+			"url":      rp.URL,
+			"path":     "./ruleset/" + rp.Name + "." + ext,
+			"interval": interval,
+		}
+	}
+	if len(out) == 0 {
+		return nil
+	}
+	return out
 }
 
 func listenerFor(in nodeapi.Inbound, slots []nodeapi.Slot, cert proto.Cert, o proto.Options) (map[string]any, error) {

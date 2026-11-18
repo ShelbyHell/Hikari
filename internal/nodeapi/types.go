@@ -35,6 +35,8 @@ type DesiredState struct {
 	// whole-traffic exits apply: the first matching rule wins. Nodes older than them
 	// ignore them.
 	CascadeRules []CascadeRule `json:"cascade_rules,omitempty"`
+	// RuleProviders are the rule lists the node configures for RULE-SET cascade rules.
+	RuleProviders []RuleProvider `json:"rule_providers,omitempty"`
 	// Torrent turns the torrent blocker on; nil: off. Nodes older than the blocker ignore it.
 	Torrent *TorrentBlock `json:"torrent,omitempty"`
 	// Filters keep users' traffic from places and strangers from the node; nil: none.
@@ -424,6 +426,15 @@ type CascadeRule struct {
 	Match   string `json:"match"`
 	Inbound string `json:"inbound,omitempty"`
 	Exit    string `json:"exit"`
+}
+
+// RuleProvider is a rule list the node configures for RULE-SET cascade rules.
+type RuleProvider struct {
+	Name     string `json:"name"`
+	Behavior string `json:"behavior"` // "classical", "domain", "ipcidr"
+	Format   string `json:"format"`   // "yaml", "text", "mrs"
+	URL      string `json:"url"`
+	Interval int    `json:"interval,omitempty"`
 }
 
 // ProbeResult is the internet as seen through one outbound of the node.

@@ -3,7 +3,8 @@
 // where the relayed traffic goes next. The cascade rules (part of the traffic to another
 // node) live in Settings → Routing → Node cascade.
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight, RefreshCw, Route as RouteIcon } from "lucide-react";
 import { api, errorText, unwrap, type Schemas } from "../../api/client";
 import { qk, useNodes } from "../../api/hooks";
 import { Drawer } from "../../components/overlay";
@@ -30,14 +31,14 @@ export function CascadeDrawer({ node, onClose }: { node: { id: number; name: str
       <div className="pt-5">
         <p className="mb-4 text-[13px] text-[var(--ink-600)]">{t("cascade.intro")}</p>
         <QueryBoundary query={cascade} pending={<Skeleton style={{ height: 240, borderRadius: 16 }} />}>
-          {(c) => <Body key={node!.id} nodeId={node!.id} c={c} refetch={() => void cascade.refetch()} checking={cascade.isFetching} />}
+          {(c) => <Body key={node!.id} nodeId={node!.id} c={c} refetch={() => void cascade.refetch()} checking={cascade.isFetching} onClose={onClose} />}
         </QueryBoundary>
       </div>
     </Drawer>
   );
 }
 
-function Body({ nodeId, c, refetch, checking }: { nodeId: number; c: Cascade; refetch: () => void; checking: boolean }) {
+function Body({ nodeId, c, refetch, checking, onClose }: { nodeId: number; c: Cascade; refetch: () => void; checking: boolean; onClose: () => void }) {
   const qc = useQueryClient();
   const toast = useToast();
   const nodes = useNodes();
@@ -102,7 +103,21 @@ function Body({ nodeId, c, refetch, checking }: { nodeId: number; c: Cascade; re
           </ul>
         )}
         <p className="mt-2 text-xs text-[var(--ink-500)]">{t("cascade.exitsHint")}</p>
-        <p className="mt-1 text-xs text-[var(--ink-500)]">{t("cascade.rulesMoved")}</p>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--hairline)] bg-[var(--surface)] p-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xs font-semibold">{t("cascade.rules")}</span>
+            <span className="text-xs text-[var(--ink-500)]">{t("cascade.rulesMoved")}</span>
+          </div>
+          <Link
+            to="/settings"
+            search={{ tab: "routing", part: "cascade" }}
+            className="btn btn-sm btn-glass inline-flex items-center gap-1.5 shrink-0"
+            onClick={onClose}
+          >
+            <RouteIcon size={13} aria-hidden />
+            <span>{t("cascade.rulesOpenSettings")}</span>
+          </Link>
+        </div>
       </section>
 
       <section className="border-t border-[var(--hairline)] pt-4">

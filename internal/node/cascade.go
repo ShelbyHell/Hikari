@@ -52,9 +52,9 @@ func exitProxyConfig(e nodeapi.Exit) (map[string]any, error) {
 }
 
 // cascadeRules send matching traffic to the exits' nodes, before the inbounds' catch-all
-// exits apply: the first rule that matches wins. What does not parse, or names a listener
-// or an exit that is not there, is left out: mihomo refuses the whole config over one
-// rule it cannot parse.
+// exits apply: the first rule that matches wins. What does not parse, or names a listener,
+// an exit, or an unconfigured rule set that is not there, is left out: mihomo refuses the whole
+// config over one rule it cannot parse.
 func cascadeRules(st nodeapi.DesiredState) []string {
 	present := listenerNames(st)
 	exits := map[string]bool{}
@@ -63,20 +63,39 @@ func cascadeRules(st nodeapi.DesiredState) []string {
 			exits[e.Name] = true
 		}
 	}
+	providers := map[string]bool{}
+	for _, p := range st.RuleProviders {
+		providers[p.Name] = true
+	}
 	var r []string
 	for _, cr := range st.CascadeRules {
 		match, ok := nodeapi.CanonMatch(cr.Match)
 		if !ok || !exits[cr.Exit] || !safeRuleValue(cr.Exit) {
 			continue
 		}
-		rule := match
+		noResolve := false
+		typ, val := nodeapi.SplitMatch(match)
+		if typ == "RULE-SET" {
+			name, opt, hasOpt := strings.Cut(val, ",")
+			if hasOpt && strings.TrimSpace(opt) == "no-resolve" {
+				noResolve = true
+			}
+			name = strings.TrimSpace(name)
+			if !providers[name] {
+				continue
+			}
+		}
 		if cr.Inbound != "" {
 			if !present[cr.Inbound] || !safeRuleValue(cr.Inbound) {
 				continue
 			}
-			rule = "AND,((IN-NAME," + cr.Inbound + "),(" + match + "))"
+			r = append(r, "AND,((IN-NAME,"+cr.Inbound+"),("+match+")),"+cr.Exit)
+		} else if noResolve {
+			name, _, _ := strings.Cut(val, ",")
+			r = append(r, "RULE-SET,"+strings.TrimSpace(name)+","+cr.Exit+",no-resolve")
+		} else {
+			r = append(r, match+","+cr.Exit)
 		}
-		r = append(r, rule+","+cr.Exit)
 	}
 	return r
 }

@@ -25,6 +25,7 @@ import (
 	"mikan/internal/panel/domain"
 	"mikan/internal/panel/settings"
 	"mikan/internal/panel/store/db"
+	"mikan/internal/panel/subs"
 	"mikan/internal/panel/warp"
 	"mikan/internal/proto"
 )
@@ -221,7 +222,7 @@ func (s *Syncer) desiredPin(ctx context.Context) (st nodeapi.DesiredState, pin s
 	if st.Warp, err = s.warp(ctx, n, inbounds); err != nil {
 		return st, "", err
 	}
-	if st.Relay, st.Exits, st.CascadeRules, err = s.cascade(ctx, n, inbounds); err != nil {
+	if st.Relay, st.Exits, st.CascadeRules, st.RuleProviders, err = s.cascade(ctx, n, inbounds); err != nil {
 		return st, "", err
 	}
 	if s.local {
@@ -814,15 +815,16 @@ func stateKey(st nodeapi.DesiredState) string {
 		S []nodeapi.Slot
 		T *nodeapi.TLSFiles
 		P int
-		W *nodeapi.Warp
-		R *nodeapi.Relay
-		E []nodeapi.Exit
-		C []nodeapi.CascadeRule
-		B *nodeapi.TorrentBlock
-		F *nodeapi.Filters
-		H *nodeapi.Shaping
-		D *nodeapi.ExitDNS
-	}{st.Inbounds, st.Slots, st.TLS, st.SelfStealPort, st.Warp, st.Relay, st.Exits, st.CascadeRules, st.Torrent, st.Filters, st.Shaping, st.DNS})
+		W  *nodeapi.Warp
+		R  *nodeapi.Relay
+		E  []nodeapi.Exit
+		C  []nodeapi.CascadeRule
+		RP []nodeapi.RuleProvider
+		B  *nodeapi.TorrentBlock
+		F  *nodeapi.Filters
+		H  *nodeapi.Shaping
+		D  *nodeapi.ExitDNS
+	}{st.Inbounds, st.Slots, st.TLS, st.SelfStealPort, st.Warp, st.Relay, st.Exits, st.CascadeRules, st.RuleProviders, st.Torrent, st.Filters, st.Shaping, st.DNS})
 	sum := sha256.Sum256(raw)
 	return hex.EncodeToString(sum[:])
 }
@@ -891,26 +893,26 @@ func (m *Manager) Warp(ctx context.Context, id int64, force bool) (nodeapi.WarpS
 // rules (part of a listener's traffic to yet another node). Keys and relays are made by
 // the API when an exit is chosen; a missing one leaves that exit out, and the inbounds
 // behind it fail instead of going direct.
-func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) (*nodeapi.Relay, []nodeapi.Exit, []nodeapi.CascadeRule, error) {
+func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) (*nodeapi.Relay, []nodeapi.Exit, []nodeapi.CascadeRule, []nodeapi.RuleProvider, error) {
 	q := s.m.st.Q
 	if n.Enabled == 0 {
-		return nil, nil, nil, nil
+		return nil, nil, nil, nil, nil
 	}
 	var relay *nodeapi.Relay
 	own, err := q.GetNodeRelay(ctx, n.ID)
 	hasRelay := err == nil
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	if hasRelay {
 		users, err := q.ListRelayUsers(ctx, n.ID)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, nil, err
 		}
 		if len(users) > 0 {
 			t, err := proto.Parse(own.Config)
 			if err != nil {
-				return nil, nil, nil, err
+				return nil, nil, nil, nil, err
 			}
 			relay = &nodeapi.Relay{Port: own.Port, Config: t.JSON()}
 			for _, u := range users {
@@ -922,7 +924,7 @@ func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) 
 	// exit is registered too (with no listener name), so the relay and key exist for it.
 	rulesRows, err := q.ListCascadeRules(ctx, n.ID)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	routes := map[int64][]string{}
 	var order []int64
@@ -976,7 +978,29 @@ func (s *Syncer) cascade(ctx context.Context, n db.Node, inbounds []db.Inbound) 
 		}
 		rules = append(rules, cr)
 	}
-	return relay, exits, rules, nil
+	routesConfig, _, _ := settings.Get[subs.Routes](ctx, s.m.set, settings.KeyRoutes)
+	var rps []nodeapi.RuleProvider
+	seenRP := map[string]bool{}
+	for _, r := range rulesRows {
+		typ, val := nodeapi.SplitMatch(r.Match)
+		if typ == "RULE-SET" {
+			name, _, _ := strings.Cut(val, ",")
+			name = strings.TrimSpace(name)
+			if name != "" && !seenRP[name] {
+				if pr, ok := subs.FindProvider(name, routesConfig); ok {
+					rps = append(rps, nodeapi.RuleProvider{
+						Name:     pr.Name,
+						Behavior: pr.Behavior,
+						Format:   pr.Format,
+						URL:      pr.URL,
+						Interval: 86400,
+					})
+					seenRP[name] = true
+				}
+			}
+		}
+	}
+	return relay, exits, rules, rps, nil
 }
 
 // exitTo is the outbound from node src to node id's relay.

@@ -15,6 +15,12 @@ func TestCanonMatch(t *testing.T) {
 		"ip-cidr, 203.0.113.0/24 ":    "IP-CIDR,203.0.113.0/24",
 		"IP-CIDR,2606:4700::/32":      "IP-CIDR6,2606:4700::/32",
 		"SRC-IP-CIDR,10.0.0.0/8":      "IP-CIDR,10.0.0.0/8",
+		"RULE-SET,mikan-ai":           "RULE-SET,mikan-ai",
+		"rule-set, mikan-ai ":         "RULE-SET,mikan-ai",
+		"RULE-SET,mikan-telegram-ip,no-resolve":  "RULE-SET,mikan-telegram-ip,no-resolve",
+		"rule-set, mikan-telegram-ip , NO-RESOLVE ": "RULE-SET,mikan-telegram-ip,no-resolve",
+		"RULE-SET,own-wl":             "RULE-SET,own-wl",
+		"RULE-SET,https://raw.githubusercontent.com/user/repo/main/list.yaml": "RULE-SET,https://raw.githubusercontent.com/user/repo/main/list.yaml",
 	}
 	for in, want := range ok {
 		got, ok := CanonMatch(in)
@@ -24,7 +30,9 @@ func TestCanonMatch(t *testing.T) {
 	}
 	bad := []string{
 		"", "example.com", "DOMAIN-SUFFIX,", ",example.com",
-		"GEOSITE,youtube", "GEOIP,cn", "RULE-SET,mikan-ai", // no geodata on the node
+		"GEOSITE,youtube", "GEOIP,cn", // no geodata on the node
+		"RULE-SET,", "RULE-SET,mikan-ai,invalid-flag", "RULE-SET,bad name with spaces",
+		"RULE-SET,mikan-ai,no-resolve,extra",
 		"DOMAIN-SUFFIX,evil.com,DIRECT", "DOMAIN-SUFFIX,bad host",
 		"DST-PORT,0", "DST-PORT,70000", "DST-PORT,25,53",
 		"IP-CIDR,not-a-net", "IP-CIDR,example.com",

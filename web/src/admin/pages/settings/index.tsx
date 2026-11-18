@@ -43,8 +43,8 @@ const PART_LABELS: Record<string, Key> = {
 export function SettingsPage() {
   const settings = useSettings();
   const { tab, part } = useSearch({ from: "/_app/settings" });
-  const navigate = useNavigate({ from: "/settings" });
-  const go = (next: Tab, nextPart?: string) => void navigate({ search: { tab: next, part: nextPart }, replace: true });
+  const navigate = useNavigate();
+  const go = (next: Tab, nextPart?: string) => void navigate({ to: "/settings", search: { tab: next, part: nextPart }, replace: true });
   // The routing opens where it is in use: the own YAML once there is one.
   const routingPart: RoutingPart = part === "simple" || part === "yaml" || part === "cascade" ? part : settings.data?.sub_template.trim() ? "yaml" : "simple";
   const pagePart: SubPagePart = (part as SubPagePart | undefined) ?? "look";
@@ -91,7 +91,7 @@ export function SettingsPage() {
               ) : tab === "routing" ? (
                 <>
                   <RoutingSection s={s} view={routingPart} onView={(v) => go("routing", v)} />
-                  <ExitDnsCard />
+                  {routingPart !== "cascade" ? <ExitDnsCard /> : null}
                 </>
               ) : tab === "security" ? (
                 <>

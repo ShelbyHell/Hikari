@@ -102,10 +102,11 @@ type Engine struct {
 // routesKey covers what the outbound side of the config depends on.
 func routesKey(st nodeapi.DesiredState, allowPrivate bool) string {
 	raw, _ := json.Marshal(struct {
-		W *nodeapi.Warp
-		E []nodeapi.Exit
-		R []string
-	}{st.Warp, st.Exits, rules(st, allowPrivate)})
+		W  *nodeapi.Warp
+		E  []nodeapi.Exit
+		R  []string
+		RP []nodeapi.RuleProvider
+	}{st.Warp, st.Exits, rules(st, allowPrivate), st.RuleProviders})
 	return string(raw)
 }
 
@@ -282,6 +283,11 @@ func (e *Engine) Apply(st nodeapi.DesiredState) (nodeapi.ApplyResult, error) {
 		}
 		tunnel.UpdateProxies(cfg.Proxies, cfg.Providers)
 		tunnel.UpdateRules(cfg.Rules, cfg.SubRules, cfg.RuleProviders)
+		for _, pv := range cfg.RuleProviders {
+			go func(p interface{ Initial() error }) {
+				_ = p.Initial()
+			}(pv)
+		}
 		e.routes = key
 		e.warpMu.Lock()
 		e.warp = nodeapi.WarpStatus{}

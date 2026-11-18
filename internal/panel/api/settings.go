@@ -571,6 +571,9 @@ func (h *handlers) updateSettings(ctx context.Context, in *patchSettingsInput) (
 	if caChanged && h.d.WakeNodeCerts != nil {
 		h.d.WakeNodeCerts()
 	}
+	if b.SubRoutes != nil {
+		h.d.Changes.SlotsChanged()
+	}
 	auditDetails := map[string]any{}
 	if b.SubPort != nil {
 		auditDetails["sub_port"] = *b.SubPort

@@ -2826,7 +2826,7 @@
     "nodePick": "Нода",
     "rulesNodeHint": "Правила этой ноды: часть её трафика уходит через другую ноду панели, остальное — как обычно. Выигрывает первое подходящее правило.",
     "rulesMoved": "Правила каскада живут в «Настройки → Маршрутизация → Каскад нод».",
-    "rulesJsonHint": "Два формата: JSON-массив ([{\"match\":\"…\",\"exit_node_id\":2}], поля match, необязательный inbound_id, exit_node_id) или вставленный список mihomo/YAML вида «- DOMAIN-SUFFIX,youtube.com» — каждая строка станет правилом с нодой выхода, выбранной ниже. Порядок в списке = порядок правил, пустые строки и #комментарии игнорируются. Шпаргалка по id — ниже.",
+    "rulesJsonHint": "Два формата: JSON-массив ([{\"match\":\"…\",\"exit_node_id\":2}], поля match, необязательный inbound_id, exit_node_id) или вставленный список mihomo/YAML/payload вида «- DOMAIN-SUFFIX,youtube.com» или «- RULE-SET,mikan-ai» — каждая строка станет правилом с нодой выхода, выбранной ниже. Поддерживаются RULE-SET (встроенные, свои списки и HTTPS-ссылки), домены (+.domain.com), IP CIDR. Порядок в списке = порядок правил, пустые строки и #комментарии игнорируются. Шпаргалка — ниже.",
     "rulesJsonApply": "Применить",
     "rulesJsonReset": "Сбросить изменения",
     "rulesJsonSaved": "Правила сохранены",
@@ -2834,7 +2834,18 @@
     "rulesJsonArray": "Ожидается JSON-массив правил, например [{\"match\":\"DOMAIN-SUFFIX,youtube.com\",\"exit_node_id\":2}]",
     "rulesListExit": "Выход для правил списком",
     "rulesListExitNeeded": "Выберите ноду выхода для правил списком (поле «Выход для правил списком» ниже).",
-    "rulesListBadLine": "Строка {line} не похожа на правило TYPE,VALUE: уберите её или приведите к виду DOMAIN-SUFFIX,example.com."
+    "rulesListBadLine": "Строка {line} не похожа на правило, список или домен/IP: уберите её или приведите к виду DOMAIN-SUFFIX,example.com или RULE-SET,mikan-ai.",
+    "rulesFormat": "Форматировать JSON",
+    "rulesFormatErr": "Невозможно отформатировать: в JSON есть синтаксические ошибки",
+    "rulesCount": "{n, plural, =0 {нет правил} one {# правило} few {# правила} many {# правил} other {# правила}}",
+    "rulesConvertToJson": "В JSON",
+    "rulesConverted": "Список правил преобразован в JSON",
+    "rulesLegendNodes": "Выходы через другие ноды (exit_node_id)",
+    "rulesLegendInbounds": "Протоколы этой ноды (inbound_id)",
+    "rulesLegendRuleSets": "Списки правил (RULE-SET)",
+    "rulesCopied": "Скопировано в буфер",
+    "rulesExample": "Пример правил",
+    "rulesOpenSettings": "Настроить правила каскада"
   },
   "pools": {
     "title": "Пулы трафика",

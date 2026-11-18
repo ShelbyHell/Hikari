@@ -3,6 +3,18 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.10
+### en
+- **RULE-SET support in cascade rules**: Cascade rules now fully support RULE-SET matches (`RULE-SET,<name>` and `RULE-SET,<name>,no-resolve`), referencing built-in service lists (such as `mikan-ai`, `mikan-blocked`, etc.), custom route lists, or direct HTTPS URLs, with automated rule provider generation on nodes and quick-reference chips in the editor.
+- **CodeMirror JSON editor and redesign for node cascade rules**: Settings → Routing → Node cascade now features a full-featured CodeMirror JSON editor with syntax highlighting, line numbers, automatic formatting, sample insertion, rule count indicators, and interactive clickable chips for exit node, inbound, and rule set IDs.
+- **Fixed navigation after visiting cascade settings**: Resolved a React hook order violation in the routing view switcher that broke page transitions and tab navigation after opening the cascade routing panel.
+- **Direct cascade rules link**: The node cascade drawer now includes a direct button leading into Settings → Routing → Node cascade.
+### ru
+- **Поддержка списков RULE-SET в правилах каскада**: В правилах каскада нод теперь полностью поддерживаются правила RULE-SET (`RULE-SET,<список>` и `RULE-SET,<список>,no-resolve`) со ссылками на встроенные сервисы (например, `mikan-ai`, `mikan-blocked` и др.), собственные списки маршрутизации и прямые HTTPS-ссылки, с автогенерацией провайдеров правил на нодах и быстрыми чипами в редакторе.
+- **JSON-редактор CodeMirror и редизайн правил каскада нод**: В «Настройки → Маршрутизация → Каскад нод» добавлен полноценный редактор CodeMirror с подсветкой синтаксиса JSON, номерами строк, кнопкой форматирования, вставкой примера, счётчиком правил и интерактивными кликабельными чипами с ID нод выхода, протоколов и списков правил.
+- **Исправлен переход между страницами после открытия настроек каскада**: Устранено нарушение порядка вызова React-хуков в переключателе видов маршрутизации, из-за которого ломалась навигация и переходы между вкладками после захода в каскад.
+- **Прямой переход к правилам каскада**: В шторку каскада ноды добавлена кнопка быстрого перехода в «Настройки → Маршрутизация → Каскад нод».
+
 ## 0.5.1.4-rc.9
 ### en
 - **Paste a mihomo rule list into the cascade editor**: Settings → Routing → Node cascade now also accepts a plain mihomo/YAML list (`- DOMAIN-SUFFIX,youtube.com`, `DOMAIN-KEYWORD,…`, `IP-CIDR,…`, `IP-CIDR6,…`, `payload:` and #comments are handled) next to the JSON array. Every line becomes a rule with the exit picked in "Exit for rule lists". The bulk replace endpoint accepts up to 1000 rules now.
