@@ -5,7 +5,8 @@
 # dependabot (.github/dependabot.yml) proposes the new digest when the tag moves.
 FROM --platform=$BUILDPLATFORM node:25-alpine@sha256:bdf2cca6fe3dabd014ea60163eca3f0f7015fbd5c7ee1b0e9ccb4ced6eb02ef4 AS web
 WORKDIR /web
-RUN corepack enable
+# Node 25 no longer ships corepack; pnpm is pinned to the web package's packageManager.
+RUN npm install -g pnpm@11.20.0
 COPY web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
 COPY web/ ./

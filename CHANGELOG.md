@@ -3,6 +3,14 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.8
+### en
+- **mihomo core 1.19.34**: The nodes' core is updated from 1.19.32 to 1.19.34 (with its bumped sing, sing-tun, utls, wireguard and other companions).
+- **Docker build on Node 25**: Node 25 no longer bundles corepack, so `RUN corepack enable` failed with exit 127; the web stage now installs pnpm 11.20.0 (the web package's `packageManager`) directly.
+### ru
+- **Ядро mihomo 1.19.34**: Ядро нод обновлено с 1.19.32 до 1.19.34 (вместе с подтянутыми sing, sing-tun, utls, wireguard и прочими зависимостями).
+- **Сборка Docker на Node 25**: В Node 25 больше нет встроенного corepack, поэтому `RUN corepack enable` падал с exit 127; web-стадия теперь ставит pnpm 11.20.0 (версия из `packageManager` веб-пакета) напрямую.
+
 ## 0.5.1.4-rc.7
 ### en
 - **Cascade rules as JSON**: Settings → Routing → Node cascade is now a JSON editor: the whole rule set of a node is one array (`match`, optional `inbound_id`, `exit_node_id`), its order is the rule order. Saving is atomic — one invalid rule rejects the whole list and keeps the previous rules. New API: `PUT /api/v1/nodes/{id}/cascade/rules` replaces the node's rules in one transaction. The single-rule POST/PATCH/DELETE and the order endpoint remain.

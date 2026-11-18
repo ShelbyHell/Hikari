@@ -16,7 +16,7 @@
 [![Release](https://img.shields.io/github/v/release/ShelbyHell/Hikari?color=f07a2e&label=release&style=flat-square)](https://github.com/ShelbyHell/Hikari/releases)
 [![Image](https://img.shields.io/badge/ghcr.io-shelbyhell%2Fhikari-2b8c9e?style=flat-square&logo=docker&logoColor=white)](https://github.com/ShelbyHell/Hikari/pkgs/container/hikari)
 [![License](https://img.shields.io/badge/license-GPL--3.0-2f9e6b?style=flat-square)](LICENSE)
-[![mihomo](https://img.shields.io/badge/core-mihomo%201.19.32-9e8eff?style=flat-square)](https://github.com/MetaCubeX/mihomo)
+[![mihomo](https://img.shields.io/badge/core-mihomo%201.19.34-9e8eff?style=flat-square)](https://github.com/MetaCubeX/mihomo)
 
 [English](README.md) · [Русский](README.ru.md) · [简体中文](README.zh-CN.md) · **فارسی** · [Türkçe](README.tr.md) · [Español](README.es.md)
 
