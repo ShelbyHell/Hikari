@@ -137,6 +137,7 @@ type NodePatch struct {
 	Host        *string
 	Domain      *string
 	Enabled     *bool
+	IPv6        *bool
 	FairShare   *bool
 	ChannelMbps *int64
 	Rules       NodeRules
@@ -223,6 +224,9 @@ func UpdateNode(ctx context.Context, st *store.Store, id int64, p NodePatch, now
 		if p.Enabled != nil {
 			cur.Enabled = Flag(*p.Enabled)
 		}
+		if p.IPv6 != nil {
+			cur.Ipv6 = Flag(*p.IPv6)
+		}
 		if p.ChannelMbps != nil {
 			cur.ChannelMbps = NullInt(p.ChannelMbps)
 		}
@@ -238,7 +242,7 @@ func UpdateNode(ctx context.Context, st *store.Store, id int64, p NodePatch, now
 			}
 		}
 		out, err = q.UpdateNode(ctx, db.UpdateNodeParams{Name: cur.Name, Address: cur.Address, PublicHost: cur.PublicHost, Domain: cur.Domain, PublicName: cur.PublicName,
-			Enabled: cur.Enabled, UpdatedAt: now.Unix(), ID: cur.ID})
+			Enabled: cur.Enabled, Ipv6: cur.Ipv6, UpdatedAt: now.Unix(), ID: cur.ID})
 		return err
 	})
 	return out, err

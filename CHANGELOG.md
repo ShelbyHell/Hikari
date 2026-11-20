@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.11
+### en
+- **IPv6 toggle per node**: Nodes can now have IPv6 connectivity and resolution toggled on or off individually from the admin panel (Edit Node drawer) or CLI (`hikari node set <id> -ipv6=false`). When IPv6 is disabled on a node, Mihomo stops resolving AAAA records (`resolver.DisableIPv6 = true`, DNS config `ipv6: false`) and blocks all direct outbound IPv6 traffic (`IP-CIDR6,::/0,REJECT,no-resolve`), preventing connection timeouts and stalls on VPS hosts with broken or missing IPv6 routes. Nodes with IPv6 disabled show an indicator badge in the node list.
+### ru
+- **Переключатель IPv6 для нод**: Для каждой ноды теперь можно включить или выключить поддержку IPv6 индивидуально в панели управления (шторка редактирования ноды) или через CLI (`hikari node set <id> -ipv6=false`). При отключении IPv6 на ноде движок Mihomo отключает AAAA-запросы (`resolver.DisableIPv6 = true`, DNS-конфиг `ipv6: false`) и блокирует весь прямой исходящий трафик по IPv6 (`IP-CIDR6,::/0,REJECT,no-resolve`), предотвращая таймауты и зависания соединений на серверах без рабочей маршрутизации IPv6. В карточке ноды с выключенным IPv6 отображается соответствующая плашка.
+
 ## 0.5.1.4-rc.10
 ### en
 - **RULE-SET support in cascade rules**: Cascade rules now fully support RULE-SET matches (`RULE-SET,<name>` and `RULE-SET,<name>,no-resolve`), referencing built-in service lists (such as `mikan-ai`, `mikan-blocked`, etc.), custom route lists, or direct HTTPS URLs, with automated rule provider generation on nodes and quick-reference chips in the editor.

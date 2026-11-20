@@ -14,7 +14,10 @@ RETURNING *;
 UPDATE nodes SET sort = $1 WHERE id = $2;
 
 -- name: UpdateNode :one
-UPDATE nodes SET name = $1, address = $2, public_host = $3, domain = $4, public_name = $5, enabled = $6, updated_at = $7 WHERE id = $8 RETURNING *;
+UPDATE nodes SET name = $1, address = $2, public_host = $3, domain = $4, public_name = $5, enabled = $6, ipv6 = $7, updated_at = $8 WHERE id = $9 RETURNING *;
+
+-- name: SetNodeIPv6 :exec
+UPDATE nodes SET ipv6 = $1, updated_at = $2 WHERE id = $3;
 
 -- name: SetNodeShaping :exec
 UPDATE nodes SET fair_share = $1, channel_mbps = $2, updated_at = $3 WHERE id = $4;

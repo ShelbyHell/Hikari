@@ -268,6 +268,7 @@ type Node struct {
 	TotalDown   int64
 	FairShare   int64
 	ChannelMbps sql.NullInt64
+	Ipv6        int64
 }
 
 type NodeRelay struct {

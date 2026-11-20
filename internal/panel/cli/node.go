@@ -124,6 +124,7 @@ func nodeCmd(ctx context.Context, st *store.Store, dataDir string, args []string
 		host := fs.String("host", n.PublicHost, "IP or host name of the node's server")
 		dom := fs.String("domain", n.Domain, "the node's domain")
 		enabled := fs.Bool("enabled", n.Enabled != 0, "whether the node serves clients")
+		ipv6 := fs.Bool("ipv6", n.Ipv6 != 0, "whether IPv6 is enabled on the node")
 		if err := fs.Parse(args[2:]); err != nil {
 			return err
 		}
@@ -141,6 +142,9 @@ func nodeCmd(ctx context.Context, st *store.Store, dataDir string, args []string
 		if on := *enabled; on != (n.Enabled != 0) {
 			patch.Enabled = &on
 		}
+		if on := *ipv6; on != (n.Ipv6 != 0) {
+			patch.IPv6 = &on
+		}
 		if patch.Rules, err = nodeRules(ctx, st); err != nil {
 			return err
 		}
@@ -149,7 +153,7 @@ func nodeCmd(ctx context.Context, st *store.Store, dataDir string, args []string
 			return nodeError(err)
 		}
 		_ = audit.Write(ctx, st.Q, time.Now(), audit.Entry{Action: "cli.node_update", TargetType: "node", TargetID: strconv.FormatInt(id, 10),
-			Details: map[string]any{"name": n.Name, "enabled": n.Enabled != 0}})
+			Details: map[string]any{"name": n.Name, "enabled": n.Enabled != 0, "ipv6": n.Ipv6 != 0}})
 		fmt.Fprintf(stderr, "Node %d %q saved. The panel applies the changes within 30 seconds.\n", n.ID, n.Name)
 		return nil
 	default:

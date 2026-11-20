@@ -48,6 +48,9 @@ type DesiredState struct {
 	// DNS is how the node names the sites users reach (ExitDNS); nil: as before it, the
 	// address the user's device sent and the host's resolver. Nodes older than it ignore it.
 	DNS *ExitDNS `json:"dns,omitempty"`
+	// IPv6 turns IPv6 connectivity and resolution on the node on; nil: on (as before it).
+	// When false, mihomo disables IPv6 resolution and outbound IPv6 traffic.
+	IPv6 *bool `json:"ipv6,omitempty"`
 }
 
 // Shaping is the fair share of a node: ChannelMbps (each way) is split evenly between the

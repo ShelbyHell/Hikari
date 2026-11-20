@@ -79,6 +79,54 @@ func (q *Queries) AddTrafficHourly(ctx context.Context, arg AddTrafficHourlyPara
 	return err
 }
 
+const addUserDevice = `-- name: AddUserDevice :one
+UPDATE users SET device_limit = device_limit + 1, updated_at = $1
+WHERE id = $2 AND device_limit IS NOT NULL AND device_limit < 100
+RETURNING id, name, contact, note, tags, status, tariff_id, traffic_limit, device_limit, reset_strategy, period_days, period_start, used_up, used_down, total_up, total_down, expires_at, inbounds, sub_token, slot_id, online_at, created_at, updated_at, billing_day, source, hidden, folder_id, speed_limit, device_mode
+`
+
+type AddUserDeviceParams struct {
+	UpdatedAt int64
+	ID        int64
+}
+
+func (q *Queries) AddUserDevice(ctx context.Context, arg AddUserDeviceParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, addUserDevice, arg.UpdatedAt, arg.ID)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Contact,
+		&i.Note,
+		&i.Tags,
+		&i.Status,
+		&i.TariffID,
+		&i.TrafficLimit,
+		&i.DeviceLimit,
+		&i.ResetStrategy,
+		&i.PeriodDays,
+		&i.PeriodStart,
+		&i.UsedUp,
+		&i.UsedDown,
+		&i.TotalUp,
+		&i.TotalDown,
+		&i.ExpiresAt,
+		&i.Inbounds,
+		&i.SubToken,
+		&i.SlotID,
+		&i.OnlineAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.BillingDay,
+		&i.Source,
+		&i.Hidden,
+		&i.FolderID,
+		&i.SpeedLimit,
+		&i.DeviceMode,
+	)
+	return i, err
+}
+
 const addUserTraffic = `-- name: AddUserTraffic :exec
 UPDATE users
 SET used_up = used_up + $1, used_down = used_down + $2,
@@ -1316,18 +1364,6 @@ type SetUserDeviceModeParams struct {
 func (q *Queries) SetUserDeviceMode(ctx context.Context, arg SetUserDeviceModeParams) error {
 	_, err := q.db.ExecContext(ctx, setUserDeviceMode, arg.DeviceMode, arg.UpdatedAt, arg.ID)
 	return err
-}
-
-const addUserDevice = `-- name: AddUserDevice :one
-UPDATE users SET device_limit = device_limit + 1, updated_at = $1 WHERE id = $2 AND device_limit IS NOT NULL AND device_limit < 100
-RETURNING *
-`
-type AddUserDeviceParams struct { UpdatedAt int64; ID int64 }
-func (q *Queries) AddUserDevice(ctx context.Context, arg AddUserDeviceParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, addUserDevice, arg.UpdatedAt, arg.ID)
-	var i User
-	err := row.Scan(&i.ID, &i.Name, &i.Contact, &i.Note, &i.Tags, &i.Status, &i.TariffID, &i.TrafficLimit, &i.DeviceLimit, &i.ResetStrategy, &i.PeriodDays, &i.PeriodStart, &i.UsedUp, &i.UsedDown, &i.TotalUp, &i.TotalDown, &i.ExpiresAt, &i.Inbounds, &i.SubToken, &i.SlotID, &i.OnlineAt, &i.CreatedAt, &i.UpdatedAt, &i.BillingDay, &i.Source, &i.Hidden, &i.FolderID, &i.SpeedLimit, &i.DeviceMode)
-	return i, err
 }
 
 const slotCounter = `-- name: SlotCounter :one

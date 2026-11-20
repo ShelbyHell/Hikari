@@ -325,6 +325,12 @@ function NodeCard({
             <span className="mono min-w-0 break-all">{n.host || "—"}</span>
             <span>·</span>
             <span>{n.local ? t("nodes.kindLocal") : t("nodes.kindRemote")}</span>
+            {!n.ipv6 ? (
+              <>
+                <span>·</span>
+                <span className="text-[var(--honey-600)]">{t("nodes.ipv6Off")}</span>
+              </>
+            ) : null}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1">
@@ -674,11 +680,11 @@ function KeyDrawer({ joined, onClose, actions }: { joined: Joined | null; onClos
 function EditNodeDrawer({ node, onClose }: { node: Node | null; onClose: () => void }) {
   const qc = useQueryClient();
   const toast = useToast();
-  const [form, setForm] = useState({ name: "", public_name: "", host: "", domain: "", enabled: true, fair_share: false, channel: "" });
+  const [form, setForm] = useState({ name: "", public_name: "", host: "", domain: "", enabled: true, ipv6: true, fair_share: false, channel: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   useEffect(() => {
     if (node) {
-      setForm({ name: node.name, public_name: node.public_name, host: node.host, domain: node.domain, enabled: node.enabled, fair_share: node.fair_share, channel: node.channel_mbps != null ? String(node.channel_mbps) : "" });
+      setForm({ name: node.name, public_name: node.public_name, host: node.host, domain: node.domain, enabled: node.enabled, ipv6: node.ipv6, fair_share: node.fair_share, channel: node.channel_mbps != null ? String(node.channel_mbps) : "" });
       setErrors({});
     }
   }, [node]);
@@ -702,7 +708,7 @@ function EditNodeDrawer({ node, onClose }: { node: Node | null; onClose: () => v
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!node) return;
-    const body: Schemas["PatchNodeInputBody"] = { name: form.name.trim(), public_name: form.public_name.trim(), enabled: form.enabled, fair_share: form.fair_share };
+    const body: Schemas["PatchNodeInputBody"] = { name: form.name.trim(), public_name: form.public_name.trim(), enabled: form.enabled, ipv6: form.ipv6, fair_share: form.fair_share };
     const channel = Number(form.channel);
     if (form.channel.trim() || form.fair_share) {
       if (!Number.isInteger(channel) || channel < 1 || channel > 100000) {
@@ -754,6 +760,9 @@ function EditNodeDrawer({ node, onClose }: { node: Node | null; onClose: () => v
         )}
         <Field label={t("nodes.serving")} hint={t("nodes.servingHint")}>
           <Switch checked={form.enabled} onChange={(v) => setForm((f) => ({ ...f, enabled: v }))} label={t("nodes.serving")} />
+        </Field>
+        <Field label={t("nodes.ipv6")} hint={t("nodes.ipv6Hint")}>
+          <Switch checked={form.ipv6} onChange={(v) => setForm((f) => ({ ...f, ipv6: v }))} label={t("nodes.ipv6")} />
         </Field>
         <div className="dr-sec">
           <div className="switch-row pt-0">

@@ -40,6 +40,9 @@ func rules(st nodeapi.DesiredState, allowPrivate bool) []string {
 	r = append(r, cascadeRules(st)...)
 	r = append(r, exitRules(st)...)
 	r = append(r, warpRules(st)...)
+	if st.IPv6 != nil && !*st.IPv6 {
+		r = append(r, "IP-CIDR6,::/0,REJECT,no-resolve")
+	}
 	return append(r, "MATCH,DIRECT")
 }
 
@@ -96,15 +99,16 @@ func buildConfig(st nodeapi.DesiredState, cert proto.Cert, allowPrivate bool) (r
 	if err != nil {
 		return nil, nil, err
 	}
+	ipv6 := st.IPv6 == nil || *st.IPv6
 	cfg := map[string]any{
 		"mode":              "rule",
 		"log-level":         "warning",
-		"ipv6":              true,
+		"ipv6":              ipv6,
 		"allow-lan":         false,
 		"mixed-port":        0,
 		"find-process-mode": "off",
 		"profile":           map[string]any{"store-selected": false, "store-fake-ip": false},
-		"dns":               dnsConfig(st.DNS),
+		"dns":               dnsConfig(st.DNS, ipv6),
 		"sniffer":           snifferConfig(st.DNS),
 		"proxies":           proxies,
 		"rules":             rules(st, allowPrivate),

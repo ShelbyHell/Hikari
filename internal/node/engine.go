@@ -24,6 +24,7 @@ import (
 	"time"
 
 	C "github.com/metacubex/mihomo/constant"
+	"github.com/metacubex/mihomo/component/resolver"
 	"github.com/metacubex/mihomo/hub/executor"
 	"github.com/metacubex/mihomo/listener"
 	mlog "github.com/metacubex/mihomo/log"
@@ -217,7 +218,7 @@ func Start(o Options) (*Engine, error) {
 	// runs exactly once, with no listeners; ours are patched separately in Apply.
 	cfg.Listeners = map[string]C.InboundListener{}
 	executor.ApplyConfig(cfg, true)
-	e.exitDNS = exitDNSKey(nil)
+	e.exitDNS = exitDNSKey(nil, true)
 
 	st, ok, err := loadState(filepath.Join(dataDir, stateFile), log)
 	if err != nil {
@@ -297,7 +298,9 @@ func (e *Engine) Apply(st nodeapi.DesiredState) (nodeapi.ApplyResult, error) {
 		e.warpMu.Unlock()
 	}
 
-	if key := exitDNSKey(st.DNS); key != e.exitDNS {
+	ipv6 := st.IPv6 == nil || *st.IPv6
+	resolver.DisableIPv6 = !ipv6
+	if key := exitDNSKey(st.DNS, ipv6); key != e.exitDNS {
 		if err := applyExitDNS(cfg); err != nil {
 			e.log.Error("exit dns", "err", err)
 		} else {

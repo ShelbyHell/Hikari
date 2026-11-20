@@ -3827,6 +3827,8 @@ export interface components {
             id: number;
             /** Format: int64 */
             inbounds: number;
+            /** @description Включен ли IPv6 на ноде */
+            ipv6: boolean;
             /**
              * Format: date-time
              * @description Когда нода последний раз отвечала (с запуска панели)
@@ -4307,6 +4309,8 @@ export interface components {
             /** @description Делить канал ноды поровну между теми, кто сейчас качает; нужен channel_mbps */
             fair_share?: boolean;
             host?: string;
+            /** @description Включить или выключить IPv6 на ноде */
+            ipv6?: boolean;
             name?: string;
             /** @description Публичное имя ноды; пустое — не публиковать её в канале */
             public_name?: string;

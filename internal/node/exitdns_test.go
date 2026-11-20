@@ -106,15 +106,18 @@ func TestSnifferDialsTheName(t *testing.T) {
 }
 
 func TestExitDNSKey(t *testing.T) {
-	if exitDNSKey(nil) != exitDNSKey(&nodeapi.ExitDNS{}) {
+	if exitDNSKey(nil, true) != exitDNSKey(&nodeapi.ExitDNS{}, true) {
 		t.Fatal("off and none differ")
 	}
-	if exitDNSKey(nil) == exitDNSKey(&nodeapi.ExitDNS{Sniff: true}) {
+	if exitDNSKey(nil, true) == exitDNSKey(&nodeapi.ExitDNS{Sniff: true}, true) {
 		t.Fatal("the sniffer does not change the key")
 	}
 	// A server that is left out does not change what mihomo holds.
-	if exitDNSKey(&nodeapi.ExitDNS{Servers: []string{"8.8.8.8"}}) != exitDNSKey(&nodeapi.ExitDNS{Servers: []string{" 8.8.8.8", "junk"}}) {
+	if exitDNSKey(&nodeapi.ExitDNS{Servers: []string{"8.8.8.8"}}, true) != exitDNSKey(&nodeapi.ExitDNS{Servers: []string{" 8.8.8.8", "junk"}}, true) {
 		t.Fatal("the key depends on what is left out")
+	}
+	if exitDNSKey(nil, true) == exitDNSKey(nil, false) {
+		t.Fatal("ipv6 toggle does not change the key")
 	}
 }
 
@@ -144,5 +147,56 @@ func TestApplyExitDNS(t *testing.T) {
 	apply(nil)
 	if tunnel.IsSniffing() || resolver.DefaultResolver != nil || resolver.DirectHostResolver != nil {
 		t.Fatalf("off: sniffing %v, resolver %v", tunnel.IsSniffing(), resolver.DefaultResolver)
+	}
+}
+
+func TestIPv6Config(t *testing.T) {
+	bTrue, bFalse := true, false
+
+	for _, tc := range []struct {
+		name     string
+		ipv6     *bool
+		wantV6   bool
+		wantRule bool
+	}{
+		{"default nil", nil, true, false},
+		{"explicit true", &bTrue, true, false},
+		{"disabled false", &bFalse, false, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			st := cascadeState(t)
+			st.IPv6 = tc.ipv6
+			st.DNS = &nodeapi.ExitDNS{Servers: []string{"8.8.8.8"}}
+			raw, _, err := buildConfig(st, proto.Cert{CertPath: "/tmp/c.pem", KeyPath: "/tmp/k.pem"}, false)
+			if err != nil {
+				t.Fatal(err)
+			}
+			cfg, err := executor.ParseWithBytes(raw)
+			if err != nil {
+				t.Fatalf("mihomo refuses config: %v", err)
+			}
+			if cfg.General.IPv6 != tc.wantV6 {
+				t.Fatalf("general ipv6: got %v, want %v", cfg.General.IPv6, tc.wantV6)
+			}
+			if cfg.DNS.IPv6 != tc.wantV6 {
+				t.Fatalf("dns ipv6: got %v, want %v", cfg.DNS.IPv6, tc.wantV6)
+			}
+			hasRule := false
+			for _, r := range cfg.Rules {
+				if r.Payload() == "::/0" && r.Adapter() == "REJECT" {
+					hasRule = true
+					break
+				}
+			}
+			if hasRule != tc.wantRule {
+				t.Fatalf("reject ::/0 rule: got %v, want %v", hasRule, tc.wantRule)
+			}
+			if err := applyExitDNS(cfg); err != nil {
+				t.Fatal(err)
+			}
+			if resolver.DisableIPv6 != !tc.wantV6 {
+				t.Fatalf("resolver.DisableIPv6: got %v, want %v", resolver.DisableIPv6, !tc.wantV6)
+			}
+		})
 	}
 }

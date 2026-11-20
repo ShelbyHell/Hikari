@@ -46,7 +46,7 @@ func snifferConfig(d *nodeapi.ExitDNS) map[string]any {
 // (mihomo's DNS off). A server that does not parse is left out, as the egress rules are:
 // a broken or older panel must not take the node's users down with it. A resolver by
 // name finds its address with the host's resolver.
-func dnsConfig(d *nodeapi.ExitDNS) map[string]any {
+func dnsConfig(d *nodeapi.ExitDNS, ipv6 bool) map[string]any {
 	var servers []string
 	if d != nil {
 		for _, s := range d.Servers {
@@ -60,7 +60,7 @@ func dnsConfig(d *nodeapi.ExitDNS) map[string]any {
 	}
 	return map[string]any{
 		"enable":             true,
-		"ipv6":               true,
+		"ipv6":               ipv6,
 		"enhanced-mode":      "normal",
 		"default-nameserver": []string{"system://"},
 		"nameserver":         servers,
@@ -68,11 +68,12 @@ func dnsConfig(d *nodeapi.ExitDNS) map[string]any {
 }
 
 // exitDNSKey covers what applyExitDNS depends on.
-func exitDNSKey(d *nodeapi.ExitDNS) string {
+func exitDNSKey(d *nodeapi.ExitDNS, ipv6 bool) string {
 	raw, _ := json.Marshal(struct {
-		S map[string]any
-		D map[string]any
-	}{snifferConfig(d), dnsConfig(d)})
+		S    map[string]any
+		D    map[string]any
+		IPv6 bool
+	}{snifferConfig(d), dnsConfig(d, ipv6), ipv6})
 	return string(raw)
 }
 
@@ -80,6 +81,8 @@ func exitDNSKey(d *nodeapi.ExitDNS) string {
 // executor does on a full reload (updateSniffer, updateDNS) but without the DNS server:
 // the node listens for nobody's DNS.
 func applyExitDNS(cfg *config.Config) error {
+	resolver.DisableIPv6 = !cfg.General.IPv6
+
 	d, err := sniffer.NewDispatcher(cfg.Sniffer)
 	if err != nil {
 		return err
@@ -95,15 +98,16 @@ func applyExitDNS(cfg *config.Config) error {
 		resolver.DirectHostResolver = nil
 		return nil
 	}
+	ipv6 := c.IPv6 && cfg.General.IPv6
 	r := dns.NewResolver(dns.Config{
 		Main:           c.NameServer,
-		IPv6:           c.IPv6,
+		IPv6:           ipv6,
 		IPv6Timeout:    c.IPv6Timeout,
 		Default:        c.DefaultNameserver,
 		CacheAlgorithm: c.CacheAlgorithm,
 		CacheMaxSize:   c.CacheMaxSize,
 	})
-	m := dns.NewEnhancer(dns.EnhancerConfig{IPv6: c.IPv6, EnhancedMode: c.EnhancedMode, UseHosts: c.UseHosts})
+	m := dns.NewEnhancer(dns.EnhancerConfig{IPv6: ipv6, EnhancedMode: c.EnhancedMode, UseHosts: c.UseHosts})
 	if old, ok := resolver.DefaultHostMapper.(*dns.ResolverEnhancer); ok && old != nil {
 		m.PatchFrom(old)
 	}

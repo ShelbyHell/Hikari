@@ -3838,6 +3838,10 @@
             "format": "int64",
             "type": "integer"
           },
+          "ipv6": {
+            "description": "Включен ли IPv6 на ноде",
+            "type": "boolean"
+          },
           "last_ok_at": {
             "description": "Когда нода последний раз отвечала (с запуска панели)",
             "format": "date-time",
@@ -3923,7 +3927,8 @@
           "behind",
           "can_update",
           "fair_share",
-          "channel_mbps"
+          "channel_mbps",
+          "ipv6"
         ],
         "type": "object"
       },
@@ -5183,6 +5188,10 @@
           "host": {
             "maxLength": 253,
             "type": "string"
+          },
+          "ipv6": {
+            "description": "Включить или выключить IPv6 на ноде",
+            "type": "boolean"
           },
           "name": {
             "maxLength": 200,
