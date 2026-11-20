@@ -21,7 +21,7 @@ func TestDiagnoseEndpoint(t *testing.T) {
 	prev := diagOptions
 	diagOptions = func(e *Engine) diag.Options {
 		return diag.Options{DataDir: e.dataDir, HTTP: srv.Client(),
-			Targets: diag.Targets{Name: "localhost", Internet: []string{srv.Listener.Addr().String()}, GitHub: srv.URL + "/", GHCR: srv.URL + "/v2/"}}
+			Targets: diag.Targets{Name: "localhost", Internet: []string{srv.Listener.Addr().String()}, IPv6: []string{srv.Listener.Addr().String()}, GitHub: srv.URL + "/", GHCR: srv.URL + "/v2/"}}
 	}
 	defer func() { diagOptions = prev }()
 	diagnosing.last = nodeapi.Diagnosis{}
@@ -36,7 +36,7 @@ func TestDiagnoseEndpoint(t *testing.T) {
 		return d
 	}
 	first := ask()
-	if len(first.Items) != 7 {
+	if len(first.Items) != 8 {
 		t.Fatalf("items: %+v", first.Items)
 	}
 	for _, it := range first.Items {
