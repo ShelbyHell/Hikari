@@ -2950,8 +2950,8 @@ export interface components {
              * @description Что исправит: кнопка в панели или команда на сервере
              * @enum {string}
              */
-            fix?: "rekey" | "update_node" | "old_node" | "open_port" | "start_node" | "check_host" | "check_dns" | "free_port" | "sync_time" | "update_panel" | "free_disk" | "check_outbound" | "restart_panel" | "exit_node";
-            /** @description Что проверено: link, hello, version, update, skew, listeners, listener, port, relay, cascade, node_dns, node_internet, node_github, node_ghcr, node_disk, node_memory, diagnose, local_node, dns, internet, github, ghcr, disk, memory, clock, updates */
+            fix?: "rekey" | "update_node" | "old_node" | "open_port" | "start_node" | "check_host" | "check_dns" | "free_port" | "sync_time" | "update_panel" | "free_disk" | "check_outbound" | "disable_ipv6" | "restart_panel" | "exit_node";
+            /** @description Что проверено: link, hello, version, update, skew, listeners, listener, port, relay, cascade, node_dns, node_internet, node_ipv6, node_github, node_ghcr, node_disk, node_memory, diagnose, local_node, dns, internet, ipv6, github, ghcr, disk, memory, clock, updates */
             id: string;
             params?: {
                 [key: string]: string;

@@ -29,11 +29,11 @@ import (
 // CheckItem is one line of "Check node" or "Check server": what was looked at, how it is,
 // and what fixes it. The page words it by id, status and code; params are the facts.
 type CheckItem struct {
-	ID     string            `json:"id" doc:"Что проверено: link, hello, version, update, skew, listeners, listener, port, relay, cascade, node_dns, node_internet, node_github, node_ghcr, node_disk, node_memory, diagnose, local_node, dns, internet, github, ghcr, disk, memory, clock, updates"`
+	ID     string            `json:"id" doc:"Что проверено: link, hello, version, update, skew, listeners, listener, port, relay, cascade, node_dns, node_internet, node_ipv6, node_github, node_ghcr, node_disk, node_memory, diagnose, local_node, dns, internet, ipv6, github, ghcr, disk, memory, clock, updates"`
 	Status string            `json:"status" enum:"ok,warn,fail,skip"`
 	Code   string            `json:"code,omitempty" doc:"Почему не ok: timeout, refused, pin_mismatch, behind, skew, busy и другие"`
 	Params map[string]string `json:"params,omitempty"`
-	Fix    string            `json:"fix,omitempty" enum:"rekey,update_node,old_node,open_port,start_node,check_host,check_dns,free_port,sync_time,update_panel,free_disk,check_outbound,restart_panel,exit_node" doc:"Что исправит: кнопка в панели или команда на сервере"`
+	Fix    string            `json:"fix,omitempty" enum:"rekey,update_node,old_node,open_port,start_node,check_host,check_dns,free_port,sync_time,update_panel,free_disk,check_outbound,disable_ipv6,restart_panel,exit_node" doc:"Что исправит: кнопка в панели или команда на сервере"`
 	Detail string            `json:"detail,omitempty" doc:"Слова ошибки как есть, для «подробнее»"`
 }
 
@@ -166,7 +166,7 @@ func (h *handlers) checkNode(ctx context.Context, in *nodeIDInput) (*checkOutput
 	if !local {
 		wg.Go(func() { ports = h.portItems(ctx, n) })
 	}
-	wg.Go(func() { nodeDiag = h.nodeDiagItems(ctx, n.ID) })
+	wg.Go(func() { nodeDiag = h.nodeDiagItems(ctx, n) })
 	wg.Go(func() { cascade, relayIt = h.cascadeItems(ctx, n, hv) })
 	wg.Wait()
 	add(ports...)
@@ -382,8 +382,8 @@ func (h *handlers) portItems(ctx context.Context, n db.Node) []CheckItem {
 }
 
 // nodeDiagItems are the node's own look at its server.
-func (h *handlers) nodeDiagItems(ctx context.Context, id int64) []CheckItem {
-	d, err := h.d.Nodes.Diagnose(ctx, id)
+func (h *handlers) nodeDiagItems(ctx context.Context, n db.Node) []CheckItem {
+	d, err := h.d.Nodes.Diagnose(ctx, n.ID)
 	if err != nil {
 		var se *nodeapi.StatusError
 		if errors.As(err, &se) && se.Status == http.StatusNotFound {
@@ -392,11 +392,29 @@ func (h *handlers) nodeDiagItems(ctx context.Context, id int64) []CheckItem {
 		return []CheckItem{{ID: "diagnose", Status: nodeapi.CheckFail, Code: nodeapi.Classify(err), Detail: err.Error()}}
 	}
 	var out []CheckItem
+	hasIPv6 := false
 	for _, it := range d.Items {
 		if it.ID == "clock" {
 			continue // the panel measures the node's clock itself
 		}
+		if it.ID == "ipv6" {
+			hasIPv6 = true
+			if n.Ipv6 == 0 {
+				out = append(out, CheckItem{ID: "node_ipv6", Status: nodeapi.CheckSkip, Code: "disabled"})
+				continue
+			}
+			ci := diagItem("node_", it)
+			if it.Status != nodeapi.CheckOK {
+				ci.Status = nodeapi.CheckWarn
+				ci.Fix = "disable_ipv6"
+			}
+			out = append(out, ci)
+			continue
+		}
 		out = append(out, diagItem("node_", it))
+	}
+	if !hasIPv6 && n.Ipv6 == 0 {
+		out = append(out, CheckItem{ID: "node_ipv6", Status: nodeapi.CheckSkip, Code: "disabled"})
 	}
 	return out
 }
@@ -411,6 +429,8 @@ func diagItem(prefix string, it nodeapi.DiagItem) CheckItem {
 		c.Fix = "check_dns"
 	case "internet", "github", "ghcr":
 		c.Fix = "check_outbound"
+	case "ipv6":
+		c.Fix = "disable_ipv6"
 	case "clock":
 		c.Fix = "sync_time"
 	case "disk":

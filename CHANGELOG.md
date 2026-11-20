@@ -3,6 +3,12 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.12
+### en
+- **IPv6 diagnostics and recommendations**: The node diagnostics and server check (`hikari node check` and Diagnostics drawer) now test IPv6 connectivity using fixed targets without DNS. If a node has IPv6 enabled but the server host lacks working IPv6 connectivity or routes, the check displays a warning and provides a direct quick-action button to open node settings and disable IPv6, preventing client timeout issues. When IPv6 is disabled for a node, the check line is cleanly marked as skipped (`Disabled in node settings`).
+### ru
+- **Диагностика IPv6 и рекомендации**: В диагностику нод и проверку сервера («Проверить ноду», «Проверить сервер») добавлена проверка связности по IPv6 с прямым опросом адресов без необходимости DNS. Если для ноды включён IPv6, но на хосте нет рабочей связности или маршрутов, проверка выводит предупреждение и кнопку быстрого перехода в настройки ноды для отключения IPv6, предотвращая таймауты у клиентов. Если IPv6 отключён в настройках ноды, пункт проверки отображается как пропущенный («Отключён в настройках ноды»).
+
 ## 0.5.1.4-rc.11
 ### en
 - **IPv6 toggle per node**: Nodes can now have IPv6 connectivity and resolution toggled on or off individually from the admin panel (Edit Node drawer) or CLI (`hikari node set <id> -ipv6=false`). When IPv6 is disabled on a node, Mihomo stops resolving AAAA records (`resolver.DisableIPv6 = true`, DNS config `ipv6: false`) and blocks all direct outbound IPv6 traffic (`IP-CIDR6,::/0,REJECT,no-resolve`), preventing connection timeouts and stalls on VPS hosts with broken or missing IPv6 routes. Nodes with IPv6 disabled show an indicator badge in the node list.

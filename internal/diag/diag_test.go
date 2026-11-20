@@ -33,13 +33,13 @@ func TestRunAllReachable(t *testing.T) {
 	}))
 	defer srv.Close()
 	d := Run(context.Background(), Options{
-		Targets: Targets{Name: "localhost", Internet: []string{srv.Listener.Addr().String()}, GitHub: srv.URL + "/", GHCR: srv.URL + "/v2/"},
+		Targets: Targets{Name: "localhost", Internet: []string{srv.Listener.Addr().String()}, IPv6: []string{srv.Listener.Addr().String()}, GitHub: srv.URL + "/", GHCR: srv.URL + "/v2/"},
 		HTTP:    srv.Client(), DataDir: "/data",
 		Disk:   func(string) (uint64, uint64, bool) { return 1 << 30, 10 << 30, true },
 		Memory: func() (uint64, uint64, bool) { return 50 << 20, 1 << 30, true },
 	})
 	got := byID(d)
-	for _, id := range []string{"dns", "internet", "github", "ghcr"} {
+	for _, id := range []string{"dns", "internet", "ipv6", "github", "ghcr"} {
 		if got[id].Status != nodeapi.CheckOK {
 			t.Errorf("%s: %+v", id, got[id])
 		}
@@ -56,7 +56,7 @@ func TestRunAllReachable(t *testing.T) {
 	if c := got["memory"]; c.Status != nodeapi.CheckWarn {
 		t.Errorf("50 MiB available: %+v", c)
 	}
-	if len(d.Items) != 7 {
+	if len(d.Items) != 8 {
 		t.Errorf("%d items", len(d.Items))
 	}
 }
@@ -70,7 +70,7 @@ func TestRunNothingReachable(t *testing.T) {
 	closed := ln.Addr().String()
 	ln.Close()
 	d := Run(context.Background(), Options{
-		Targets: Targets{Name: "github.com", Internet: []string{closed}, GitHub: "https://" + closed + "/", GHCR: "https://" + closed + "/v2/"},
+		Targets: Targets{Name: "github.com", Internet: []string{closed}, IPv6: []string{closed}, GitHub: "https://" + closed + "/", GHCR: "https://" + closed + "/v2/"},
 		// A resolver whose server does not answer.
 		Resolver: &net.Resolver{PreferGo: true, Dial: func(ctx context.Context, _, _ string) (net.Conn, error) {
 			return (&net.Dialer{}).DialContext(ctx, "tcp", closed)
@@ -87,6 +87,9 @@ func TestRunNothingReachable(t *testing.T) {
 		if got[id].Status != nodeapi.CheckFail || got[id].Code != nodeapi.LinkRefused {
 			t.Errorf("%s: %+v", id, got[id])
 		}
+	}
+	if got["ipv6"].Status != nodeapi.CheckWarn || got["ipv6"].Code != nodeapi.LinkRefused {
+		t.Errorf("ipv6: %+v", got["ipv6"])
 	}
 	if got["clock"].Status != nodeapi.CheckSkip || got["memory"].Status != nodeapi.CheckSkip {
 		t.Errorf("unknowns: %+v %+v", got["clock"], got["memory"])
@@ -117,5 +120,32 @@ func TestParseMeminfo(t *testing.T) {
 	}
 	if _, _, ok := ParseMeminfo(strings.NewReader("MemTotal: 1 kB\n")); ok {
 		t.Fatal("no MemAvailable (kernels before 3.14): not known")
+	}
+}
+
+func TestIPv6Targets(t *testing.T) {
+	// Empty IPv6 targets skips check
+	item := ipv6(context.Background(), Options{Targets: Targets{}})
+	if item.Status != nodeapi.CheckSkip || item.Code != "unknown" {
+		t.Errorf("empty targets: %+v", item)
+	}
+
+	// Reachable
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+	item = ipv6(context.Background(), Options{Targets: Targets{IPv6: []string{ln.Addr().String()}}})
+	if item.Status != nodeapi.CheckOK {
+		t.Errorf("reachable: %+v", item)
+	}
+
+	// Unreachable
+	closed := ln.Addr().String()
+	ln.Close()
+	item = ipv6(context.Background(), Options{Targets: Targets{IPv6: []string{closed}}})
+	if item.Status != nodeapi.CheckWarn || item.Code != nodeapi.LinkRefused {
+		t.Errorf("unreachable: %+v", item)
 	}
 }

@@ -27,6 +27,8 @@ type Targets struct {
 	Name string
 	// Internet are addresses dialled without DNS: one that connects is enough.
 	Internet []string
+	// IPv6 are IPv6 addresses dialled without DNS: one that connects is enough.
+	IPv6 []string
 	// GitHub and GHCR are where releases and images come from: any HTTP answer will do.
 	GitHub string
 	GHCR   string
@@ -36,6 +38,7 @@ type Targets struct {
 var Default = Targets{
 	Name:     "github.com",
 	Internet: []string{"1.1.1.1:443", "8.8.8.8:443"},
+	IPv6:     []string{"[2606:4700:4700::1111]:443", "[2001:4860:4860::8888]:443"},
 	GitHub:   "https://github.com/",
 	GHCR:     "https://ghcr.io/v2/",
 }
@@ -93,12 +96,13 @@ func Run(ctx context.Context, o Options) nodeapi.Diagnosis {
 		o.Memory = memory
 	}
 	var (
-		wg                      sync.WaitGroup
-		dns, inet, github, ghcr nodeapi.DiagItem
-		githubSkew, ghcrSkew    *time.Duration
+		wg                               sync.WaitGroup
+		dns, inet, ipv6Item, github, ghcr nodeapi.DiagItem
+		githubSkew, ghcrSkew             *time.Duration
 	)
 	wg.Go(func() { dns = lookup(ctx, o) })
 	wg.Go(func() { inet = internet(ctx, o) })
+	wg.Go(func() { ipv6Item = ipv6(ctx, o) })
 	wg.Go(func() { github, githubSkew = fetch(ctx, o, "github", o.Targets.GitHub) })
 	wg.Go(func() { ghcr, ghcrSkew = fetch(ctx, o, "ghcr", o.Targets.GHCR) })
 	wg.Wait()
@@ -106,7 +110,7 @@ func Run(ctx context.Context, o Options) nodeapi.Diagnosis {
 	if skew == nil {
 		skew = ghcrSkew
 	}
-	return nodeapi.Diagnosis{At: o.Now().UTC(), Items: []nodeapi.DiagItem{dns, inet, github, ghcr, Clock(skew), disk(o), mem(o)}}
+	return nodeapi.Diagnosis{At: o.Now().UTC(), Items: []nodeapi.DiagItem{dns, inet, ipv6Item, github, ghcr, Clock(skew), disk(o), mem(o)}}
 }
 
 func fail(id, code string, err error) nodeapi.DiagItem {
@@ -134,10 +138,14 @@ func lookup(ctx context.Context, o Options) nodeapi.DiagItem {
 }
 
 func internet(ctx context.Context, o Options) nodeapi.DiagItem {
+	dialer := o.Dialer
+	if dialer == nil {
+		dialer = &net.Dialer{Timeout: timeout}
+	}
 	var last error
 	for _, addr := range o.Targets.Internet {
 		c, cancel := context.WithTimeout(ctx, timeout)
-		conn, err := o.Dialer.DialContext(c, "tcp", addr)
+		conn, err := dialer.DialContext(c, "tcp", addr)
 		cancel()
 		if err == nil {
 			conn.Close()
@@ -146,6 +154,30 @@ func internet(ctx context.Context, o Options) nodeapi.DiagItem {
 		last = err
 	}
 	return fail("internet", nodeapi.Classify(last), last)
+}
+
+func ipv6(ctx context.Context, o Options) nodeapi.DiagItem {
+	if len(o.Targets.IPv6) == 0 {
+		return nodeapi.DiagItem{ID: "ipv6", Status: nodeapi.CheckSkip, Code: "unknown"}
+	}
+	dialer := o.Dialer
+	if dialer == nil {
+		dialer = &net.Dialer{Timeout: timeout}
+	}
+	var last error
+	for _, addr := range o.Targets.IPv6 {
+		c, cancel := context.WithTimeout(ctx, timeout)
+		conn, err := dialer.DialContext(c, "tcp", addr)
+		cancel()
+		if err == nil {
+			conn.Close()
+			return nodeapi.DiagItem{ID: "ipv6", Status: nodeapi.CheckOK}
+		}
+		last = err
+	}
+	it := fail("ipv6", nodeapi.Classify(last), last)
+	it.Status = nodeapi.CheckWarn
+	return it
 }
 
 // fetch asks a place for any answer, and reads the time it says it is.

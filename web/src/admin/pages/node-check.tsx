@@ -120,9 +120,9 @@ function Fix({ fix, params, actions, panelServer }: { fix?: string | null; param
       <Button size="sm" variant="primary" onClick={actions.update}>
         <ArrowUpCircle size={16} aria-hidden /> {t("nodeCheck.updateNode")}
       </Button>
-    ) : fix === "check_host" && actions?.edit ? (
+    ) : (fix === "check_host" || fix === "disable_ipv6") && actions?.edit ? (
       <Button size="sm" onClick={actions.edit}>
-        <Pencil size={16} aria-hidden /> {t("nodeCheck.editHost")}
+        <Pencil size={16} aria-hidden /> {fix === "disable_ipv6" ? t("nodeCheck.editNode") : t("nodeCheck.editHost")}
       </Button>
     ) : null;
   const words = tMaybe(`nodeCheck.fix.${fix}`, p);

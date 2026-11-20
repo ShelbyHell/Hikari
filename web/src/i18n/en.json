@@ -3321,6 +3321,7 @@
     "rekey": "Reissue key",
     "updateNode": "Update node",
     "editHost": "Change address",
+    "editNode": "Node settings",
     "lastSeen": "Last seen {ago}",
     "neverSeen": "Not seen since the panel started",
     "lostAgo": "Lost {ago}",
@@ -3348,6 +3349,7 @@
       "cascade": "Cascade through {exit}",
       "node_dns": "DNS on the node",
       "node_internet": "Internet on the node",
+      "node_ipv6": "IPv6 on the node",
       "node_github": "GitHub from the node",
       "node_ghcr": "GHCR from the node",
       "node_disk": "Node's disk",
@@ -3356,6 +3358,7 @@
       "local_node": "The panel's own node",
       "dns": "DNS",
       "internet": "Internet",
+      "ipv6": "IPv6",
       "github": "GitHub for updates",
       "ghcr": "GHCR for updates",
       "clock": "Clock",
@@ -3444,6 +3447,12 @@
         "ok": "Yes",
         "fail": "No way to the internet"
       },
+      "node_ipv6": {
+        "ok": "Working",
+        "warn": "No response over IPv6: packets lost or no route",
+        "fail": "No response over IPv6: packets lost or no route",
+        "disabled": "Disabled in node settings"
+      },
       "node_github": {
         "ok": "Reachable",
         "fail": "Unreachable: the node cannot download updates"
@@ -3476,6 +3485,11 @@
       "internet": {
         "ok": "Yes",
         "fail": "No way to the internet"
+      },
+      "ipv6": {
+        "ok": "Working",
+        "warn": "No response over IPv6: packets lost or no route",
+        "fail": "No response over IPv6: packets lost or no route"
       },
       "github": {
         "ok": "Reachable",
@@ -3519,6 +3533,7 @@
       "update_panel": "Update the panel: Settings → System.",
       "free_disk": "Free some disk space:",
       "check_outbound": "The server cannot reach the internet, or its DNS does not work. The full check on the server:",
+      "disable_ipv6": "If the server does not have working IPv6 routing, disable IPv6 in node settings so client connections do not stall waiting for IPv6.",
       "restart_panel": "See what is wrong with Hikari on the panel's server and restart it:",
       "exit_node": "Open the exit node's card and check it."
     },
