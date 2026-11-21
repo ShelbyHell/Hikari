@@ -3,7 +3,7 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
-## Unreleased
+## 0.5.1.4-rc.17
 ### en
 - **Shared port 443 for REALITY and TLS protocols**:
   - Nodes can route supported TCP protocols by TLS SNI through a shared port 443.
