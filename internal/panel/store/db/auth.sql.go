@@ -48,19 +48,21 @@ func (q *Queries) CreateAdmin(ctx context.Context, arg CreateAdminParams) (Admin
 }
 
 const createSession = `-- name: CreateSession :exec
-INSERT INTO sessions (id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO sessions (id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent, auth_method, auth_identity)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 `
 
 type CreateSessionParams struct {
-	IDHash     string
-	AdminID    int64
-	CsrfToken  string
-	CreatedAt  int64
-	LastSeenAt int64
-	ExpiresAt  int64
-	Ip         string
-	UserAgent  string
+	IDHash       string
+	AdminID      int64
+	CsrfToken    string
+	CreatedAt    int64
+	LastSeenAt   int64
+	ExpiresAt    int64
+	Ip           string
+	UserAgent    string
+	AuthMethod   string
+	AuthIdentity string
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
@@ -73,6 +75,8 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 		arg.ExpiresAt,
 		arg.Ip,
 		arg.UserAgent,
+		arg.AuthMethod,
+		arg.AuthIdentity,
 	)
 	return err
 }
@@ -162,7 +166,7 @@ func (q *Queries) GetAdminByUsername(ctx context.Context, username string) (Admi
 }
 
 const getSession = `-- name: GetSession :one
-SELECT id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent FROM sessions WHERE id_hash = $1
+SELECT id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent, auth_method, auth_identity FROM sessions WHERE id_hash = $1
 `
 
 func (q *Queries) GetSession(ctx context.Context, idHash string) (Session, error) {
@@ -177,6 +181,8 @@ func (q *Queries) GetSession(ctx context.Context, idHash string) (Session, error
 		&i.ExpiresAt,
 		&i.Ip,
 		&i.UserAgent,
+		&i.AuthMethod,
+		&i.AuthIdentity,
 	)
 	return i, err
 }
@@ -221,7 +227,7 @@ func (q *Queries) InsertAudit(ctx context.Context, arg InsertAuditParams) error 
 }
 
 const listAdminSessions = `-- name: ListAdminSessions :many
-SELECT id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent FROM sessions WHERE admin_id = $1 ORDER BY last_seen_at DESC
+SELECT id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent, auth_method, auth_identity FROM sessions WHERE admin_id = $1 ORDER BY last_seen_at DESC
 `
 
 func (q *Queries) ListAdminSessions(ctx context.Context, adminID int64) ([]Session, error) {
@@ -242,6 +248,8 @@ func (q *Queries) ListAdminSessions(ctx context.Context, adminID int64) ([]Sessi
 			&i.ExpiresAt,
 			&i.Ip,
 			&i.UserAgent,
+			&i.AuthMethod,
+			&i.AuthIdentity,
 		); err != nil {
 			return nil, err
 		}

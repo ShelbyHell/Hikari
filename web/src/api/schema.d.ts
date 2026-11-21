@@ -270,7 +270,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Э╨░╤З╨░╤В╤М ╨▓╤Е╨╛╨┤ ╤З╨╡╤А╨╡╨╖ GitHub OAuth */
+        /** ╨Э╨░╤З╨░╤В╤М ╨▓╤Е╨╛╨┤ ╨╕╨╗╨╕ ╨┐╤А╨╕╨▓╤П╨╖╨║╤Г ╤З╨╡╤А╨╡╨╖ GitHub OAuth */
         get: operations["github-auth-start"];
         put?: never;
         post?: never;
@@ -394,6 +394,40 @@ export interface paths {
         post?: never;
         /** ╨Ч╨░╨▓╨╡╤А╤И╨╕╤В╤М ╤Б╨╡╤Б╤Б╨╕╤О */
         delete: operations["revoke-session"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/telegram/bind-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╤В╨░╤В╤Г╤Б ╨┐╤А╨╕╨▓╤П╨╖╨║╨╕ Telegram-╨░╨║╨║╨░╤Г╨╜╤В╨░ */
+        post: operations["telegram-bind-check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/telegram/bind-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨╖╨░╨┐╤А╨╛╤Б ╨╜╨░ ╨┐╤А╨╕╨▓╤П╨╖╨║╤Г Telegram-╨░╨║╨║╨░╤Г╨╜╤В╨░ */
+        post: operations["telegram-bind-request"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3448,6 +3482,7 @@ export interface components {
             users: number;
         };
         GitHubAuthSettings: {
+            allowed_orgs: string;
             allowed_users: string;
             callback_url: string;
             client_id: string;
@@ -3458,6 +3493,7 @@ export interface components {
             enabled: boolean;
         };
         GitHubStruct: {
+            allowed_orgs?: string;
             allowed_users?: string;
             client_id?: string;
             client_secret?: string;
@@ -5160,6 +5196,8 @@ export interface components {
             no_countries?: boolean;
         };
         SessionView: {
+            auth_identity: string;
+            auth_method: string;
             /** Format: date-time */
             created_at: string;
             current: boolean;
@@ -5556,6 +5594,23 @@ export interface components {
             bot_configured: boolean;
             bot_username?: string;
             enabled: boolean;
+        };
+        TelegramBindCheckBody: {
+            /** @enum {string} */
+            status: "pending" | "bound" | "expired";
+            /** Format: int64 */
+            telegram_id?: number;
+            telegram_username?: string;
+        };
+        TelegramBindCheckInputBody: {
+            token: string;
+        };
+        TelegramBindRequestOutputBody: {
+            bot_username: string;
+            /** Format: int64 */
+            expires_in: number;
+            link: string;
+            token: string;
         };
         TelegramBot: {
             name: string;
@@ -6774,8 +6829,11 @@ export interface operations {
         parameters: {
             query?: {
                 next?: string;
+                bind?: boolean;
             };
-            header?: never;
+            header?: {
+                Cookie?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -6998,6 +7056,68 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "telegram-bind-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TelegramBindCheckInputBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TelegramBindCheckBody"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "telegram-bind-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TelegramBindRequestOutputBody"];
+                };
             };
             /** @description Error */
             default: {

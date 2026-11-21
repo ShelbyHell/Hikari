@@ -109,12 +109,14 @@ type recoveryOutput struct {
 }
 
 type SessionView struct {
-	ID         string    `json:"id"`
-	Current    bool      `json:"current"`
-	IP         string    `json:"ip"`
-	UserAgent  string    `json:"user_agent"`
-	CreatedAt  time.Time `json:"created_at"`
-	LastSeenAt time.Time `json:"last_seen_at"`
+	ID           string    `json:"id"`
+	Current      bool      `json:"current"`
+	IP           string    `json:"ip"`
+	UserAgent    string    `json:"user_agent"`
+	CreatedAt    time.Time `json:"created_at"`
+	LastSeenAt   time.Time `json:"last_seen_at"`
+	AuthMethod   string    `json:"auth_method"`
+	AuthIdentity string    `json:"auth_identity"`
 }
 
 type sessionsOutput struct {
@@ -230,12 +232,15 @@ func (h *handlers) login(ctx context.Context, in *loginInput) (*loginOutput, err
 
 	h.d.IPLimit.Reset(ipKey)
 	h.d.UserLimit.Reset(userKey)
-	token, sess, err := h.d.Sessions.Create(ctx, admin.ID, c.IP, c.UserAgent)
+	token, sess, err := h.d.Sessions.Create(ctx, admin.ID, c.IP, c.UserAgent, "password", admin.Username)
 	if err != nil {
 		return nil, err
 	}
 	if err := h.d.Store.Q.SetAdminLastLogin(ctx, db.SetAdminLastLoginParams{LastLoginAt: sql.NullInt64{Int64: now.Unix(), Valid: true}, ID: admin.ID}); err != nil {
 		return nil, err
+	}
+	if h.d.Gateway != nil {
+		h.d.Gateway.NotifyLogin(ctx, sess.IDHash, "password", admin.Username, c.IP, c.UserAgent)
 	}
 	h.audit(ctx, admin.ID, "auth.login", "admin", admin.Username, nil)
 	return &loginOutput{SetCookie: sessionCookie(token, auth.MaxTTL), Body: MeBody{Admin: viewAdmin(admin), CSRFToken: sess.CsrfToken}}, nil
@@ -507,6 +512,7 @@ func (h *handlers) listSessions(ctx context.Context, _ *struct{}) (*sessionsOutp
 		out.Body = append(out.Body, SessionView{
 			ID: s.IDHash, Current: s.IDHash == cur.IDHash, IP: s.Ip, UserAgent: s.UserAgent,
 			CreatedAt: time.Unix(s.CreatedAt, 0).UTC(), LastSeenAt: time.Unix(s.LastSeenAt, 0).UTC(),
+			AuthMethod: s.AuthMethod, AuthIdentity: s.AuthIdentity,
 		})
 	}
 	return out, nil

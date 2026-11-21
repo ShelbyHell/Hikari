@@ -126,6 +126,7 @@ const (
 	KeyAuthGitHubClientID     = "auth_github_client_id"
 	KeyAuthGitHubClientSecret = "auth_github_client_secret"
 	KeyAuthGitHubUsers        = "auth_github_users"
+	KeyAuthGitHubOrgs         = "auth_github_orgs"
 )
 
 // Switch is an on/off setting with its default: read it with On, so the default lives

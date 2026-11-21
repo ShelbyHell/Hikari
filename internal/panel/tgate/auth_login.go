@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html"
 	"strconv"
 	"strings"
 	"time"
@@ -26,6 +27,15 @@ type TelegramAuthRequest struct {
 	ExpiresAt    time.Time `json:"expires_at"`
 	Status       string    `json:"status"` // "pending", "approved", "rejected", "expired"
 	TelegramUser *User     `json:"telegram_user,omitempty"`
+}
+
+type TelegramBindRequest struct {
+	Token     string    `json:"token"`
+	AdminID   int64     `json:"admin_id"`
+	CreatedAt time.Time `json:"created_at"`
+	ExpiresAt time.Time `json:"expires_at"`
+	Status    string    `json:"status"` // "pending", "bound", "expired"
+	BoundUser *User     `json:"bound_user,omitempty"`
 }
 
 func (g *Gateway) CreateAuthRequest(ctx context.Context, ip, userAgent string) (*TelegramAuthRequest, string, error) {
@@ -69,6 +79,57 @@ func (g *Gateway) CheckAuthRequest(token string) (*TelegramAuthRequest, error) {
 	defer g.authMu.Unlock()
 
 	req, ok := g.authRequests[token]
+	if !ok {
+		return nil, ErrAuthNotFound
+	}
+	now := g.d.Now()
+	if now.After(req.ExpiresAt) {
+		req.Status = "expired"
+	}
+	clone := *req
+	return &clone, nil
+}
+
+func (g *Gateway) CreateBindRequest(ctx context.Context, adminID int64) (*TelegramBindRequest, string, error) {
+	st := g.Status()
+	botUser := st.Bot.Username
+	if botUser == "" {
+		if cachedBot, ok, _ := settings.Get[User](ctx, g.d.Settings, KeyBot); ok && cachedBot.Username != "" {
+			botUser = cachedBot.Username
+		}
+	}
+	if botUser == "" {
+		return nil, "", ErrBotNotReady
+	}
+
+	g.authMu.Lock()
+	defer g.authMu.Unlock()
+
+	now := g.d.Now()
+	for k, req := range g.bindRequests {
+		if now.After(req.ExpiresAt) {
+			delete(g.bindRequests, k)
+		}
+	}
+
+	token := "bind_" + secure.Token(24)
+	req := &TelegramBindRequest{
+		Token:     token,
+		AdminID:   adminID,
+		CreatedAt: now,
+		ExpiresAt: now.Add(5 * time.Minute),
+		Status:    "pending",
+	}
+	g.bindRequests[token] = req
+	link := fmt.Sprintf("https://t.me/%s?start=%s", botUser, token)
+	return req, link, nil
+}
+
+func (g *Gateway) CheckBindRequest(token string) (*TelegramBindRequest, error) {
+	g.authMu.Lock()
+	defer g.authMu.Unlock()
+
+	req, ok := g.bindRequests[token]
 	if !ok {
 		return nil, ErrAuthNotFound
 	}
@@ -182,8 +243,102 @@ func (g *Gateway) authLogin(ctx context.Context, out *Outbox, m *Message) bool {
 	return true
 }
 
+func (g *Gateway) authBind(ctx context.Context, out *Outbox, m *Message) bool {
+	chat := m.Chat.ID
+	text := strings.TrimSpace(m.Text)
+	if !strings.HasPrefix(text, "/start bind_") {
+		return false
+	}
+	token := strings.TrimSpace(strings.TrimPrefix(text, "/start "))
+
+	g.authMu.Lock()
+	req, ok := g.bindRequests[token]
+	now := g.d.Now()
+	if ok && now.After(req.ExpiresAt) {
+		req.Status = "expired"
+		ok = false
+	}
+	if ok && req.Status == "pending" {
+		req.Status = "bound"
+		u := *m.From
+		req.BoundUser = &u
+	}
+	g.authMu.Unlock()
+
+	if !ok || req.Status != "bound" {
+		out.Reply(chat, "", 1, func(ctx context.Context, c *Client) error {
+			_, err := c.Send(ctx, chat, "⚠️ Ссылка для привязки аккаунта устарела или недействительна. Запросите новую в настройках панели.", nil, false)
+			return err
+		})
+		return true
+	}
+
+	current, _ := g.d.Settings.String(ctx, settings.KeyAuthTelegramIDs)
+	parts := strings.Split(current, ",")
+	seen := false
+	idStr := strconv.FormatInt(m.From.ID, 10)
+	for _, p := range parts {
+		if strings.TrimSpace(p) == idStr {
+			seen = true
+			break
+		}
+	}
+	if !seen {
+		var newParts []string
+		for _, p := range parts {
+			trimmed := strings.TrimSpace(p)
+			if trimmed != "" {
+				newParts = append(newParts, trimmed)
+			}
+		}
+		newParts = append(newParts, idStr)
+		if m.From.Username != "" {
+			newParts = append(newParts, "@"+m.From.Username)
+		}
+		_ = settings.Set(ctx, g.d.Settings, settings.KeyAuthTelegramIDs, strings.Join(newParts, ", "))
+	}
+
+	userDisplay := idStr
+	if m.From.Username != "" {
+		userDisplay = fmt.Sprintf("@%s (ID: %s)", m.From.Username, idStr)
+	}
+
+	out.Reply(chat, "bind:"+token, 1, func(ctx context.Context, c *Client) error {
+		msg := fmt.Sprintf(
+			"✅ <b>Telegram успешно привязан!</b>\n\n"+
+				"Аккаунт: <code>%s</code>\n"+
+				"Теперь вы можете входить в панель управления Hikari через этого бота.",
+			userDisplay,
+		)
+		_, err := c.Send(ctx, chat, msg, nil, false)
+		return err
+	})
+	return true
+}
+
 func (g *Gateway) authCallback(ctx context.Context, out *Outbox, q *CallbackQuery) bool {
 	data := q.Data
+	if strings.HasPrefix(data, "tgkill:") {
+		sessID := strings.TrimPrefix(data, "tgkill:")
+		chat := q.Message.Chat.ID
+		msgID := q.Message.MessageID
+
+		if !g.IsAuthAdmin(ctx, q.From.ID, q.From.Username) {
+			out.Reply(chat, "", 1, func(ctx context.Context, c *Client) error {
+				return c.Answer(ctx, q.ID, "Доступ запрещён")
+			})
+			return true
+		}
+
+		_ = g.d.Store.Q.DeleteSession(ctx, sessID)
+
+		out.Reply(chat, "kill:"+sessID, 1, func(ctx context.Context, c *Client) error {
+			_ = c.Answer(ctx, q.ID, "Сессия завершена")
+			return c.Edit(ctx, chat, msgID, "🚨 <b>Сессия была принудительно завершена.</b>\nДоступ к панели с этого устройства отозван.", nil)
+		})
+		return true
+	}
+
 	if !strings.HasPrefix(data, "tgauth:") {
 		return false
 	}
@@ -235,4 +390,79 @@ func (g *Gateway) authCallback(ctx context.Context, out *Outbox, q *CallbackQuer
 		return c.Edit(ctx, chat, msgID, "❌ <b>Вход в панель управления отклонён.</b>", nil)
 	})
 	return true
+}
+
+func (g *Gateway) NotifyLogin(ctx context.Context, sessionIDHash, method, identity, ip, userAgent string) {
+	out := g.Outbox()
+	if out == nil {
+		return
+	}
+
+	chats := make(map[int64]struct{})
+	if adminChat, ok, _ := settings.Get[int64](ctx, g.d.Settings, KeyInfraAdminChat); ok && adminChat != 0 {
+		chats[adminChat] = struct{}{}
+	}
+	for _, key := range []string{"telegram_admin_ids", settings.KeyAuthTelegramIDs} {
+		if val, ok, _ := settings.Get[string](ctx, g.d.Settings, key); ok && val != "" {
+			for _, part := range strings.Split(val, ",") {
+				if id, err := strconv.ParseInt(strings.TrimSpace(part), 10, 64); err == nil && id != 0 {
+					chats[id] = struct{}{}
+				}
+			}
+		}
+	}
+	if len(chats) == 0 {
+		return
+	}
+
+	methodTitle := "Пароль"
+	if method == "telegram" {
+		methodTitle = "Telegram"
+		if identity != "" {
+			methodTitle += " (" + identity + ")"
+		}
+	} else if method == "github" {
+		methodTitle = "GitHub"
+		if identity != "" {
+			methodTitle += " (" + identity + ")"
+		}
+	}
+
+	ua := userAgent
+	if len(ua) > 60 {
+		ua = ua[:57] + "..."
+	}
+	if ua == "" {
+		ua = "Неизвестно"
+	}
+
+	nowStr := g.d.Now().Format("15:04:05 02.01.2006")
+	msgText := fmt.Sprintf(
+		"🔔 <b>Вход в панель управления Hikari</b>\n\n"+
+			"👤 Способ: <b>%s</b>\n"+
+			"🌐 IP-адрес: <code>%s</code>\n"+
+			"💻 Устройство: <code>%s</code>\n"+
+			"🕒 Время: <code>%s</code>\n\n"+
+			"Если это были не вы, завершите сессию немедленно:",
+		html.EscapeString(methodTitle),
+		html.EscapeString(ip),
+		html.EscapeString(ua),
+		html.EscapeString(nowStr),
+	)
+
+	kb := &Keyboard{
+		InlineKeyboard: [][]Button{
+			{
+				{Text: "🚨 Завершить эту сессию", CallbackData: "tgkill:" + sessionIDHash},
+			},
+		},
+	}
+
+	for chatID := range chats {
+		cid := chatID
+		out.Notice(cid, func(ctx context.Context, c *Client) error {
+			_, err := c.Send(ctx, cid, msgText, kb, false)
+			return err
+		}, nil)
+	}
 }

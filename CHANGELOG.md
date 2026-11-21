@@ -9,11 +9,33 @@ the signed manifest, and the panel shows the one in its language.
   - **Telegram**: Supports interactive confirmation via the official panel Telegram bot (scanning a QR code or opening the bot link with `/start auth_<token>`, with inline approval buttons displaying the requesting IP, device, and timestamp), as well as Telegram Login Widget verification.
   - **GitHub OAuth**: Supports standard OAuth 2.0 redirect flow with CSRF state protection, code-to-token exchange, and validation against a list of allowed usernames.
   - **Security Settings**: Added configuration cards for Telegram and GitHub sign-in to `Settings → Security`, allowing administrators to toggle each method, set allowed Telegram IDs / usernames, configure GitHub OAuth credentials, and copy the required authorization callback URL.
+- **Security Login Alerts**:
+  - The Telegram bot sends instant notifications to infrastructure and admin chats upon every successful sign-in (Password+2FA, Telegram, GitHub) with the authentication method, identity, client IP, device User-Agent, and timestamp.
+  - Alerts include an interactive inline button «🚨 Terminate this session» (`tgkill:<session_id_hash>`) allowing instant one-click revocation of compromised sessions directly from Telegram.
+- **One-click Account Binding (One-click Bind)**:
+  - Added a «Link my Telegram» modal in Security Settings with a QR code and deep-link bot launcher that automatically binds the admin's Telegram account and adds it to the allowed list upon opening the bot.
+  - Added a «Connect my GitHub» action in Security Settings that launches an OAuth flow and automatically registers the authenticated GitHub account in the allowed users list.
+- **Session Method & Identity Tracking**:
+  - The Active Sessions card in `Settings → Security` now displays badges and icons indicating how each session was authenticated (Password, Telegram `@username`, or GitHub `@login`).
+  - Added database migration storing authentication method and identity for each session.
+- **GitHub Organizations & Teams Support**:
+  - Added `allowed_orgs` setting allowing members of specified GitHub organizations or teams to authenticate to the panel without having to manually list every individual GitHub username.
 ### ru
 - **Вход в панель через Telegram и GitHub OAuth**: В панели управления добавлена поддержка авторизации администратора через Telegram и GitHub OAuth наряду со стандартным паролем и 2FA.
   - **Telegram**: Поддерживается подтверждение входа через официального Telegram-бота панели (сканирование QR-кода или переход по ссылке `/start auth_<token>` с интерактивными кнопками подтверждения и отображением IP, устройства и времени запроса), а также проверка данных Telegram Login Widget.
   - **GitHub OAuth**: Реализована авторизация через GitHub OAuth 2.0 с защитой CSRF-состояния, обменом кода на токен и проверкой логина пользователя по списку разрешённых аккаунтов.
   - **Настройки безопасности**: В раздел «Настройки → Безопасность» добавлены карточки управления входом через Telegram и GitHub для включения каждого способа, настройки разрешённых ID и юзернеймов, параметров OAuth-приложения GitHub и быстрого копирования callback URL.
+- **Уведомления о входе в панель в Telegram (Security Login Alerts)**:
+  - При каждом успешном входе администратора в панель (по паролю, через Telegram или GitHub) бот отправляет мгновенное уведомление в чат администратора инфраструктуры и администраторам панели с указанием метода входа, логина, IP-адреса, устройства (User-Agent) и времени.
+  - Сообщение содержит интерактивную inline-кнопку «🚨 Завершить эту сессию», позволяющую в один клик сбросить скомпрометированную сессию прямо из Telegram.
+- **Быстрая привязка аккаунтов в настройках (One-click Bind)**:
+  - Добавлена кнопка «Привязать мой Telegram» в настройках безопасности: открывает диалог с QR-кодом и ссылкой на бота, при переходе по которой Telegram-аккаунт администратора автоматически связывается с панелью и добавляется в список разрешённых.
+  - Добавлена кнопка «Подключить мой GitHub»: запускает OAuth-авторизацию и автоматически добавляет GitHub-аккаунт администратора в список разрешённых.
+- **Отображение способа входа в списке активных сессий**:
+  - В карточке «Активные сессии» («Настройки → Безопасность») теперь отображаются иконка и бейдж способа авторизации каждой сессии (Пароль, Telegram с юзернеймом/ID, GitHub с логином).
+  - Добавлена миграция базы данных для сохранения метода и идентификатора авторизации для каждой сессии.
+- **Поддержка организаций GitHub (GitHub Organizations / Teams)**:
+  - Добавлена настройка `allowed_orgs`: позволяет указать организации GitHub через запятую. Все участники указанных организаций получают доступ к панели без необходимости вручную прописывать логин каждого администратора.
 
 ## 0.5.1.4-rc.13
 ### en

@@ -39,8 +39,8 @@ UPDATE admins SET recovery_codes = sqlc.arg(rest) WHERE id = sqlc.arg(id) AND re
 UPDATE admins SET last_login_at = $1 WHERE id = $2;
 
 -- name: CreateSession :exec
-INSERT INTO sessions (id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+INSERT INTO sessions (id_hash, admin_id, csrf_token, created_at, last_seen_at, expires_at, ip, user_agent, auth_method, auth_identity)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
 
 -- name: GetSession :one
 SELECT * FROM sessions WHERE id_hash = $1;

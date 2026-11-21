@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Copy, KeyRound, LoaderCircle, LogOut, RefreshCw, ShieldCheck, Stethoscope } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { ChevronRight, Copy, KeyRound, LoaderCircle, LogOut, RefreshCw, ShieldCheck, Stethoscope, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { api, ApiError, errorText, unwrap, type Schemas } from "../../../api/client";
+import { api, ApiError, basePath, errorText, unwrap, type Schemas } from "../../../api/client";
 import { meQuery, qk } from "../../../api/hooks";
 import { FormActions } from "../../../components/layout";
 import { Confirm } from "../../../components/overlay";
@@ -16,6 +18,7 @@ import { useCopy } from "../../../lib/copy";
 import { CertDrawer, certUntil, type CertInfo } from "../../../components/cert-drawer";
 import { fieldErrors, onFormError } from "../../../lib/fields";
 import { ago } from "../../../lib/format";
+import { GitHubIcon, TelegramIcon } from "../login";
 
 export function AccessCard({ s }: { s: Schemas["SettingsView"] }) {
   const toast = useToast();
@@ -454,7 +457,22 @@ export function SessionsCard() {
             {list.map((s) => (
               <li key={s.id} className="flex items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <div className="truncate text-[13px] font-medium">{browserName(s.user_agent)}</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate text-[13px] font-medium">{browserName(s.user_agent)}</span>
+                    {s.auth_method === "telegram" ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-[var(--tint-accent)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--ink-700)]">
+                        <TelegramIcon size={12} /> {t("settings.authMethodTelegram")} {s.auth_identity ? `(${s.auth_identity})` : ""}
+                      </span>
+                    ) : s.auth_method === "github" ? (
+                      <span className="inline-flex items-center gap-1 rounded bg-[var(--tint-accent)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--ink-700)]">
+                        <GitHubIcon size={12} /> {t("settings.authMethodGitHub")} {s.auth_identity ? `(${s.auth_identity})` : ""}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded bg-[var(--tint-accent)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--ink-700)]">
+                        <KeyRound size={12} /> {t("settings.authMethodPassword")}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-[var(--ink-500)]">
                     <span className="mono">{s.ip}</span> · {s.current ? <span className="text-[var(--leaf-700)]">{t("settings.thisSession")}</span> : t("settings.activeAgo", { ago: ago(s.last_seen_at) })}
                   </div>
@@ -542,9 +560,127 @@ export function AdminUsernameCard() {
   );
 }
 
+function TelegramBindDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: (user: { telegram_id?: number; telegram_username?: string }) => void;
+}) {
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const [bindData, setBindData] = useState<{ token: string; link: string; expires_in: number; bot_username: string } | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      setBindData(null);
+      return;
+    }
+    let active = true;
+    let timer: number | null = null;
+    setLoading(true);
+
+    unwrap(api.POST("/api/v1/auth/telegram/bind-request"))
+      .then((data) => {
+        if (!active) return;
+        setBindData(data);
+        setLoading(false);
+
+        timer = window.setInterval(async () => {
+          try {
+            const res = await unwrap(api.POST("/api/v1/auth/telegram/bind-check", { body: { token: data.token } }));
+            if (!active) return;
+            if (res.status === "bound") {
+              if (timer) window.clearInterval(timer);
+              const display = res.telegram_username ? `@${res.telegram_username}` : res.telegram_id ? String(res.telegram_id) : "";
+              toast.ok(t("settings.authTelegramBindSuccess", { user: display }));
+              onSuccess(res);
+              onOpenChange(false);
+            } else if (res.status === "expired") {
+              if (timer) window.clearInterval(timer);
+            }
+          } catch {
+            // Keep polling
+          }
+        }, 1500);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setLoading(false);
+        toast.error(errorText(err));
+        onOpenChange(false);
+      });
+
+    return () => {
+      active = false;
+      if (timer) window.clearInterval(timer);
+    };
+  }, [open]);
+
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <AnimatePresence>
+        {open ? (
+          <Dialog.Portal forceMount>
+            <Dialog.Overlay asChild forceMount>
+              <motion.div className="scrim" style={{ zIndex: 55 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+            </Dialog.Overlay>
+            <Dialog.Content asChild forceMount>
+              <motion.div
+                className="dialog glass-strong text-center"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.18 }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <Dialog.Title asChild>
+                    <h2 className="text-base font-semibold">{t("settings.authTelegramBindTitle")}</h2>
+                  </Dialog.Title>
+                  <Dialog.Close className="icon-btn" aria-label={t("common.close")}>
+                    <X size={18} />
+                  </Dialog.Close>
+                </div>
+                <p className="text-xs text-[var(--ink-500)] mb-4">{t("settings.authTelegramBindHint")}</p>
+                {loading || !bindData ? (
+                  <div className="flex h-[200px] w-full items-center justify-center">
+                    <LoaderCircle className="spin text-[var(--mikan-500)]" size={32} />
+                  </div>
+                ) : (
+                  <div>
+                    <div className="mx-auto my-3 flex w-fit justify-center rounded-2xl bg-white p-3.5 shadow-sm">
+                      <QR value={bindData.link} size={180} />
+                    </div>
+                    <a
+                      href={bindData.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-primary mt-4 flex w-full items-center justify-center gap-2"
+                    >
+                      <TelegramIcon size={18} />
+                      <span>{t("settings.authTelegramOpenBot")}</span>
+                    </a>
+                    <div className="mt-4 flex items-center justify-center gap-2 text-[13px] text-[var(--ink-500)]">
+                      <LoaderCircle className="spin" size={14} />
+                      <span>{t("settings.authTelegramWaiting")}</span>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        ) : null}
+      </AnimatePresence>
+    </Dialog.Root>
+  );
+}
+
 export function TelegramAuthCard() {
   const qc = useQueryClient();
   const toast = useToast();
+  const [bindOpen, setBindOpen] = useState(false);
   const query = useQuery({
     queryKey: qk.externalAuthSettings,
     queryFn: () => unwrap(api.GET("/api/v1/auth/external/settings")),
@@ -622,8 +758,43 @@ export function TelegramAuthCard() {
           />
         </Field>
 
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant="glass"
+            size="sm"
+            onClick={() => setBindOpen(true)}
+            disabled={!tg?.bot_configured}
+          >
+            <TelegramIcon size={16} aria-hidden /> {t("settings.authTelegramBindButton")}
+          </Button>
+          {!tg?.bot_configured ? (
+            <span className="text-xs text-[var(--ink-500)]">{t("settings.authTelegramBotNeeded")}</span>
+          ) : null}
+        </div>
+
         <FormActions saving={save.isPending} disabled={!dirty} label={t("common.save")} />
       </form>
+
+      <TelegramBindDialog
+        open={bindOpen}
+        onOpenChange={setBindOpen}
+        onSuccess={(res) => {
+          void qc.invalidateQueries({ queryKey: qk.externalAuthSettings });
+          if (res.telegram_id) {
+            setAllowedIDs((prev) => {
+              const idStr = String(res.telegram_id);
+              const parts = prev.split(",").map((p) => p.trim()).filter(Boolean);
+              if (!parts.includes(idStr)) {
+                parts.push(idStr);
+                if (res.telegram_username) parts.push(`@${res.telegram_username}`);
+                return parts.join(", ");
+              }
+              return prev;
+            });
+          }
+        }}
+      />
     </section>
   );
 }
@@ -642,12 +813,32 @@ export function GitHubAuthCard() {
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [allowedUsers, setAllowedUsers] = useState("");
+  const [allowedOrgs, setAllowedOrgs] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const bound = params.get("github_bound");
+    const err = params.get("github_error");
+    if (bound) {
+      toast.ok(t("settings.authGitHubBoundSuccess", { user: "@" + bound }));
+      void qc.invalidateQueries({ queryKey: qk.externalAuthSettings });
+      params.delete("github_bound");
+      const q = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
+    } else if (err) {
+      toast.error(tMaybe(`errors.api.${err}`) ?? err);
+      params.delete("github_error");
+      const q = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (q ? "?" + q : ""));
+    }
+  }, []);
 
   useEffect(() => {
     if (gh) {
       setEnabled(gh.enabled);
       setClientId(gh.client_id ?? "");
       setAllowedUsers(gh.allowed_users ?? "");
+      setAllowedOrgs(gh.allowed_orgs ?? "");
       setClientSecret("");
     }
   }, [gh]);
@@ -662,6 +853,7 @@ export function GitHubAuthCard() {
               client_id: clientId,
               client_secret: clientSecret || undefined,
               allowed_users: allowedUsers,
+              allowed_orgs: allowedOrgs,
             },
           },
         })
@@ -680,7 +872,12 @@ export function GitHubAuthCard() {
     enabled !== gh.enabled ||
     clientId !== (gh.client_id ?? "") ||
     allowedUsers !== (gh.allowed_users ?? "") ||
+    allowedOrgs !== (gh.allowed_orgs ?? "") ||
     clientSecret.length > 0;
+
+  const startBind = () => {
+    window.location.assign(`${basePath}/api/v1/auth/github/start?bind=true`);
+  };
 
   return (
     <section className="card glass reveal" style={{ "--i": 4 } as React.CSSProperties}>
@@ -741,6 +938,28 @@ export function GitHubAuthCard() {
             onChange={(e) => setAllowedUsers(e.target.value)}
           />
         </Field>
+
+        <Field label={t("settings.authGitHubAllowedOrgs")} htmlFor="gh-orgs" hint={t("settings.authGitHubAllowedOrgsHint")}>
+          <input
+            id="gh-orgs"
+            className="input"
+            placeholder="my-team, company-org"
+            value={allowedOrgs}
+            onChange={(e) => setAllowedOrgs(e.target.value)}
+          />
+        </Field>
+
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            variant="glass"
+            size="sm"
+            onClick={startBind}
+            disabled={!gh?.client_id || !gh?.client_secret_set}
+          >
+            <GitHubIcon size={16} aria-hidden /> {t("settings.authGitHubBindButton")}
+          </Button>
+        </div>
 
         {gh?.callback_url ? (
           <Field label={t("settings.authGitHubCallback")} hint={t("settings.authGitHubCallbackHint")}>

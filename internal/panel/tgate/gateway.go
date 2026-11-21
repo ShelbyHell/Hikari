@@ -109,6 +109,7 @@ type Gateway struct {
 
 	authMu       sync.Mutex
 	authRequests map[string]*TelegramAuthRequest
+	bindRequests map[string]*TelegramBindRequest
 }
 
 type handlerRef struct{ h Handler }
@@ -124,7 +125,7 @@ func New(d Deps) *Gateway {
 	if d.Store != nil {
 		polled = settings.Cached(d.Store.Q, 15*time.Second)
 	}
-	return &Gateway{d: d, polled: polled, reload: make(chan struct{}, 1), input: map[int64][]time.Time{}, members: map[int64]time.Time{}, authRequests: make(map[string]*TelegramAuthRequest)}
+	return &Gateway{d: d, polled: polled, reload: make(chan struct{}, 1), input: map[int64][]time.Time{}, members: map[int64]time.Time{}, authRequests: make(map[string]*TelegramAuthRequest), bindRequests: make(map[string]*TelegramBindRequest)}
 }
 
 // SetHandler plugs in what takes the bot's updates; without it the gateway still sends (alerts,
@@ -670,7 +671,7 @@ func (g *Gateway) handle(ctx context.Context, c *Client, up Update) error {
 	case up.Message != nil && up.Message.From != nil && up.Message.Chat.Type == "private":
 		m := up.Message
 		chat, now := m.Chat.ID, g.d.Now().Unix()
-		if g.flooding(chat) || g.adminLink(ctx, out, m) || g.authLogin(ctx, out, m) {
+		if g.flooding(chat) || g.adminLink(ctx, out, m) || g.authLogin(ctx, out, m) || g.authBind(ctx, out, m) {
 			return nil
 		}
 		_ = g.d.Store.Q.UpsertTgChat(ctx, db.UpsertTgChatParams{TgID: chat, Username: m.From.Username, FirstName: m.From.FirstName, CreatedAt: now, UpdatedAt: now})

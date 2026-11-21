@@ -33,21 +33,31 @@ func NewSessions(q *db.Queries, now func() time.Time, log *slog.Logger) *Session
 }
 
 // Create returns the raw cookie token; only its SHA-256 is stored.
-func (s *Sessions) Create(ctx context.Context, adminID int64, ip, userAgent string) (string, db.Session, error) {
+func (s *Sessions) Create(ctx context.Context, adminID int64, ip, userAgent string, authMethodAndIdentity ...string) (string, db.Session, error) {
 	token := secure.Token(43)
 	now := s.now().Unix()
 	if len(userAgent) > 256 {
 		userAgent = userAgent[:256]
 	}
+	authMethod := "password"
+	authIdentity := ""
+	if len(authMethodAndIdentity) > 0 && authMethodAndIdentity[0] != "" {
+		authMethod = authMethodAndIdentity[0]
+	}
+	if len(authMethodAndIdentity) > 1 {
+		authIdentity = authMethodAndIdentity[1]
+	}
 	p := db.CreateSessionParams{
-		IDHash:     secure.SHA256Hex(token),
-		AdminID:    adminID,
-		CsrfToken:  secure.Token(32),
-		CreatedAt:  now,
-		LastSeenAt: now,
-		ExpiresAt:  now + int64(MaxTTL/time.Second),
-		Ip:         ip,
-		UserAgent:  userAgent,
+		IDHash:       secure.SHA256Hex(token),
+		AdminID:      adminID,
+		CsrfToken:    secure.Token(32),
+		CreatedAt:    now,
+		LastSeenAt:   now,
+		ExpiresAt:    now + int64(MaxTTL/time.Second),
+		Ip:           ip,
+		UserAgent:    userAgent,
+		AuthMethod:   authMethod,
+		AuthIdentity: authIdentity,
 	}
 	if err := s.q.CreateSession(ctx, p); err != nil {
 		return "", db.Session{}, err

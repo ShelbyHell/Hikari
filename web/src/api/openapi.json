@@ -2478,6 +2478,9 @@
       "GitHubAuthSettings": {
         "additionalProperties": false,
         "properties": {
+          "allowed_orgs": {
+            "type": "string"
+          },
           "allowed_users": {
             "type": "string"
           },
@@ -2499,6 +2502,7 @@
           "client_id",
           "client_secret_set",
           "allowed_users",
+          "allowed_orgs",
           "callback_url"
         ],
         "type": "object"
@@ -2518,6 +2522,9 @@
       "GitHubStruct": {
         "additionalProperties": false,
         "properties": {
+          "allowed_orgs": {
+            "type": "string"
+          },
           "allowed_users": {
             "type": "string"
           },
@@ -7238,6 +7245,12 @@
       "SessionView": {
         "additionalProperties": false,
         "properties": {
+          "auth_identity": {
+            "type": "string"
+          },
+          "auth_method": {
+            "type": "string"
+          },
           "created_at": {
             "format": "date-time",
             "type": "string"
@@ -7265,7 +7278,9 @@
           "ip",
           "user_agent",
           "created_at",
-          "last_seen_at"
+          "last_seen_at",
+          "auth_method",
+          "auth_identity"
         ],
         "type": "object"
       },
@@ -8236,6 +8251,69 @@
           "enabled",
           "allowed_ids",
           "bot_configured"
+        ],
+        "type": "object"
+      },
+      "TelegramBindCheckBody": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "enum": [
+              "pending",
+              "bound",
+              "expired"
+            ],
+            "type": "string"
+          },
+          "telegram_id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "telegram_username": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "type": "object"
+      },
+      "TelegramBindCheckInputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "maxLength": 128,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "type": "object"
+      },
+      "TelegramBindRequestOutputBody": {
+        "additionalProperties": false,
+        "properties": {
+          "bot_username": {
+            "type": "string"
+          },
+          "expires_in": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "link": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "link",
+          "bot_username",
+          "expires_in"
         ],
         "type": "object"
       },
@@ -10681,6 +10759,21 @@
               "maxLength": 256,
               "type": "string"
             }
+          },
+          {
+            "explode": false,
+            "in": "query",
+            "name": "bind",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Cookie",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -10713,7 +10806,7 @@
         "security": [
           {}
         ],
-        "summary": "╨Э╨░╤З╨░╤В╤М ╨▓╤Е╨╛╨┤ ╤З╨╡╤А╨╡╨╖ GitHub OAuth",
+        "summary": "╨Э╨░╤З╨░╤В╤М ╨▓╤Е╨╛╨┤ ╨╕╨╗╨╕ ╨┐╤А╨╕╨▓╤П╨╖╨║╤Г ╤З╨╡╤А╨╡╨╖ GitHub OAuth",
         "tags": [
           "auth"
         ]
@@ -10968,6 +11061,80 @@
         "tags": [
           "auth"
         ]
+      }
+    },
+    "/api/v1/auth/telegram/bind-check": {
+      "post": {
+        "operationId": "telegram-bind-check",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramBindCheckInputBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramBindCheckBody"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╤В╨░╤В╤Г╤Б ╨┐╤А╨╕╨▓╤П╨╖╨║╨╕ Telegram-╨░╨║╨║╨░╤Г╨╜╤В╨░",
+        "tags": [
+          "auth"
+        ],
+        "x-session-only": true
+      }
+    },
+    "/api/v1/auth/telegram/bind-request": {
+      "post": {
+        "operationId": "telegram-bind-request",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelegramBindRequestOutputBody"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "╨б╨╛╨╖╨┤╨░╤В╤М ╨╖╨░╨┐╤А╨╛╤Б ╨╜╨░ ╨┐╤А╨╕╨▓╤П╨╖╨║╤Г Telegram-╨░╨║╨║╨░╤Г╨╜╤В╨░",
+        "tags": [
+          "auth"
+        ],
+        "x-session-only": true
       }
     },
     "/api/v1/auth/telegram/check": {

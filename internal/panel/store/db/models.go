@@ -406,14 +406,16 @@ type RelayUser struct {
 }
 
 type Session struct {
-	IDHash     string
-	AdminID    int64
-	CsrfToken  string
-	CreatedAt  int64
-	LastSeenAt int64
-	ExpiresAt  int64
-	Ip         string
-	UserAgent  string
+	IDHash       string
+	AdminID      int64
+	CsrfToken    string
+	CreatedAt    int64
+	LastSeenAt   int64
+	ExpiresAt    int64
+	Ip           string
+	UserAgent    string
+	AuthMethod   string
+	AuthIdentity string
 }
 
 type Setting struct {

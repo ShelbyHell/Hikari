@@ -194,7 +194,7 @@ type handlers struct {
 	pending   map[int64]pendingTOTP
 
 	ghStateMu sync.Mutex
-	ghStates  map[string]time.Time
+	ghStates  map[string]ghOAuthState
 
 	metricsCache metricsCache
 
@@ -260,7 +260,7 @@ func New(d Deps) (http.Handler, huma.API, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	h := &handlers{d: d, api: api, dummyHash: dummy, hashSem: make(chan struct{}, 4), pending: map[int64]pendingTOTP{}, ghStates: map[string]time.Time{}}
+	h := &handlers{d: d, api: api, dummyHash: dummy, hashSem: make(chan struct{}, 4), pending: map[int64]pendingTOTP{}, ghStates: map[string]ghOAuthState{}}
 	api.UseMiddleware(h.middleware)
 	h.registerAuth()
 	h.registerAuthExternal()

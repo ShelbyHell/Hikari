@@ -11,7 +11,7 @@ import { Button, Field, QR } from "../../components/ui";
 import { t } from "../../i18n";
 import { localPath } from "../../lib/url";
 
-function TelegramIcon({ size = 18 }: { size?: number }) {
+export function TelegramIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.99 1.27-5.63 3.73-.53.37-1.02.55-1.45.54-.48-.01-1.4-.27-2.09-.49-.84-.27-1.51-.42-1.45-.89.03-.25.38-.51 1.05-.78 4.12-1.79 6.87-2.98 8.24-3.55 3.92-1.63 4.74-1.92 5.26-1.93.12 0 .37.03.54.17.14.12.18.28.2.45-.02.07-.02.19-.04.31z" />
@@ -19,7 +19,7 @@ function TelegramIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-function GitHubIcon({ size = 18 }: { size?: number }) {
+export function GitHubIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path
