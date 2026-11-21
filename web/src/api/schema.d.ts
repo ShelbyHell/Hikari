@@ -11,10 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║╨╕ ╤Б╤В╨╛╤А╨╛╨╜╨╜╨╕╤Е ╨░╨┤╨┤╨╛╨╜╨╛╨▓ */
+        /** Источники сторонних аддонов */
         get: operations["list-addon-sources"];
         put?: never;
-        /** ╨Ф╨╛╨▒╨░╨▓╨╕╤В╤М ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║: ╨┐╨░╨╜╨╡╨╗╤М ╤З╨╕╤В╨░╨╡╤В ╨╡╨│╨╛, ╨┐╤А╨╛╨▓╨╡╤А╤П╨╡╤В ╨╕ ╨╖╨░╨║╤А╨╡╨┐╨╗╤П╨╡╤В ╨║╨╗╤О╤З ╨┐╨╛╨┤╨┐╨╕╤Б╨╕ */
+        /** Добавить источник: панель читает его, проверяет и закрепляет ключ подписи */
         post: operations["add-addon-source"];
         delete?: never;
         options?: never;
@@ -32,7 +32,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║: ╨┐╨╛╨║╨░ ╨╕╨╖ ╨╜╨╡╨│╨╛ ╤Б╤В╨╛╨╕╤В ╨░╨┤╨┤╨╛╨╜, ╨╜╨╡╨╗╤М╨╖╤П */
+        /** Убрать источник: пока из него стоит аддон, нельзя */
         delete: operations["delete-addon-source"];
         options?: never;
         head?: never;
@@ -48,7 +48,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╤З╨╕╤В╨░╤В╤М ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ ╨╖╨░╨╜╨╛╨▓╨╛ */
+        /** Прочитать источник заново */
         post: operations["refresh-addon-source"];
         delete?: never;
         options?: never;
@@ -63,9 +63,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╨║╨╛╨╗╤М╨║╨╛ ╨░╨┤╨┤╨╛╨╜ ╨╝╨╛╨╢╨╡╤В ╤Е╤А╨░╨╜╨╕╤В╤М ╨▓ ╤Б╨▓╨╛╤С╨╝ ╤Е╤А╨░╨╜╨╕╨╗╨╕╤Й╨╡ */
+        /** Сколько аддон может хранить в своём хранилище */
         get: operations["get-addon-storage"];
-        /** ╨Ы╨╕╨╝╨╕╤В ╤Е╤А╨░╨╜╨╕╨╗╨╕╤Й╨░ ╨░╨┤╨┤╨╛╨╜╨░ ╨╕╨╗╨╕ ╨▒╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░ */
+        /** Лимит хранилища аддона или без лимита */
         put: operations["set-addon-storage"];
         post?: never;
         delete?: never;
@@ -81,7 +81,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ь╨░╤А╨║╨╡╤В╨┐╨╗╨╡╨╣╤Б ╤Б╨┐╨╛╤Б╨╛╨▒╨╛╨▓ ╨╛╨┐╨╗╨░╤В╤Л */
+        /** Маркетплейс способов оплаты */
         get: operations["list-addons"];
         put?: never;
         post?: never;
@@ -104,7 +104,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨░╨┤╨░╨┐╤В╨╡╤А╨░ */
+        /** Настройки адаптера */
         patch: operations["update-addon"];
         trace?: never;
     };
@@ -117,7 +117,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨г╤Б╤В╨░╨╜╨╛╨▓╨╕╤В╤М ╨╕╨╗╨╕ ╨╛╨▒╨╜╨╛╨▓╨╕╤В╤М ╨░╨┤╨░╨┐╤В╨╡╤А: ╨╖╨░╤П╨▓╨║╨░ ╤Б╨╡╤А╨▓╨╡╤А╤Г */
+        /** Установить или обновить адаптер: заявка серверу */
         post: operations["install-addon"];
         delete?: never;
         options?: never;
@@ -134,7 +134,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨░╨┤╨░╨┐╤В╨╡╤А: ╨╖╨░╤П╨▓╨║╨░ ╤Б╨╡╤А╨▓╨╡╤А╤Г */
+        /** Удалить адаптер: заявка серверу */
         post: operations["remove-addon"];
         delete?: never;
         options?: never;
@@ -149,7 +149,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣ ╨░╨┤╤А╨╡╤Б ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨░╨┤╨┤╨╛╨╜╨░ ╨▓ ╨░╨┤╨╝╨╕╨╜╨║╨╡ */
+        /** Подписанный адрес страницы аддона в админке */
         get: operations["get-addon-page"];
         put?: never;
         post?: never;
@@ -168,7 +168,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Л╨╖╨╛╨▓ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨░╨┤╨┤╨╛╨╜╨░: ╨┐╨░╨╜╨╡╨╗╤М ╨┐╨╡╤А╨╡╨┤╨░╤С╤В ╨╡╨│╨╛ ╨░╨┤╨┤╨╛╨╜╤Г */
+        /** Вызов страницы аддона: панель передаёт его аддону */
         post: operations["call-addon-page"];
         delete?: never;
         options?: never;
@@ -183,10 +183,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ъ╨╗╤О╤З╨╕ API */
+        /** Ключи API */
         get: operations["list-api-keys"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨║╨╗╤О╤З API */
+        /** Создать ключ API */
         post: operations["create-api-key"];
         delete?: never;
         options?: never;
@@ -204,7 +204,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨Ю╤В╨╛╨╖╨▓╨░╤В╤М ╨║╨╗╤О╤З API */
+        /** Отозвать ключ API */
         delete: operations["delete-api-key"];
         options?: never;
         head?: never;
@@ -218,7 +218,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ц╤Г╤А╨╜╨░╨╗ ╨┤╨╡╨╣╤Б╤В╨▓╨╕╨╣ ╨░╨┤╨╝╨╕╨╜╨░: ╤Е╤А╨░╨╜╨╕╤В╤Б╤П 180 ╤Б╤Г╤В╨╛╨║ */
+        /** Журнал действий админа: хранится 180 суток */
         get: operations["list-audit"];
         put?: never;
         post?: never;
@@ -235,14 +235,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨▓╨╜╨╡╤И╨╜╨╕╤Е ╤Б╨┐╨╛╤Б╨╛╨▒╨╛╨▓ ╨▓╤Е╨╛╨┤╨░ */
+        /** Настройки внешних способов входа */
         get: operations["get-external-auth-settings"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨▓╨╜╨╡╤И╨╜╨╕╤Е ╤Б╨┐╨╛╤Б╨╛╨▒╨╛╨▓ ╨▓╤Е╨╛╨┤╨░ */
+        /** Изменить настройки внешних способов входа */
         patch: operations["update-external-auth-settings"];
         trace?: never;
     };
@@ -253,7 +253,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ю╨▒╤А╨░╨▒╨╛╤В╨║╨░ ╨┐╨╡╤А╨╡╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П ╨╛╤В GitHub OAuth */
+        /** Обработка перенаправления от GitHub OAuth */
         get: operations["github-auth-callback"];
         put?: never;
         post?: never;
@@ -270,7 +270,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Э╨░╤З╨░╤В╤М ╨▓╤Е╨╛╨┤ ╨╕╨╗╨╕ ╨┐╤А╨╕╨▓╤П╨╖╨║╤Г ╤З╨╡╤А╨╡╨╖ GitHub OAuth */
+        /** Начать вход или привязку через GitHub OAuth */
         get: operations["github-auth-start"];
         put?: never;
         post?: never;
@@ -289,7 +289,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Е╨╛╨┤ */
+        /** Вход */
         post: operations["login"];
         delete?: never;
         options?: never;
@@ -306,7 +306,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Л╤Е╨╛╨┤ */
+        /** Выход */
         post: operations["logout"];
         delete?: never;
         options?: never;
@@ -321,7 +321,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨в╨╡╨║╤Г╤Й╨╕╨╣ ╨░╨┤╨╝╨╕╨╜ */
+        /** Текущий админ */
         get: operations["me"];
         put?: never;
         post?: never;
@@ -340,7 +340,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨б╨╝╨╡╨╜╨╕╤В╤М ╨┐╨░╤А╨╛╨╗╤М */
+        /** Сменить пароль */
         post: operations["change-password"];
         delete?: never;
         options?: never;
@@ -355,7 +355,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ф╨╛╤Б╤В╤Г╨┐╨╜╤Л╨╡ ╤Б╨┐╨╛╤Б╨╛╨▒╤Л ╨▓╤Е╨╛╨┤╨░ */
+        /** Доступные способы входа */
         get: operations["auth-providers"];
         put?: never;
         post?: never;
@@ -372,7 +372,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Р╨║╤В╨╕╨▓╨╜╤Л╨╡ ╤Б╨╡╤Б╤Б╨╕╨╕ */
+        /** Активные сессии */
         get: operations["list-sessions"];
         put?: never;
         post?: never;
@@ -392,7 +392,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨Ч╨░╨▓╨╡╤А╤И╨╕╤В╤М ╤Б╨╡╤Б╤Б╨╕╤О */
+        /** Завершить сессию */
         delete: operations["revoke-session"];
         options?: never;
         head?: never;
@@ -408,7 +408,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╤В╨░╤В╤Г╤Б ╨┐╤А╨╕╨▓╤П╨╖╨║╨╕ Telegram-╨░╨║╨║╨░╤Г╨╜╤В╨░ */
+        /** Проверить статус привязки Telegram-аккаунта */
         post: operations["telegram-bind-check"];
         delete?: never;
         options?: never;
@@ -425,7 +425,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨╖╨░╨┐╤А╨╛╤Б ╨╜╨░ ╨┐╤А╨╕╨▓╤П╨╖╨║╤Г Telegram-╨░╨║╨║╨░╤Г╨╜╤В╨░ */
+        /** Создать запрос на привязку Telegram-аккаунта */
         post: operations["telegram-bind-request"];
         delete?: never;
         options?: never;
@@ -442,7 +442,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╤В╨░╤В╤Г╤Б ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨╡╨╜╨╕╤П ╨▓╤Е╨╛╨┤╨░ ╤З╨╡╤А╨╡╨╖ Telegram-╨▒╨╛╤В╨░ */
+        /** Проверить статус подтверждения входа через Telegram-бота */
         post: operations["telegram-auth-check"];
         delete?: never;
         options?: never;
@@ -459,7 +459,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ч╨░╨┐╤А╨╛╤Б╨╕╤В╤М ╨▓╤Е╨╛╨┤ ╤З╨╡╤А╨╡╨╖ Telegram-╨▒╨╛╤В╨░ */
+        /** Запросить вход через Telegram-бота */
         post: operations["telegram-auth-request"];
         delete?: never;
         options?: never;
@@ -476,7 +476,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Е╨╛╨┤ ╤З╨╡╤А╨╡╨╖ Telegram Login Widget */
+        /** Вход через Telegram Login Widget */
         post: operations["telegram-auth-widget"];
         delete?: never;
         options?: never;
@@ -493,7 +493,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Л╨║╨╗╤О╤З╨╕╤В╤М 2FA */
+        /** Выключить 2FA */
         post: operations["totp-disable"];
         delete?: never;
         options?: never;
@@ -510,7 +510,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╨║╨╗╤О╤З╨╕╤В╤М 2FA */
+        /** Включить 2FA */
         post: operations["totp-enable"];
         delete?: never;
         options?: never;
@@ -527,7 +527,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Э╨░╤З╨░╤В╤М ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╤Г 2FA */
+        /** Начать настройку 2FA */
         post: operations["totp-setup"];
         delete?: never;
         options?: never;
@@ -544,7 +544,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨б╨╝╨╡╨╜╨╕╤В╤М ╨╗╨╛╨│╨╕╨╜ ╨░╨┤╨╝╨╕╨╜╨░ */
+        /** Сменить логин админа */
         post: operations["change-username"];
         delete?: never;
         options?: never;
@@ -559,11 +559,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** DNS ╨╜╨░ ╨▓╤Л╤Е╨╛╨┤╨╡ */
+        /** DNS на выходе */
         get: operations["get-exit-dns"];
         /**
-         * ╨Э╨░╤Б╤В╤А╨╛╨╕╤В╤М DNS ╨╜╨░ ╨▓╤Л╤Е╨╛╨┤╨╡
-         * @description ╨Э╨╛╨┤╤Л ╨┐╨╛╨╗╤Г╤З╨░╤О╤В ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╤Г ╤Б╨╛ ╤Б╨▓╨╛╨╕╨╝ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡╨╝; ╨╜╨╛╨┤╤Л ╤Б╤В╨░╤А╤И╨╡ ╨╜╨╡╤С ╨╡╤С ╨╜╨╡ ╨┐╤А╨╕╨╝╨╡╨╜╤П╤О╤В.
+         * Настроить DNS на выходе
+         * @description Ноды получают настройку со своим состоянием; ноды старше неё её не применяют.
          */
         put: operations["update-exit-dns"];
         post?: never;
@@ -580,10 +580,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Т╨╜╨╡╤И╨╜╨╕╨╡ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Внешние подписки */
         get: operations["list-external-subscriptions"];
         put?: never;
-        /** ╨Ф╨╛╨▒╨░╨▓╨╕╤В╤М ╨▓╨╜╨╡╤И╨╜╤О╤О ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г */
+        /** Добавить внешнюю подписку */
         post: operations["create-external-subscription"];
         delete?: never;
         options?: never;
@@ -601,11 +601,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨▓╨╜╨╡╤И╨╜╤О╤О ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г */
+        /** Удалить внешнюю подписку */
         delete: operations["delete-external-subscription"];
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨▓╨╜╨╡╤И╨╜╤О╤О ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г */
+        /** Изменить внешнюю подписку */
         patch: operations["update-external-subscription"];
         trace?: never;
     };
@@ -618,7 +618,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ю╨▒╨╜╨╛╨▓╨╕╤В╤М ╨▓╨╜╨╡╤И╨╜╤О╤О ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╤Б╨╡╨╣╤З╨░╤Б */
+        /** Обновить внешнюю подписку сейчас */
         post: operations["fetch-external-subscription"];
         delete?: never;
         options?: never;
@@ -633,7 +633,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╨╡╤А╨▓╨╡╤А╤Л ╨▓╨╜╨╡╤И╨╜╨╡╨╣ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Серверы внешней подписки */
         get: operations["list-external-servers"];
         put?: never;
         post?: never;
@@ -652,7 +652,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╨║╨╗╤О╤З╨╕╤В╤М ╨╕╨╗╨╕ ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М ╨▓╤Б╨╡ ╤Б╨╡╤А╨▓╨╡╤А╤Л ╨▓╨╜╨╡╤И╨╜╨╡╨╣ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Включить или выключить все серверы внешней подписки */
         post: operations["enable-external-servers"];
         delete?: never;
         options?: never;
@@ -673,7 +673,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Т╨║╨╗╤О╤З╨╕╤В╤М ╨╕╨╗╨╕ ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М ╤Б╨╡╤А╨▓╨╡╤А ╨▓╨╜╨╡╤И╨╜╨╡╨╣ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Включить или выключить сервер внешней подписки */
         patch: operations["update-external-server"];
         trace?: never;
     };
@@ -684,7 +684,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨д╨╕╨╗╤М╤В╤А╤Л ╤В╤А╨░╤Д╨╕╨║╨░ */
+        /** Фильтры трафика */
         get: operations["get-filters"];
         put?: never;
         post?: never;
@@ -692,8 +692,8 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * ╨Э╨░╤Б╤В╤А╨╛╨╕╤В╤М ╤Д╨╕╨╗╤М╤В╤А╤Л ╤В╤А╨░╤Д╨╕╨║╨░
-         * @description ╨Ъ╨░╨╢╨┤╤Л╨╣ ╨┐╨╡╤А╨╡╨┤╨░╨╜╨╜╤Л╨╣ ╤Д╨╕╨╗╤М╤В╤А ╨╖╨░╨╝╨╡╨╜╤П╨╡╤В╤Б╤П ╤Ж╨╡╨╗╨╕╨║╨╛╨╝. ╨Э╨╛╨┤╤Л ╨┐╨╛╨╗╤Г╤З╨░╤О╤В ╨╡╨│╨╛ ╤Б╨╛ ╤Б╨▓╨╛╨╕╨╝ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡╨╝; ╨╜╨╛╨┤╤Л ╤Б╤В╨░╤А╤И╨╡ ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓ ╨╡╨│╨╛ ╨╜╨╡ ╨┐╤А╨╕╨╝╨╡╨╜╤П╤О╤В.
+         * Настроить фильтры трафика
+         * @description Каждый переданный фильтр заменяется целиком. Ноды получают его со своим состоянием; ноды старше фильтров его не применяют.
          */
         patch: operations["update-filters"];
         trace?: never;
@@ -705,10 +705,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨░╨┐╨║╨╕ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ */
+        /** Папки пользователей */
         get: operations["list-folders"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨┐╨░╨┐╨║╤Г */
+        /** Создать папку */
         post: operations["create-folder"];
         delete?: never;
         options?: never;
@@ -724,7 +724,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤А╤П╨┤╨╛╨║ ╨┐╨░╨┐╨╛╨║ */
+        /** Порядок папок */
         put: operations["order-folders"];
         post?: never;
         delete?: never;
@@ -743,11 +743,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨┐╨░╨┐╨║╤Г: ╨╡╤С ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨╛╤Б╤В╨░╤О╤В╤Б╤П, ╨╜╨╛ ╨▓╨╜╨╡ ╨┐╨░╨┐╨╛╨║ */
+        /** Удалить папку: её пользователи остаются, но вне папок */
         delete: operations["delete-folder"];
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨┐╨░╨┐╨║╤Г */
+        /** Изменить папку */
         patch: operations["update-folder"];
         trace?: never;
     };
@@ -761,13 +761,13 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ╨Я╨╡╤А╨╡╨╜╨╡╤Б╤В╨╕ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╨╕╨╖ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕
-         * @description ╨Ш╨╝╨┐╨╛╤А╤В ╨╕╨┤╤С╤В ╨▓ ╤Д╨╛╨╜╨╡: ╨╛╤В╨▓╨╡╤В 202 ╤Б╤А╨░╨╖╤Г, ╤Е╨╛╨┤ ╨╕ ╨╕╤В╨╛╨│ тАФ ╨▓ GET /api/v1/import/status.
+         * Перенести пользователей из другой панели
+         * @description Импорт идёт в фоне: ответ 202 сразу, ход и итог — в GET /api/v1/import/status.
          */
         post: operations["import-run"];
         /**
-         * ╨Ю╤Б╤В╨░╨╜╨╛╨▓╨╕╤В╤М ╨╕╨╝╨┐╨╛╤А╤В
-         * @description ╨г╨╢╨╡ ╤Б╨╛╨╖╨┤╨░╨╜╨╜╤Л╨╡ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨╛╤Б╤В╨░╤О╤В╤Б╤П, ╨╕╤Е ╤Б╨┐╨╕╤Б╨╛╨║ тАФ ╨▓ ╨╛╤В╤З╤С╤В╨╡.
+         * Остановить импорт
+         * @description Уже созданные пользователи остаются, их список — в отчёте.
          */
         delete: operations["import-cancel"];
         options?: never;
@@ -782,14 +782,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╤В╨░╤А╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Старые ссылки подписки */
         get: operations["get-legacy-links"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╕╤В╤М ╤Б╤В╨░╤А╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Настроить старые ссылки подписки */
         patch: operations["update-legacy-links"];
         trace?: never;
     };
@@ -803,8 +803,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ╨з╤В╨╛ ╨┐╨╡╤А╨╡╨╜╨╡╤Б╤С╤В╤Б╤П ╨╕╨╖ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕
-         * @description ╨Ш╨┤╤С╤В ╨▓ ╤Д╨╛╨╜╨╡: ╨╛╤В╨▓╨╡╤В 202 ╤Б╤А╨░╨╖╤Г, ╨╕╤В╨╛╨│ тАФ ╨▓ GET /api/v1/import/status (preview).
+         * Что перенесётся из другой панели
+         * @description Идёт в фоне: ответ 202 сразу, итог — в GET /api/v1/import/status (preview).
          */
         post: operations["import-preview"];
         delete?: never;
@@ -820,7 +820,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨е╨╛╨┤ ╨╕╨╝╨┐╨╛╤А╤В╨░ */
+        /** Ход импорта */
         get: operations["import-status"];
         put?: never;
         post?: never;
@@ -837,10 +837,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П */
+        /** Подключения */
         get: operations["list-inbounds"];
         put?: never;
-        /** ╨Ф╨╛╨▒╨░╨▓╨╕╤В╤М ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ */
+        /** Добавить подключение */
         post: operations["create-inbound"];
         delete?: never;
         options?: never;
@@ -857,7 +857,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╨░╨╣╤В ╨║╨░╨║ ╤Ж╨╡╨╗╤М REALITY */
+        /** Проверить сайт как цель REALITY */
         post: operations["check-target"];
         delete?: never;
         options?: never;
@@ -874,7 +874,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╛╨┤╨╛╨▒╤А╨░╤В╤М ╤Ж╨╡╨╗╨╕ REALITY ╤А╤П╨┤╨╛╨╝ ╤Б ╤Б╨╡╤А╨▓╨╡╤А╨╛╨╝ */
+        /** Подобрать цели REALITY рядом с сервером */
         post: operations["scan-targets"];
         delete?: never;
         options?: never;
@@ -891,7 +891,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤И╨░╨▒╨╗╨╛╨╜ ╨╗╨╕╤Б╤В╨╡╨╜╨╡╤А╨░ ╨▒╨╡╨╖ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╕╤П */
+        /** Проверить шаблон листенера без сохранения */
         post: operations["validate-inbound"];
         delete?: never;
         options?: never;
@@ -909,11 +909,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ */
+        /** Удалить подключение */
         delete: operations["delete-inbound"];
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ */
+        /** Изменить подключение */
         patch: operations["update-inbound"];
         trace?: never;
     };
@@ -924,7 +924,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ь╨░╤А╨║╨╡╤В╨┐╨╗╨╡╨╣╤Б ╨░╨┤╨┤╨╛╨╜╨╛╨▓: ╨▒╨╛╤В╤Л, ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨╕ ╨┐╤А╨╛╤З╨╡╨╡ */
+        /** Маркетплейс аддонов: боты, страницы и прочее */
         get: operations["list-marketplace"];
         put?: never;
         post?: never;
@@ -943,7 +943,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨а╨╡╨╢╨╕╨╝ ╤А╨░╨╖╤А╨░╨▒╨╛╤В╤З╨╕╨║╨░: ╨┐╨╛╨┤╨║╨╗╤О╤З╨╕╤В╤М ╤Б╨▓╨╛╨╣ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б ╨╜╨░ 127.0.0.1, ╨▒╨╡╨╖ ╨┐╤А╨╛╨▓╨╡╤А╨║╨╕ Hikari */
+        /** Режим разработчика: подключить свой процесс на 127.0.0.1, без проверки Hikari */
         post: operations["install-external-addon"];
         delete?: never;
         options?: never;
@@ -960,7 +960,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ю╨┤╨╛╨▒╤А╨╕╤В╤М ╨┐╤А╨░╨▓╨░ ╨╕ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨╕╤В╤М ╨╕╨╗╨╕ ╨╛╨▒╨╜╨╛╨▓╨╕╤В╤М ╨░╨┤╨┤╨╛╨╜ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨╕╨╗╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░: ╨╖╨░╤П╨▓╨║╨░ ╤Б╨╡╤А╨▓╨╡╤А╤Г */
+        /** Одобрить права и установить или обновить аддон каталога или источника: заявка серверу */
         post: operations["install-marketplace"];
         delete?: never;
         options?: never;
@@ -977,7 +977,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨░╨┤╨┤╨╛╨╜ ╨╕ ╨╛╤В╨╛╨╖╨▓╨░╤В╤М ╨╡╨│╨╛ ╨┐╤А╨░╨▓╨░: ╨╖╨░╤П╨▓╨║╨░ ╤Б╨╡╤А╨▓╨╡╤А╤Г */
+        /** Удалить аддон и отозвать его права: заявка серверу */
         post: operations["remove-marketplace"];
         delete?: never;
         options?: never;
@@ -993,8 +993,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * ╨Ь╨╡╤В╤А╨╕╨║╨╕ ╨▓ ╤Д╨╛╤А╨╝╨░╤В╨╡ Prometheus
-         * @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨┐╨╛ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╤П╨╝, ╨╛╨╜╨╗╨░╨╣╨╜, ╤В╤А╨░╤Д╨╕╨║, ╨╜╨╛╨┤╤Л ╨╕ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П. ╨Ф╨╗╤П Prometheus ╨╕ Grafana: ╨║╨╗╤О╤З ╨╜╨░ ╤З╤В╨╡╨╜╨╕╨╡ ╨▓ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╡ Authorization: Bearer.
+         * Метрики в формате Prometheus
+         * @description Пользователи по состояниям, онлайн, трафик, ноды и подключения. Для Prometheus и Grafana: ключ на чтение в заголовке Authorization: Bearer.
          */
         get: operations["metrics"];
         put?: never;
@@ -1012,7 +1012,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡ ╨╜╨╛╨┤╤Л */
+        /** Состояние ноды */
         get: operations["node-health"];
         put?: never;
         post?: never;
@@ -1029,10 +1029,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Э╨╛╨┤╤Л */
+        /** Ноды */
         get: operations["list-nodes"];
         put?: never;
-        /** ╨Ф╨╛╨▒╨░╨▓╨╕╤В╤М ╨╜╨╛╨┤╤Г */
+        /** Добавить ноду */
         post: operations["create-node"];
         delete?: never;
         options?: never;
@@ -1048,7 +1048,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤А╤П╨┤╨╛╨║ ╤Б╨╡╤А╨▓╨╡╤А╨╛╨▓ ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡ */
+        /** Порядок серверов в подписке */
         put: operations["order-nodes"];
         post?: never;
         delete?: never;
@@ -1066,7 +1066,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ю╨▒╨╜╨╛╨▓╨╕╤В╤М ╨╛╤В╤Б╤В╨░╤О╤Й╨╕╨╡ ╨╜╨╛╨┤╤Л ╨┤╨╛ ╨▓╨╡╤А╤Б╨╕╨╕ ╨┐╨░╨╜╨╡╨╗╨╕, ╨┐╨╛ ╨╛╨┤╨╜╨╛╨╣ */
+        /** Обновить отстающие ноды до версии панели, по одной */
         post: operations["update-nodes"];
         delete?: never;
         options?: never;
@@ -1084,11 +1084,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨╜╨╛╨┤╤Г */
+        /** Удалить ноду */
         delete: operations["delete-node"];
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨╜╨╛╨┤╤Г */
+        /** Изменить ноду */
         patch: operations["update-node"];
         trace?: never;
     };
@@ -1099,14 +1099,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ъ╨░╤Б╨║╨░╨┤ ╨╜╨╛╨┤╤Л: ╨▓╤Л╤Е╨╛╨┤╤Л ╨╕ ╤Б╨╗╤Г╨╢╨╡╨▒╨╜╤Л╨╣ ╨▓╤Е╨╛╨┤ */
+        /** Каскад ноды: выходы и служебный вход */
         get: operations["get-node-cascade"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Ъ╤Г╨┤╨░ ╨╜╨╛╨┤╨░ ╨▓╤Л╨┐╤Г╤Б╨║╨░╨╡╤В ╤В╤А╨░╤Д╨╕╨║ ╨┤╤А╤Г╨│╨╕╤Е ╨╜╨╛╨┤ */
+        /** Куда нода выпускает трафик других нод */
         patch: operations["update-node-cascade"];
         trace?: never;
     };
@@ -1117,11 +1117,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╤А╨░╨▓╨╕╨╗╨░ ╨║╨░╤Б╨║╨░╨┤╨░ ╨╜╨╛╨┤╤Л: ╤З╤В╨╛ ╨╜╨░ ╨║╨░╨║╤Г╤О ╨╜╨╛╨┤╤Г ╤Г╤Е╨╛╨┤╨╕╤В */
+        /** Правила каскада ноды: что на какую ноду уходит */
         get: operations["list-cascade-rules"];
-        /** ╨Ч╨░╨╝╨╡╨╜╨╕╤В╤М ╨▓╤Б╨╡ ╨┐╤А╨░╨▓╨╕╨╗╨░ ╨║╨░╤Б╨║╨░╨┤╨░ ╨╜╨╛╨┤╤Л ╤Б╨┐╨╕╤Б╨║╨╛╨╝ ╨╕╨╖ JSON-╤А╨╡╨┤╨░╨║╤В╨╛╤А╨░ */
+        /** Заменить все правила каскада ноды списком из JSON-редактора */
         put: operations["replace-cascade-rules"];
-        /** ╨Ф╨╛╨▒╨░╨▓╨╕╤В╤М ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨║╨░╤Б╨║╨░╨┤╨░ */
+        /** Добавить правило каскада */
         post: operations["create-cascade-rule"];
         delete?: never;
         options?: never;
@@ -1137,7 +1137,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤А╤П╨┤╨╛╨║ ╨┐╤А╨░╨▓╨╕╨╗ ╨║╨░╤Б╨║╨░╨┤╨░: ╨┐╨╡╤А╨▓╨╛╨╡ ╨┐╨╛╨┤╤Е╨╛╨┤╤П╤Й╨╡╨╡ ╨▓╤Л╨╕╨│╤А╤Л╨▓╨░╨╡╤В */
+        /** Порядок правил каскада: первое подходящее выигрывает */
         put: operations["order-cascade-rules"];
         post?: never;
         delete?: never;
@@ -1156,11 +1156,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨║╨░╤Б╨║╨░╨┤╨░ */
+        /** Удалить правило каскада */
         delete: operations["delete-cascade-rule"];
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨║╨░╤Б╨║╨░╨┤╨░ */
+        /** Изменить правило каскада */
         patch: operations["update-cascade-rule"];
         trace?: never;
     };
@@ -1172,10 +1172,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╨╜╨╛╨┤╨╡ ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В */
+        /** Поставить ноде свой сертификат */
         put: operations["set-node-certificate"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨╜╨╛╨┤╤Л: ╨▓╨╡╤А╨╜╤С╤В╤Б╤П ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣, ╨┐╨╛╨╗╤Г╤З╨╡╨╜╨╜╤Л╨╣ ╨┐╨░╨╜╨╡╨╗╤М╤О, ╨╕╨╗╨╕ ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣ */
+        /** Убрать свой сертификат ноды: вернётся публичный, полученный панелью, или самоподписанный */
         delete: operations["clear-node-certificate"];
         options?: never;
         head?: never;
@@ -1191,7 +1191,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╛╨╗╤Г╤З╨╕╤В╤М ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨╜╨╛╨┤╤Л ╤Б╨╡╨╣╤З╨░╤Б (╨╢╨┤╤С╤В ╨┤╨╛ 90 ╤Б) */
+        /** Получить публичный сертификат ноды сейчас (ждёт до 90 с) */
         post: operations["renew-node-certificate"];
         delete?: never;
         options?: never;
@@ -1208,7 +1208,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╨╜╨╛╨┤╤Г: ╤Б╨▓╤П╨╖╤М, ╨▓╨╡╤А╤Б╨╕╤П, ╤З╨░╤Б╤Л, ╨┐╤А╨╛╤В╨╛╨║╨╛╨╗╤Л, ╨┐╨╛╤А╤В╤Л, ╨╕╨╜╤В╨╡╤А╨╜╨╡╤В, ╨║╨░╤Б╨║╨░╨┤ */
+        /** Проверить ноду: связь, версия, часы, протоколы, порты, интернет, каскад */
         post: operations["check-node"];
         delete?: never;
         options?: never;
@@ -1225,7 +1225,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╨┐╨╛╤А╤В╤Л ╨╜╨╛╨┤╤Л ╨╕╨╖ ╨а╨╛╤Б╤Б╨╕╨╕ ╤З╨╡╤А╨╡╨╖ Globalping */
+        /** Проверить порты ноды из России через Globalping */
         post: operations["check-node-russia"];
         delete?: never;
         options?: never;
@@ -1242,7 +1242,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Л╨┐╤Г╤Б╤В╨╕╤В╤М ╨╜╨╛╨▓╤Л╨╣ ╨║╨╗╤О╤З ╨╜╨╛╨┤╤Л (╤Б╤В╨░╤А╤Л╨╣ ╨┐╨╡╤А╨╡╤Б╤В╨░╤С╤В ╤А╨░╨▒╨╛╤В╨░╤В╤М) */
+        /** Выпустить новый ключ ноды (старый перестаёт работать) */
         post: operations["rekey-node"];
         delete?: never;
         options?: never;
@@ -1260,8 +1260,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╨║╨╛╤А╨╛╤Б╤В╤М ╨╜╨╛╨┤╤Л
-         * @description ╨Ч╨░╨┤╨╡╤А╨╢╨║╨░, ╤А╨░╨╖╨▒╤А╨╛╤Б ╨╕ ╨┐╨╛╤В╨╡╤А╨╕ ╨┐╨╛ 20 DNS-╨╖╨░╨┐╤А╨╛╤Б╨░╨╝ ╨║ 1.1.1.1, ╨╖╨░╤В╨╡╨╝ ╨╖╨░╨│╤А╤Г╨╖╨║╨░ ╨╕ ╨╛╤В╨┤╨░╤З╨░ ╤З╨╡╤А╨╡╨╖ speed.cloudflare.com: ╨║╨░╨╢╨┤╨╛╨╡ ╨┤╨╛ 8 ╤Б╨╡╨║╤Г╨╜╨┤ ╨╕╨╗╨╕ ╨┤╨╛ ╨╗╨╕╨╝╨╕╤В╨░ ╨╛╨▒╤К╤С╨╝╨░, ╤З╤В╨╛ ╨╜╨░╤Б╤В╤Г╨┐╨╕╤В ╤А╨░╨╜╤М╤И╨╡, ╨╜╨╡ ╨▒╨╛╨╗╤М╤И╨╡ 250 ╨Ь╨С ╨╜╨░ ╨╖╨░╨│╤А╤Г╨╖╨║╤Г ╨╕ 100 ╨Ь╨С ╨╜╨░ ╨╛╤В╨┤╨░╤З╤Г. ╨Ч╨░╨╜╨╕╨╝╨░╨╡╤В ╨╛╨║╨╛╨╗╨╛ 20 ╤Б╨╡╨║╤Г╨╜╨┤; ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨╜╨╛╨┤╤Л ╨╝╨╛╨│╤Г╤В ╨┐╨╛╤З╤Г╨▓╤Б╤В╨▓╨╛╨▓╨░╤В╤М ╨╜╨░╨│╤А╤Г╨╖╨║╤Г ╨╜╨░ ╨▓╤А╨╡╨╝╤П ╤В╨╡╤Б╤В╨░. ╨Ю╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╜╨░ ╨╜╨╛╨┤╨╡ ╨╕╨┤╤С╤В ╨╛╨┤╨╕╨╜ ╤В╨╡╤Б╤В, ╨╜╨░ ╨╛╨┤╨╜╤Г ╨╜╨╛╨┤╤Г ╨╜╨╡ ╤З╨░╤Й╨╡ ╤А╨░╨╖╨░ ╨▓ 5 ╨╝╨╕╨╜╤Г╤В (╨╕╨╜╨░╤З╨╡ 429 speed_test_cooldown).
+         * Проверить скорость ноды
+         * @description Задержка, разброс и потери по 20 DNS-запросам к 1.1.1.1, затем загрузка и отдача через speed.cloudflare.com: каждое до 8 секунд или до лимита объёма, что наступит раньше, не больше 250 МБ на загрузку и 100 МБ на отдачу. Занимает около 20 секунд; пользователи ноды могут почувствовать нагрузку на время теста. Одновременно на ноде идёт один тест, на одну ноду не чаще раза в 5 минут (иначе 429 speed_test_cooldown).
          */
         post: operations["run-node-speedtest"];
         delete?: never;
@@ -1278,8 +1278,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * ╨Ш╤Б╤В╨╛╤А╨╕╤П ╨┐╤А╨╛╨▓╨╡╤А╨╛╨║ ╤Б╨║╨╛╤А╨╛╤Б╤В╨╕ ╨╜╨╛╨┤╤Л
-         * @description ╨Э╨╛╨▓╤Л╨╡ ╤Б╨▓╨╡╤А╤Е╤Г; ╤Е╤А╨░╨╜╤П╤В╤Б╤П ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╡ 100.
+         * История проверок скорости ноды
+         * @description Новые сверху; хранятся последние 100.
          */
         get: operations["list-node-speedtests"];
         put?: never;
@@ -1297,7 +1297,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨У╤А╨░╤Д╨╕╨║ ╤В╤А╨░╤Д╨╕╨║╨░ ╨╜╨╛╨┤╤Л */
+        /** График трафика ноды */
         get: operations["node-traffic"];
         put?: never;
         post?: never;
@@ -1316,7 +1316,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ю╨▒╨╜╨╛╨▓╨╕╤В╤М ╨╜╨╛╨┤╤Г ╨┤╨╛ ╨▓╨╡╤А╤Б╨╕╨╕ ╨┐╨░╨╜╨╡╨╗╨╕ */
+        /** Обновить ноду до версии панели */
         post: operations["update-node-version"];
         delete?: never;
         options?: never;
@@ -1331,15 +1331,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** WARP ╨╜╨╛╨┤╤Л */
+        /** WARP ноды */
         get: operations["get-node-warp"];
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М WARP ╨╜╨╛╨┤╤Л */
+        /** Удалить WARP ноды */
         delete: operations["delete-node-warp"];
         options?: never;
         head?: never;
-        /** ╨Т╨║╨╗╤О╤З╨╕╤В╤М WARP, ╤Б╨┐╨╕╤Б╨║╨╕ ╨┤╨╛╨╝╨╡╨╜╨╛╨▓, ╨║╨╗╤О╤З WARP+ */
+        /** Включить WARP, списки доменов, ключ WARP+ */
         patch: operations["update-node-warp"];
         trace?: never;
     };
@@ -1352,7 +1352,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ч╨░╨│╤А╤Г╨╖╨╕╤В╤М ╤Б╨▓╨╛╨╣ WireGuard-╨║╨╛╨╜╤Д╨╕╨│ WARP */
+        /** Загрузить свой WireGuard-конфиг WARP */
         post: operations["import-node-warp"];
         delete?: never;
         options?: never;
@@ -1369,7 +1369,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ч╨░╤А╨╡╨│╨╕╤Б╤В╤А╨╕╤А╨╛╨▓╨░╤В╤М WARP ╨┤╨╗╤П ╨╜╨╛╨┤╤Л ╨▓ Cloudflare */
+        /** Зарегистрировать WARP для ноды в Cloudflare */
         post: operations["register-node-warp"];
         delete?: never;
         options?: never;
@@ -1384,10 +1384,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨░╨║╨╡╤В╤Л ╤В╤А╨░╤Д╨╕╨║╨░ */
+        /** Пакеты трафика */
         get: operations["list-packages"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨┐╨░╨║╨╡╤В ╤В╤А╨░╤Д╨╕╨║╨░ */
+        /** Создать пакет трафика */
         post: operations["create-package"];
         delete?: never;
         options?: never;
@@ -1403,10 +1403,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨┐╨░╨║╨╡╤В ╤В╤А╨░╤Д╨╕╨║╨░ */
+        /** Изменить пакет трафика */
         put: operations["update-package"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╨┐╨░╨║╨╡╤В ╨▓ ╨░╤А╤Е╨╕╨▓ */
+        /** Убрать пакет в архив */
         delete: operations["archive-package"];
         options?: never;
         head?: never;
@@ -1420,7 +1420,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ш╤Б╤В╨╛╤А╨╕╤П ╨┐╨╗╨░╤В╨╡╨╢╨╡╨╣ */
+        /** История платежей */
         get: operations["list-payments"];
         put?: never;
         post?: never;
@@ -1437,14 +1437,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨╛╨┐╨╗╨░╤В╤Л */
+        /** Настройки оплаты */
         get: operations["get-payment-settings"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨╛╨┐╨╗╨░╤В╤Л */
+        /** Изменить настройки оплаты */
         patch: operations["update-payment-settings"];
         trace?: never;
     };
@@ -1457,7 +1457,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╨╡╤А╨╜╤Г╤В╤М Stars ╨┐╨╛╨║╤Г╨┐╨░╤В╨╡╨╗╤О */
+        /** Вернуть Stars покупателю */
         post: operations["refund-payment"];
         delete?: never;
         options?: never;
@@ -1475,8 +1475,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ╨Ю╤В╨╝╨╡╤В╨╕╤В╤М, ╤З╤В╨╛ ╨┤╨╡╨╜╤М╨│╨╕ ╨▓╨╛╨╖╨▓╤А╨░╤Й╨╡╨╜╤Л ╨▓╤А╤Г╤З╨╜╤Г╤О
-         * @description ╨Ю╨┐╨╗╨░╤В╨░ ╤З╨╡╤А╨╡╨╖ ╤Б╨┐╨╛╤Б╨╛╨▒ ╨╛╨┐╨╗╨░╤В╤Л ╨╕╨╖ ╨╝╨░╤А╨║╨╡╤В╨┐╨╗╨╡╨╣╤Б╨░, ╨╛╨┐╨╗╨░╤З╨╡╨╜╨╜╨░╤П, ╨╜╨╛ ╨╜╨╡ ╨┐╤А╨╕╨╝╨╡╨╜╤С╨╜╨╜╨░╤П (╨╜╨░╨┐╤А╨╕╨╝╨╡╤А, ╨┐╤А╨╛╨▒╨╜╤Л╨╣ ╨┐╨╡╤А╨╕╨╛╨┤, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╤Г╨╢╨╡ ╨╜╨╡╨╗╤М╨╖╤П ╨▓╤Л╨┤╨░╤В╤М): ╨░╨┤╨╝╨╕╨╜ ╨▓╨╡╤А╨╜╤Г╨╗ ╨┤╨╡╨╜╤М╨│╨╕ ╨▓ ╨║╨░╨▒╨╕╨╜╨╡╤В╨╡ ╨┐╨╗╨░╤В╤С╨╢╨╜╨╛╨╣ ╤Б╨╕╤Б╤В╨╡╨╝╤Л, ╨┐╨╗╨░╤В╤С╨╢ ╤Б╤В╨░╨╜╨╛╨▓╨╕╤В╤Б╤П ╨▓╨╛╨╖╨▓╤А╨░╤Й╤С╨╜╨╜╤Л╨╝, ╨┐╨╛╨║╤Г╨┐╨░╤В╨╡╨╗╤О ╨┐╤А╨╕╤Е╨╛╨┤╨╕╤В ╤Б╨╛╨╛╨▒╤Й╨╡╨╜╨╕╨╡. Stars ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╤О╤В╤Б╤П ╤З╨╡╤А╨╡╨╖ refund.
+         * Отметить, что деньги возвращены вручную
+         * @description Оплата через способ оплаты из маркетплейса, оплаченная, но не применённая (например, пробный период, который уже нельзя выдать): админ вернул деньги в кабинете платёжной системы, платёж становится возвращённым, покупателю приходит сообщение. Stars возвращаются через refund.
          */
         post: operations["mark-payment-refunded"];
         delete?: never;
@@ -1492,10 +1492,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╤Г╨╗╤Л ╤В╤А╨░╤Д╨╕╨║╨░ */
+        /** Пулы трафика */
         get: operations["list-pools"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨┐╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░ */
+        /** Создать пул трафика */
         post: operations["create-pool"];
         delete?: never;
         options?: never;
@@ -1513,11 +1513,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨┐╤Г╨╗: ╨╡╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨▓╨╡╤А╨╜╤Г╤В╤Б╤П ╨▓ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║; ╨┐╨╛╨║╨░ ╨▓ ╨╜╤С╨╝ ╨╡╤Б╤В╤М ╨╛╨┐╨╗╨░╤З╨╡╨╜╨╜╤Л╨╣ ╤В╤А╨░╤Д╨╕╨║, ╨┐╤Г╨╗ ╨╛╤Б╤В╨░╤С╤В╤Б╤П */
+        /** Удалить пул: его подключения вернутся в основной трафик; пока в нём есть оплаченный трафик, пул остаётся */
         delete: operations["delete-pool"];
         options?: never;
         head?: never;
-        /** ╨Я╨╡╤А╨╡╨╕╨╝╨╡╨╜╨╛╨▓╨░╤В╤М ╨┐╤Г╨╗ */
+        /** Переименовать пул */
         patch: operations["rename-pool"];
         trace?: never;
     };
@@ -1528,7 +1528,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ф╨╛╤Б╤В╤Г╨┐╨╜╤Л╨╡ ╨┐╤А╨╡╤Б╨╡╤В╤Л ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ */
+        /** Доступные пресеты подключений */
         get: operations["list-presets"];
         put?: never;
         post?: never;
@@ -1545,10 +1545,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╤А╨╛╨╝╨╛╨║╨╛╨┤╤Л */
+        /** Промокоды */
         get: operations["list-promocodes"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨┐╤А╨╛╨╝╨╛╨║╨╛╨┤ */
+        /** Создать промокод */
         post: operations["create-promocode"];
         delete?: never;
         options?: never;
@@ -1563,7 +1563,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ш╤Б╤В╨╛╤А╨╕╤П ╨┐╤А╨╛╨╝╨╛╨║╨╛╨┤╨╛╨▓ */
+        /** История промокодов */
         get: operations["list-promocode-redemptions"];
         put?: never;
         post?: never;
@@ -1580,7 +1580,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╤В╨░╤В╨╕╤Б╤В╨╕╨║╨░ ╨┐╤А╨╛╨╝╨╛╨║╨╛╨┤╨╛╨▓ */
+        /** Статистика промокодов */
         get: operations["promocode-stats"];
         put?: never;
         post?: never;
@@ -1598,10 +1598,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨┐╤А╨╛╨╝╨╛╨║╨╛╨┤ */
+        /** Изменить промокод */
         put: operations["update-promocode"];
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨┐╤А╨╛╨╝╨╛╨║╨╛╨┤ */
+        /** Удалить промокод */
         delete: operations["delete-promocode"];
         options?: never;
         head?: never;
@@ -1617,7 +1617,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╨║╨╗╤О╤З╨╕╤В╤М ╨╕╨╗╨╕ ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М ╨┐╤А╨╛╨╝╨╛╨║╨╛╨┤ */
+        /** Включить или выключить промокод */
         post: operations["enable-promocode"];
         delete?: never;
         options?: never;
@@ -1632,14 +1632,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ */
+        /** Настройки */
         get: operations["get-settings"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ */
+        /** Изменить настройки */
         patch: operations["update-settings"];
         trace?: never;
     };
@@ -1651,10 +1651,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┐╨░╨╜╨╡╨╗╨╕ */
+        /** Поставить свой сертификат панели */
         put: operations["set-certificate"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┐╨░╨╜╨╡╨╗╨╕: ╨▓╨╡╤А╨╜╤С╤В╤Б╤П ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ */
+        /** Убрать свой сертификат панели: вернётся автоматический */
         delete: operations["clear-certificate"];
         options?: never;
         head?: never;
@@ -1670,7 +1670,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В╤Л ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕ ╨╜╨╛╨┤ ╤Б╨╜╨░╤А╤Г╨╢╨╕: ╤З╤В╨╛ ╨╛╤В╨┤╨░╤О╤В ╨┐╨╛╤А╤В╤Л, DNS, ╨┐╨╛╤А╤В 80, ╨╖╨░╨║╨░╨╖╤Л */
+        /** Проверить сертификаты панели и нод снаружи: что отдают порты, DNS, порт 80, заказы */
         post: operations["check-certificate"];
         delete?: never;
         options?: never;
@@ -1687,7 +1687,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╛╨╗╤Г╤З╨╕╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┐╨░╨╜╨╡╨╗╨╕ ╤Б╨╡╨╣╤З╨░╤Б: ╨╢╨┤╤С╤В ╨┤╨╛ 90 ╤Б ╨╕ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╤В╨╡╨╝, ╤З╤В╨╛ ╨▓╤Л╤И╨╗╨╛ (ordering тАФ ╨╖╨░╨║╨░╨╖ ╨╡╤Й╤С ╨╕╨┤╤С╤В) */
+        /** Получить сертификат панели сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт) */
         post: operations["renew-certificate"];
         delete?: never;
         options?: never;
@@ -1704,7 +1704,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Т╤Л╨┤╨░╤В╤М ╨╜╨╛╨▓╤Г╤О ╤Б╨╡╨║╤А╨╡╤В╨╜╤Г╤О ╤Б╤Б╤Л╨╗╨║╤Г ╨╜╨░ ╨┐╨░╨╜╨╡╨╗╤М */
+        /** Выдать новую секретную ссылку на панель */
         post: operations["reset-admin-path"];
         delete?: never;
         options?: never;
@@ -1719,7 +1719,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╨╡╤А╨▓╨╕╤Б╤Л ╨╕ ╤Б╨┐╨╕╤Б╨║╨╕ ╨┤╨╗╤П ╨╝╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╨╕ */
+        /** Сервисы и списки для маршрутизации */
         get: operations["routes-catalog"];
         put?: never;
         post?: never;
@@ -1738,7 +1738,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╤Д╨╕╨╗╤М Clash ╤Б ╤Н╤В╨╛╨╣ ╨╝╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╨╡╨╣, ╨▒╨╡╨╖ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╕╤П */
+        /** Профиль Clash с этой маршрутизацией, без сохранения */
         post: operations["routes-preview"];
         delete?: never;
         options?: never;
@@ -1754,10 +1754,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П SNI */
+        /** Поставить свой сертификат для SNI */
         put: operations["set-sni-certificate"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П SNI: ╨▓╨╡╤А╨╜╤С╤В╤Б╤П ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ */
+        /** Убрать свой сертификат для SNI: вернётся автоматический */
         delete: operations["clear-sni-certificate"];
         options?: never;
         head?: never;
@@ -1773,7 +1773,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╛╨╗╤Г╤З╨╕╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П SNI ╤Б╨╡╨╣╤З╨░╤Б: ╨╢╨┤╤С╤В ╨┤╨╛ 90 ╤Б ╨╕ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╤В╨╡╨╝, ╤З╤В╨╛ ╨▓╤Л╤И╨╗╨╛ (ordering тАФ ╨╖╨░╨║╨░╨╖ ╨╡╤Й╤С ╨╕╨┤╤С╤В) */
+        /** Получить сертификат для SNI сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт) */
         post: operations["renew-sni-certificate"];
         delete?: never;
         options?: never;
@@ -1789,10 +1789,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Поставить свой сертификат для ссылки подписки */
         put: operations["set-sub-certificate"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╤Б╨▓╨╛╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕: ╨▓╨╡╤А╨╜╤С╤В╤Б╤П ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ */
+        /** Убрать свой сертификат для ссылки подписки: вернётся автоматический */
         delete: operations["clear-sub-certificate"];
         options?: never;
         head?: never;
@@ -1808,7 +1808,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╛╨╗╤Г╤З╨╕╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╤Б╨╡╨╣╤З╨░╤Б: ╨╢╨┤╤С╤В ╨┤╨╛ 90 ╤Б ╨╕ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╤В╨╡╨╝, ╤З╤В╨╛ ╨▓╤Л╤И╨╗╨╛ (ordering тАФ ╨╖╨░╨║╨░╨╖ ╨╡╤Й╤С ╨╕╨┤╤С╤В) */
+        /** Получить сертификат для ссылки подписки сейчас: ждёт до 90 с и отвечает тем, что вышло (ordering — заказ ещё идёт) */
         post: operations["renew-sub-certificate"];
         delete?: never;
         options?: never;
@@ -1824,8 +1824,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * ╨в╤А╨░╤Д╨╕╨║ ╨┐╨╛ ╨╜╨╛╨┤╨░╨╝
-         * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Г╨╜╨╡╤Б╨╗╨░ ╨║╨░╨╢╨┤╨░╤П ╨╜╨╛╨┤╨░ ╨╖╨░ ╨┐╨╡╤А╨╕╨╛╨┤. ╨г╤З╤С╤В ╨╕╨┤╤С╤В ╤Б ╨▓╨╡╤А╤Б╨╕╨╕, ╨│╨┤╨╡ ╨╛╨╜ ╨┐╨╛╤П╨▓╨╕╨╗╤Б╤П: ╨┐╤А╨╛╤И╨╗╨╛╨╡ ╨┐╨╛ ╨╜╨╛╨┤╨░╨╝ ╨╜╨╡ ╨▓╨╛╤Б╤Б╤В╨░╨╜╨░╨▓╨╗╨╕╨▓╨░╨╡╤В╤Б╤П.
+         * Трафик по нодам
+         * @description Сколько унесла каждая нода за период. Учёт идёт с версии, где он появился: прошлое по нодам не восстанавливается.
          */
         get: operations["stats-nodes"];
         put?: never;
@@ -1843,7 +1843,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨╛╨║╨░╨╖╨░╤В╨╡╨╗╨╕ ╨┤╨░╤И╨▒╨╛╤А╨┤╨░ */
+        /** Показатели дашборда */
         get: operations["stats-overview"];
         put?: never;
         post?: never;
@@ -1860,7 +1860,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨в╤А╨░╤Д╨╕╨║ ╤Б╨╡╤А╨▓╨╡╤А╨░ */
+        /** Трафик сервера */
         get: operations["stats-traffic"];
         put?: never;
         post?: never;
@@ -1877,10 +1877,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ш╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╨╕ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Инструкции страницы подписки */
         get: operations["list-sub-docs"];
         put?: never;
-        /** ╨Э╨╛╨▓╨░╤П ╨╕╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╤П */
+        /** Новая инструкция */
         post: operations["create-sub-doc"];
         delete?: never;
         options?: never;
@@ -1896,7 +1896,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Я╨╛╤А╤П╨┤╨╛╨║ ╨╕╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╨╣ */
+        /** Порядок инструкций */
         put: operations["order-sub-docs"];
         post?: never;
         delete?: never;
@@ -1913,10 +1913,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨╕╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╤О */
+        /** Изменить инструкцию */
         put: operations["update-sub-doc"];
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨╕╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╤О */
+        /** Удалить инструкцию */
         delete: operations["delete-sub-doc"];
         options?: never;
         head?: never;
@@ -1930,9 +1930,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╤В╤А╨░╨╜╨╕╤Ж╨░ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕: ╨▓╨╕╨┤, ╨▒╨╗╨╛╨║╨╕, ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П */
+        /** Страница подписки: вид, блоки, приложения */
         get: operations["get-sub-page"];
-        /** ╨б╨╛╤Е╤А╨░╨╜╨╕╤В╤М ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Г ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Сохранить страницу подписки */
         put: operations["update-sub-page"];
         post?: never;
         delete?: never;
@@ -1948,12 +1948,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ч╨░╨│╤А╤Г╨╢╨╡╨╜╨╜╨░╤П ╨║╨░╤А╤В╨╕╨╜╨║╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Загруженная картинка страницы подписки */
         get: operations["get-sub-page-image"];
-        /** ╨Ч╨░╨│╤А╤Г╨╖╨╕╤В╤М ╨╗╨╛╨│╨╛╤В╨╕╨┐ ╨╕╨╗╨╕ ╤Д╨╛╨╜ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Загрузить логотип или фон страницы подписки */
         put: operations["put-sub-page-image"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╨╗╨╛╨│╨╛╤В╨╕╨┐ ╨╕╨╗╨╕ ╤Д╨╛╨╜ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+        /** Убрать логотип или фон страницы подписки */
         delete: operations["delete-sub-page-image"];
         options?: never;
         head?: never;
@@ -1969,7 +1969,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╤Б╨╡╤А╨▓╨╡╤А ╨┐╨░╨╜╨╡╨╗╨╕ */
+        /** Проверить сервер панели */
         post: operations["check-server"];
         delete?: never;
         options?: never;
@@ -1987,8 +1987,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М, ╨╛╤В╨║╤А╤Л╨▓╨░╤О╤В╤Б╤П ╨╗╨╕ ╨┐╨╛╤А╤В╤Л ╤Б╨╡╤А╨▓╨╡╤А╨░ ╨╕╨╖ ╨а╨╛╤Б╤Б╨╕╨╕
-         * @description ╨Ч╨╛╨╜╨┤╤Л Globalping ╨▓ ╨┤╨╛╨╝╨░╤И╨╜╨╕╤Е ╨╕ ╨╝╨╛╨▒╨╕╨╗╤М╨╜╤Л╤Е ╤Б╨╡╤В╤П╤Е ╨а╨╛╤Б╤Б╨╕╨╕ ╨╕ ╨▓ ╨┤╨░╤В╨░-╤Ж╨╡╨╜╤В╤А╨░╤Е ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╤О╤В╤Б╤П ╨║ ╨┐╨╛╤А╤В╨░╨╝, ╨║╨╛╨╜╤В╤А╨╛╨╗╤М ╨╕╨╖ ╨Х╨▓╤А╨╛╨┐╤Л. ╨Р╨┤╤А╨╡╤Б ╤Б╨╡╤А╨▓╨╡╤А╨░ ╤Г╤Е╨╛╨┤╨╕╤В ╨▓ Globalping.
+         * Проверить, открываются ли порты сервера из России
+         * @description Зонды Globalping в домашних и мобильных сетях России и в дата-центрах подключаются к портам, контроль из Европы. Адрес сервера уходит в Globalping.
          */
         post: operations["check-reach"];
         delete?: never;
@@ -2004,10 +2004,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨в╨░╤А╨╕╤Д╤Л */
+        /** Тарифы */
         get: operations["list-tariffs"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╤В╨░╤А╨╕╤Д */
+        /** Создать тариф */
         post: operations["create-tariff"];
         delete?: never;
         options?: never;
@@ -2023,10 +2023,10 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╤В╨░╤А╨╕╤Д */
+        /** Изменить тариф */
         put: operations["update-tariff"];
         post?: never;
-        /** ╨г╨▒╤А╨░╤В╤М ╤В╨░╤А╨╕╤Д ╨▓ ╨░╤А╤Е╨╕╨▓ */
+        /** Убрать тариф в архив */
         delete: operations["archive-tariff"];
         options?: never;
         head?: never;
@@ -2042,7 +2042,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╕╨╝╨╡╨╜╨╕╤В╤М ╨╗╨╕╨╝╨╕╤В╤Л ╨┐╤Г╨╗╨╛╨▓ ╤В╨░╤А╨╕╤Д╨░ ╨║ ╤Г╨╢╨╡ ╨▓╤Л╨┤╨░╨╜╨╜╤Л╨╝ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░╨╝: ╤Б╨▓╨╛╨╕ ╨╗╨╕╨╝╨╕╤В╤Л ╨┐╤Г╨╗╨╛╨▓ ╤Г ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓ ╨╖╨░╨╝╨╡╨╜╤П╤В╤Б╤П, ╨╕╨╖╤А╨░╤Б╤Е╨╛╨┤╨╛╨▓╨░╨╜╨╜╨╛╨╡ ╨╛╤Б╤В╨░╨╜╨╡╤В╤Б╤П */
+        /** Применить лимиты пулов тарифа к уже выданным подпискам: свои лимиты пулов у клиентов заменятся, израсходованное останется */
         post: operations["apply-tariff-pools"];
         delete?: never;
         options?: never;
@@ -2057,14 +2057,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Telegram-╨▒╨╛╤В */
+        /** Telegram-бот */
         get: operations["get-telegram"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╕╤В╤М Telegram-╨▒╨╛╤В╨░ */
+        /** Настроить Telegram-бота */
         patch: operations["update-telegram"];
         trace?: never;
     };
@@ -2075,14 +2075,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨С╤Н╨║╨░╨┐╤Л ╨▓ Telegram */
+        /** Бэкапы в Telegram */
         get: operations["get-telegram-backup"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╕╤В╤М ╨▒╤Н╨║╨░╨┐╤Л ╨▓ Telegram */
+        /** Настроить бэкапы в Telegram */
         patch: operations["update-telegram-backup"];
         trace?: never;
     };
@@ -2096,8 +2096,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * ╨Ю╤В╨┐╤А╨░╨▓╨╕╤В╤М ╨▒╤Н╨║╨░╨┐ ╤Б╨╡╨╣╤З╨░╤Б
-         * @description ╨С╤Н╨║╨░╨┐ ╨┤╨╡╨╗╨░╨╡╤В╤Б╤П ╨▓ ╤Д╨╛╨╜╨╡: ╨╛╤В╨▓╨╡╤В 202 ╤Б╤А╨░╨╖╤Г, ╨╕╤В╨╛╨│ тАФ ╨▓ GET /api/v1/telegram/backup (sending, last_ok, last_error).
+         * Отправить бэкап сейчас
+         * @description Бэкап делается в фоне: ответ 202 сразу, итог — в GET /api/v1/telegram/backup (sending, last_ok, last_error).
          */
         post: operations["send-telegram-backup"];
         delete?: never;
@@ -2113,9 +2113,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ъ╤В╨╛ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╨▓ ╨▒╨╛╤В╨╡ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║╨╛╨▓ */
+        /** Кто отвечает в боте подписчиков */
         get: operations["get-bot-addon"];
-        /** ╨Ю╤В╨┤╨░╤В╤М ╨▒╨╛╤В╨░ ╨░╨┤╨┤╨╛╨╜╤Г */
+        /** Отдать бота аддону */
         put: operations["set-bot-addon"];
         post?: never;
         delete?: never;
@@ -2133,7 +2133,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨а╨░╨╖╨╛╤Б╨╗╨░╤В╤М ╤Б╨╛╨╛╨▒╤Й╨╡╨╜╨╕╨╡ ╨▓╤Б╨╡╨╝ ╨▓ ╨▒╨╛╤В╨╡ */
+        /** Разослать сообщение всем в боте */
         post: operations["telegram-broadcast"];
         delete?: never;
         options?: never;
@@ -2150,9 +2150,9 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╛╨┤╨║╨╗╤О╤З╨╕╤В╤М ╤З╨░╤В ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░ ╨┤╨╗╤П ╤Г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╣ */
+        /** Подключить чат администратора для уведомлений */
         post: operations["telegram-infrastructure-connect"];
-        /** ╨Ю╤В╨║╨╗╤О╤З╨╕╤В╤М ╤З╨░╤В ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░ ╨┤╨╗╤П ╤Г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╣ */
+        /** Отключить чат администратора для уведомлений */
         delete: operations["telegram-infrastructure-disconnect"];
         options?: never;
         head?: never;
@@ -2168,7 +2168,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ъ╨░╨║ ╨▒╨╛╤В ╨╛╤В╨┐╤А╨░╨▓╨╕╤В ╤В╨╡╨║╤Б╤В ╤Б Markdown */
+        /** Как бот отправит текст с Markdown */
         post: operations["telegram-preview"];
         delete?: never;
         options?: never;
@@ -2183,14 +2183,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨С╨╗╨╛╨║╨╕╤А╨╛╨▓╨║╨░ ╤В╨╛╤А╤А╨╡╨╜╤В╨╛╨▓ */
+        /** Блокировка торрентов */
         get: operations["get-torrent"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Э╨░╤Б╤В╤А╨╛╨╕╤В╤М ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨║╤Г ╤В╨╛╤А╤А╨╡╨╜╤В╨╛╨▓ */
+        /** Настроить блокировку торрентов */
         patch: operations["update-torrent"];
         trace?: never;
     };
@@ -2202,8 +2202,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * ╨Я╨╛╨╣╨╝╨░╨╜╨╜╤Л╨╡ ╤В╨╛╤А╤А╨╡╨╜╤В╤Л
-         * @description ╨Э╨╛╨▓╤Л╨╡ ╤Б╨▓╨╡╤А╤Е╤Г; ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨░╤П ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ тАФ before=id ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╣ ╨╖╨░╨┐╨╕╤Б╨╕.
+         * Пойманные торренты
+         * @description Новые сверху; следующая страница — before=id последней записи.
          */
         get: operations["list-torrent-hits"];
         put?: never;
@@ -2221,14 +2221,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П */
+        /** Обновления */
         get: operations["get-updates"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** ╨Р╨▓╤В╨╛╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╕ ╨║╨░╨╜╨░╨╗ ╤А╨╡╨╗╨╕╨╖╨╛╨▓ */
+        /** Автообновление и канал релизов */
         patch: operations["update-updates"];
         trace?: never;
     };
@@ -2241,7 +2241,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П ╤Б╨╡╨╣╤З╨░╤Б */
+        /** Проверить обновления сейчас */
         post: operations["check-updates"];
         delete?: never;
         options?: never;
@@ -2258,7 +2258,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ю╨▒╨╜╨╛╨▓╨╕╤В╤М ╤Б╨╡╨╣╤З╨░╤Б: ╨╖╨░╤П╨▓╨║╨░ ╤Б╨╡╤А╨▓╨╡╤А╤Г */
+        /** Обновить сейчас: заявка серверу */
         post: operations["request-update"];
         delete?: never;
         options?: never;
@@ -2273,10 +2273,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨б╨┐╨╕╤Б╨╛╨║ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ */
+        /** Список пользователей */
         get: operations["list-users"];
         put?: never;
-        /** ╨б╨╛╨╖╨┤╨░╤В╤М ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П ╨┐╨╛ ╤В╨░╤А╨╕╤Д╤Г */
+        /** Создать пользователя по тарифу */
         post: operations["create-user"];
         delete?: never;
         options?: never;
@@ -2293,7 +2293,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ь╨░╤Б╤Б╨╛╨▓╨╛╨╡ ╨┤╨╡╨╣╤Б╤В╨▓╨╕╨╡ */
+        /** Массовое действие */
         post: operations["bulk-users"];
         delete?: never;
         options?: never;
@@ -2308,15 +2308,15 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М */
+        /** Пользователь */
         get: operations["get-user"];
         put?: never;
         post?: never;
-        /** ╨г╨┤╨░╨╗╨╕╤В╤М ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Удалить пользователя */
         delete: operations["delete-user"];
         options?: never;
         head?: never;
-        /** ╨Ш╨╖╨╝╨╡╨╜╨╕╤В╤М ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Изменить пользователя */
         patch: operations["update-user"];
         trace?: never;
     };
@@ -2327,7 +2327,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╨╡ ╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡ */
+        /** Устройства, привязанные к подписке */
         get: operations["user-bound-devices"];
         put?: never;
         post?: never;
@@ -2347,11 +2347,11 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨Ю╤В╨▓╤П╨╖╨░╤В╤М ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛: ╨╡╨│╨╛ ╨║╨╗╤О╤З╨╕ ╤Б╨│╨╛╤А╨░╤О╤В */
+        /** Отвязать устройство: его ключи сгорают */
         delete: operations["unbind-device"];
         options?: never;
         head?: never;
-        /** ╨Я╨╡╤А╨╡╨╕╨╝╨╡╨╜╨╛╨▓╨░╤В╤М ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╨╛╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛ */
+        /** Переименовать привязанное устройство */
         patch: operations["rename-device"];
         trace?: never;
     };
@@ -2364,7 +2364,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Ч╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╤В╤М ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛: ╨╛╤В╨▓╤П╨╖╨░╤В╤М ╨╕ ╨╜╨╡ ╨┤╨░╨▓╨░╤В╤М ╨┐╤А╨╕╨▓╤П╨╖╨░╤В╤М╤Б╤П ╤Б╨╜╨╛╨▓╨░ ╨┐╨╛ ╨╡╨│╨╛ ID */
+        /** Заблокировать устройство: отвязать и не давать привязаться снова по его ID */
         post: operations["ban-device"];
         delete?: never;
         options?: never;
@@ -2379,7 +2379,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Ч╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Заблокированные устройства пользователя */
         get: operations["device-bans"];
         put?: never;
         post?: never;
@@ -2399,7 +2399,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨а╨░╨╖╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╤В╤М ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛: ╨╛╨╜╨╛ ╤Б╨╜╨╛╨▓╨░ ╤Б╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╕╨▓╤П╨╖╨░╤В╤М╤Б╤П */
+        /** Разблокировать устройство: оно снова сможет привязаться */
         delete: operations["unban-device"];
         options?: never;
         head?: never;
@@ -2413,7 +2413,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Р╨┤╤А╨╡╤Б╨░, ╤Б ╨║╨╛╤В╨╛╤А╤Л╤Е ╨╖╨░╤Е╨╛╨┤╨╕╨╗ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М */
+        /** Адреса, с которых заходил пользователь */
         get: operations["user-devices"];
         put?: never;
         post?: never;
@@ -2432,7 +2432,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╤А╨╛╨┤╨╗╨╕╤В╤М */
+        /** Продлить */
         post: operations["extend-user"];
         delete?: never;
         options?: never;
@@ -2447,10 +2447,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╨░╨║╨╡╤В╤Л ╤В╤А╨░╤Д╨╕╨║╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Пакеты трафика пользователя */
         get: operations["user-grants"];
         put?: never;
-        /** ╨Э╨░╤З╨╕╤Б╨╗╨╕╤В╤М ╤В╤А╨░╤Д╨╕╨║ */
+        /** Начислить трафик */
         post: operations["grant-traffic"];
         delete?: never;
         options?: never;
@@ -2465,7 +2465,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨и╨╕╤Д╤А╨╛╨▓╨░╨╜╨╜╨░╤П ╤Б╤Б╤Л╨╗╨║╨░ Happ ╨╜╨░ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Шифрованная ссылка Happ на подписку пользователя */
         get: operations["user-happ-link"];
         put?: never;
         post?: never;
@@ -2482,9 +2482,9 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨Я╤Г╨╗╤Л ╤В╤А╨░╤Д╨╕╨║╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Пулы трафика пользователя */
         get: operations["user-pools"];
-        /** ╨Ы╨╕╨╝╨╕╤В╤Л ╨┐╤Г╨╗╨╛╨▓ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Лимиты пулов пользователя */
         put: operations["set-user-pools"];
         post?: never;
         delete?: never;
@@ -2502,7 +2502,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨Я╨╡╤А╨╡╨▓╤Л╨┐╤Г╤Б╤В╨╕╤В╤М ╤Б╤Б╤Л╨╗╨║╤Г */
+        /** Перевыпустить ссылку */
         post: operations["reissue-user"];
         delete?: never;
         options?: never;
@@ -2519,7 +2519,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨б╨▒╤А╨╛╤Б╨╕╤В╤М ╤В╤А╨░╤Д╨╕╨║ */
+        /** Сбросить трафик */
         post: operations["reset-user-traffic"];
         delete?: never;
         options?: never;
@@ -2537,7 +2537,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** ╨Ю╤В╨▓╤П╨╖╨░╤В╤М ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╨╛╤В Telegram */
+        /** Отвязать подписку от Telegram */
         delete: operations["unlink-telegram"];
         options?: never;
         head?: never;
@@ -2553,7 +2553,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ╨б╨╜╤П╤В╤М ╤В╨╛╤А╤А╨╡╨╜╤В-╨▒╨░╨╜ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** Снять торрент-бан пользователя */
         post: operations["lift-torrent-ban"];
         delete?: never;
         options?: never;
@@ -2568,7 +2568,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ╨У╤А╨░╤Д╨╕╨║ ╤В╤А╨░╤Д╨╕╨║╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+        /** График трафика пользователя */
         get: operations["user-traffic"];
         put?: never;
         post?: never;
@@ -2593,15 +2593,15 @@ export interface components {
             /** Format: date-time */
             last_used_at?: string;
             name: string;
-            /** @description ╨Я╨╡╤А╨▓╤Л╨╡ ╤Б╨╕╨╝╨▓╨╛╨╗╤Л ╨║╨╗╤О╤З╨░, ╤З╤В╨╛╨▒╤Л ╨╛╤В╨╗╨╕╤З╨░╤В╤М ╨║╨╗╤О╤З╨╕ */
+            /** @description Первые символы ключа, чтобы отличать ключи */
             prefix: string;
             /** @enum {string} */
             scope: "read" | "full";
         };
         AddSourceInputBody: {
-            /** @description ╨Я╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ ╨║╨╗╤О╤З ╨░╨▓╤В╨╛╤А╨░, ed25519 ╨▓ base64, ╨╡╤Б╨╗╨╕ ╨░╨┤╨╝╨╕╨╜ ╨╖╨╜╨░╨╡╤В ╨╡╨│╨╛ ╨╖╨░╤А╨░╨╜╨╡╨╡: ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В╤Б╤П, ╤В╨╛╨╗╤М╨║╨╛ ╨╡╤Б╨╗╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜ ╨╕╨╝ */
+            /** @description Публичный ключ автора, ed25519 в base64, если админ знает его заранее: источник принимается, только если подписан им */
             key?: string;
-            /** @description https://тАж/mikan-addon.json, https://тАж/index.json ╨╕╨╗╨╕ github.com/<╨▓╨╗╨░╨┤╨╡╨╗╨╡╤Ж>/<╤А╨╡╨┐╨╛╨╖╨╕╤В╨╛╤А╨╕╨╣> (╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╣ ╤А╨╡╨╗╨╕╨╖) */
+            /** @description https://…/mikan-addon.json, https://…/index.json или github.com/<владелец>/<репозиторий> (последний релиз) */
             url: string;
         };
         AddonCatalogEntry: {
@@ -2611,16 +2611,16 @@ export interface components {
             homepage: string;
             id: string;
             installed: boolean;
-            /** @description ╨Э╨░╨╖╨▓╨░╨╜╨╕╨╡ ╨┐╨╛ ╤П╨╖╤Л╨║╨░╨╝ */
+            /** @description Название по языкам */
             name: {
                 [key: string]: string;
             };
-            /** @description ╨г╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜, ╨░ ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨┤╤А╤Г╨│╨░╤П ╤Б╨▒╨╛╤А╨║╨░ */
+            /** @description Установлен, а в каталоге другая сборка */
             update: boolean;
             version: string;
         };
         AddonField: {
-            /** @description ╨Я╨╛╨┤╤Б╨║╨░╨╖╨║╨░ ╨▓ ╨┐╤Г╤Б╤В╨╛╨╝ ╨┐╨╛╨╗╨╡; ╨┐╨░╨╜╨╡╨╗╤М ╨╡╨│╨╛ ╨╜╨╡ ╤Б╨╛╤Е╤А╨░╨╜╤П╨╡╤В, ╨░╨┤╨░╨┐╤В╨╡╤А ╨┐╤А╨╕╨╝╨╡╨╜╤П╨╡╤В ╤Б╨░╨╝ */
+            /** @description Подсказка в пустом поле; панель его не сохраняет, адаптер применяет сам */
             default?: unknown;
             help?: {
                 [key: string]: string;
@@ -2631,31 +2631,31 @@ export interface components {
             };
             /**
              * Format: int64
-             * @description ╨в╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П number
+             * @description Только для number
              */
             max?: number;
             /**
              * Format: int64
-             * @description ╨в╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П number
+             * @description Только для number
              */
             min?: number;
-            /** @description ╨в╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П select */
+            /** @description Только для select */
             options?: components["schemas"]["AddonOption"][];
-            /** @description ╨в╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П string */
+            /** @description Только для string */
             pattern?: string;
             required: boolean;
-            /** @description ╨Ч╨╜╨░╤З╨╡╨╜╨╕╨╡ API ╨╜╨╡ ╨╛╤В╨┤╨░╤С╤В; ╨┐╤Г╤Б╤В╨╛ ╨┐╤А╨╕ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╕╨╕ тАФ ╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╨┐╤А╨╡╨╢╨╜╨╡╨╡ */
+            /** @description Значение API не отдаёт; пусто при сохранении — оставить прежнее */
             secret: boolean;
-            /** @description ╨Ч╨╜╨░╤З╨╡╨╜╨╕╨╡ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╛ */
+            /** @description Значение сохранено */
             set: boolean;
             /**
-             * @description ╨Ф╤А╤Г╨│╨╛╨╣ ╤В╨╕╨┐ ╨┐╨░╨╜╨╡╨╗╤М ╨╜╨╡ ╨╖╨╜╨░╨╡╤В: ╤Б╨╝. unsupported
+             * @description Другой тип панель не знает: см. unsupported
              * @enum {string}
              */
             type: "string" | "bool" | "select" | "number" | "text" | "code";
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╨╜╨╡ ╨╖╨╜╨░╨╡╤В ╤Н╤В╨╛╤В ╤В╨╕╨┐: ╨┐╨╛╨╗╨╡ ╨╜╨╡ ╨╖╨░╨┐╨╛╨╗╨╜╨╕╤В╤М ╨╕ ╨╜╨╡ ╤Б╨╛╤Е╤А╨░╨╜╨╕╤В╤М */
+            /** @description Панель не знает этот тип: поле не заполнить и не сохранить */
             unsupported?: boolean;
-            /** @description ╨в╨╡╨║╤Г╤Й╨╡╨╡ ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡, ╨║╤А╨╛╨╝╨╡ ╤Б╨╡╨║╤А╨╡╤В╨╛╨▓ */
+            /** @description Текущее значение, кроме секретов */
             value?: unknown;
         };
         AddonOption: {
@@ -2667,38 +2667,38 @@ export interface components {
         AddonPageView: {
             /**
              * Format: int64
-             * @description Unix-╨▓╤А╨╡╨╝╤П, ╨┐╨╛╤Б╨╗╨╡ ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨░╨┤╤А╨╡╤Б ╨╜╨╡ ╨╛╤В╨║╤А╨╛╨╡╤В ╤Д╨░╨╣╨╗╤Л ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л
+             * @description Unix-время, после которого адрес не откроет файлы страницы
              */
             expires_at: number;
-            /** @description ╨Э╨░╨╖╨▓╨░╨╜╨╕╨╡ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛ ╤П╨╖╤Л╨║╨░╨╝ */
+            /** @description Название страницы по языкам */
             title: {
                 [key: string]: string;
             };
-            /** @description ╨Р╨┤╤А╨╡╤Б ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨╛╤В╨╜╨╛╤Б╨╕╤В╨╡╨╗╤М╨╜╨╛ ╨░╨┤╤А╨╡╤Б╨░ ╨░╨┤╨╝╨╕╨╜╨║╨╕ (addons-ui/<id>/<╨┐╨╛╨┤╨┐╨╕╤Б╤М>/тАж); ╨┐╨╛╨┤╨┐╨╕╤Б╤М ╨┤╨╡╨╣╤Б╤В╨▓╤Г╨╡╤В 10 ╨╝╨╕╨╜╤Г╤В */
+            /** @description Адрес страницы относительно адреса админки (addons-ui/<id>/<подпись>/…); подпись действует 10 минут */
             url: string;
         };
         AddonRPCInputBody: {
-            /** @description ╨Ы╤О╨▒╨╛╨╣ JSON ╨┤╨╗╤П ╨░╨┤╨┤╨╛╨╜╨░ */
+            /** @description Любой JSON для аддона */
             body?: unknown;
             /**
-             * @description ╨п╨╖╤Л╨║ ╨░╨┤╨╝╨╕╨╜╨║╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╤П╨╖╤Л╨║ ╨┐╨░╨╜╨╡╨╗╨╕
+             * @description Язык админки; пусто — язык панели
              * @enum {string}
              */
             lang?: "ru" | "en";
             /**
-             * @description ╨Ь╨╡╤В╨╛╨┤ ╨┤╨╗╤П ╨░╨┤╨┤╨╛╨╜╨░; GET ╨╜╨╡ ╨┐╨╕╤И╨╡╤В╤Б╤П ╨▓ ╨╢╤Г╤А╨╜╨░╨╗
+             * @description Метод для аддона; GET не пишется в журнал
              * @enum {string}
              */
             method: "GET" | "POST" | "PUT" | "DELETE";
-            /** @description ╨Я╤Г╤В╤М ╨┤╨╗╤П ╨░╨┤╨┤╨╛╨╜╨░, ╨╜╨░╤З╨╕╨╜╨░╨╡╤В╤Б╤П ╤Б / */
+            /** @description Путь для аддона, начинается с / */
             path: string;
         };
         AddonRPCResult: {
-            /** @description JSON ╨░╨┤╨┤╨╛╨╜╨░ ╨║╨░╨║ ╨╡╤Б╤В╤М, ╨┤╨╛ 1 ╨Ь╨╕╨С */
+            /** @description JSON аддона как есть, до 1 МиБ */
             body: unknown;
             /**
              * Format: int64
-             * @description ╨Ъ╨╛╨┤ ╨╛╤В╨▓╨╡╤В╨░ ╨░╨┤╨┤╨╛╨╜╨░: ╨╛╤И╨╕╨▒╨║╨╕ ╨░╨┤╨┤╨╛╨╜╨░ ╤В╨╛╨╢╨╡ ╨┐╤А╨╕╤Е╨╛╨┤╤П╤В ╤Б╤О╨┤╨░
+             * @description Код ответа аддона: ошибки аддона тоже приходят сюда
              */
             status: number;
         };
@@ -2722,7 +2722,7 @@ export interface components {
         AddonStorageInputBody: {
             /**
              * Format: int64
-             * @description 1 ╨Ь╨╕╨С тАж 1 ╨в╨╕╨С; ╨┐╤А╨╕ unlimited ╨╜╨╡ ╨╜╤Г╨╢╨╡╨╜
+             * @description 1 МиБ … 1 ТиБ; при unlimited не нужен
              */
             limit_mib?: number;
             unlimited?: boolean;
@@ -2730,26 +2730,26 @@ export interface components {
         AddonStorageView: {
             /**
              * Format: int64
-             * @description ╨Ы╨╕╨╝╨╕╤В ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О
+             * @description Лимит по умолчанию
              */
             default_mib: number;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨Ь╨╕╨С ╨╛╨┤╨╕╨╜ ╨░╨┤╨┤╨╛╨╜ ╨╝╨╛╨╢╨╡╤В ╤Е╤А╨░╨╜╨╕╤В╤М; ╨┐╤А╨╕ unlimited ╨╜╨╡ ╨┤╨╡╨╣╤Б╤В╨▓╤Г╨╡╤В
+             * @description Сколько МиБ один аддон может хранить; при unlimited не действует
              */
             limit_mib: number;
-            /** @description ╨С╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░: ╨░╨┤╨┤╨╛╨╜ ╨╝╨╛╨╢╨╡╤В ╨╖╨░╨╜╤П╤В╤М ╨▓╨╡╤Б╤М ╨┤╨╕╤Б╨║ ╤Б╨╡╤А╨▓╨╡╤А╨░ */
+            /** @description Без лимита: аддон может занять весь диск сервера */
             unlimited: boolean;
         };
         AddonView: {
-            /** @description ╨Я╤А╨╕╨╜╨╕╨╝╨░╨╡╤В ╨╛╨┐╨╗╨░╤В╤Г ╨┐╤А╤П╨╝╨╛ ╤Б╨╡╨╣╤З╨░╤Б: ╨▓╨║╨╗╤О╤З╤С╨╜, ╨╜╨░╤Б╤В╤А╨╛╨╡╨╜, ╤А╨░╨▒╨╛╤В╨░╨╡╤В */
+            /** @description Принимает оплату прямо сейчас: включён, настроен, работает */
             available: boolean;
             enabled: boolean;
             help: {
                 [key: string]: string;
             };
             id: string;
-            /** @description ╨Р╨┤╨░╨┐╤В╨╡╤А ╨╜╨╡ ╨╛╤В╨▓╨╡╤В╨╕╨╗ ╨╛ ╤Б╨╡╨▒╨╡: ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╜╤Л */
+            /** @description Адаптер не ответил о себе: настройки недоступны */
             info_error?: string;
             name: {
                 [key: string]: string;
@@ -2758,19 +2758,19 @@ export interface components {
             /** @enum {string} */
             status: "running";
             version: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б ╨┤╨╗╤П ╤Г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╣ ╨▓ ╨║╨░╨▒╨╕╨╜╨╡╤В╨╡ ╨┐╤А╨╛╨▓╨░╨╣╨┤╨╡╤А╨░ */
+            /** @description Адрес для уведомлений в кабинете провайдера */
             webhook_url: string;
         };
         AddonsView: {
             catalog: components["schemas"]["AddonCatalogEntry"][];
-            /** @description catalog_unavailable тАФ ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨╡ ╨╖╨░╨│╤А╤Г╨╖╨╕╨╗╤Б╤П */
+            /** @description catalog_unavailable — каталог не загрузился */
             catalog_error?: string;
             installed: components["schemas"]["AddonView"][];
-            /** @description ╨Ъ╨░╨║ ╤Б╨╡╤А╨▓╨╡╤А ╨▓╤Л╨┐╨╛╨╗╨╜╨╕╨╗ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╤О╤О ╨╖╨░╤П╨▓╨║╤Г */
+            /** @description Как сервер выполнил последнюю заявку */
             last?: components["schemas"]["AddonResult"];
-            /** @description ╨Т╤Б╨╡ ╨╖╨░╤П╨▓╨║╨╕, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╤Б╨╡╤А╨▓╨╡╤А ╨╡╤Й╤С ╨╜╨╡ ╨▓╨╖╤П╨╗, ╨┐╨╛ ╨┐╨╛╤А╤П╨┤╨║╤Г */
+            /** @description Все заявки, которые сервер ещё не взял, по порядку */
             queue?: components["schemas"]["AddonRequest"][];
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╨▓╨╕╨┤╨╕╤В ╨║╨░╤В╨░╨╗╨╛╨│ ╨┤╨░╨╜╨╜╤Л╤Е ╤Б╨╡╤А╨▓╨╡╤А╨░; ╨╕╨╜╨░╤З╨╡ ╤Б╤В╨░╨▓╨╕╤В╤М ╨░╨┤╨░╨┐╤В╨╡╤А╤Л ╨╜╨╡╨╗╤М╨╖╤П */
+            /** @description Панель видит каталог данных сервера; иначе ставить адаптеры нельзя */
             supported: boolean;
         };
         AdminView: {
@@ -2800,7 +2800,7 @@ export interface components {
         ApplyPoolsOutputBody: {
             /**
              * Format: int64
-             * @description ╨г ╤Б╨║╨╛╨╗╤М╨║╨╕╤Е ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓ ╤В╨░╤А╨╕╤Д╨░ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л ╨╗╨╕╨╝╨╕╤В╤Л ╨┐╤Г╨╗╨╛╨▓
+             * @description У скольких клиентов тарифа обновлены лимиты пулов
              */
             applied: number;
         };
@@ -2809,24 +2809,24 @@ export interface components {
             at: string;
             /** @enum {string} */
             ca: "letsencrypt" | "zerossl" | "google";
-            /** @description ╨б╨╗╨╛╨▓╨░ ╤Ж╨╡╨╜╤В╤А╨░ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤Ж╨╕╨╕ ╨╕╨╗╨╕ ╤Б╨╕╤Б╤В╨╡╨╝╤Л ╨║╨░╨║ ╨╡╤Б╤В╤М */
+            /** @description Слова центра сертификации или системы как есть */
             detail?: string;
-            /** @description ╨Ъ╨╛╨┤ errors.acme; ╨┐╤Г╤Б╤В╨╛ тАФ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┐╨╛╨╗╤Г╤З╨╡╨╜ */
+            /** @description Код errors.acme; пусто — сертификат получен */
             error?: string;
-            /** @description ╨Ъ╤В╨╛ ╨┤╨╡╤А╨╢╨░╨╗ ╨┐╨╛╤А╤В 80 (port80_busy), ╨╡╤Б╨╗╨╕ ╤Н╤В╨╛ ╨▓╨╕╨┤╨╜╨╛ */
+            /** @description Кто держал порт 80 (port80_busy), если это видно */
             holder?: string;
         };
         AuditEntry: {
-            /** @description ╨Э╨░╨┐╤А╨╕╨╝╨╡╤А user.create, settings.update, auth.login_failed */
+            /** @description Например user.create, settings.update, auth.login_failed */
             action: string;
             /**
              * Format: int64
-             * @description null тАФ ╤Б╨╕╤Б╤В╨╡╨╝╨░, ╨║╨╛╨╜╤Б╨╛╨╗╤М ╤Б╨╡╤А╨▓╨╡╤А╨░ ╨╕╨╗╨╕ ╨╜╨╡╤Г╨┤╨░╤З╨╜╤Л╨╣ ╨▓╤Е╨╛╨┤
+             * @description null — система, консоль сервера или неудачный вход
              */
             admin_id: number | null;
             /** Format: date-time */
             at: string;
-            /** @description ╨Я╨╛╨┤╤А╨╛╨▒╨╜╨╛╤Б╤В╨╕ ╨┤╨╡╨╣╤Б╤В╨▓╨╕╤П; null тАФ ╨╜╨╡╤В */
+            /** @description Подробности действия; null — нет */
             details: unknown;
             /** Format: int64 */
             id: number;
@@ -2835,11 +2835,11 @@ export interface components {
             target_type: string;
         };
         AuditOutputBody: {
-            /** @description ╨Ю╤В ╨╜╨╛╨▓╤Л╤Е ╨║ ╤Б╤В╨░╤А╤Л╨╝ */
+            /** @description От новых к старым */
             items: components["schemas"]["AuditEntry"][];
             /**
              * Format: int64
-             * @description ╨Я╨╡╤А╨╡╨┤╨░╨╣╤В╨╡ ╨║╨░╨║ before ╨╖╨░ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡╨╣; 0 тАФ ╤Н╤В╨╛ ╨▓╤Б╤С
+             * @description Передайте как before за следующей страницей; 0 — это всё
              */
             next: number;
         };
@@ -2860,22 +2860,22 @@ export interface components {
         AutoView: {
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤В╨░╨║╨╕╤Е ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓
+             * @description Сколько таких устройств
              */
             blocked: number;
-            /** @description ╨г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨┤╨╛╤Е╨╛╨┤╤П╤В ╨┤╨╛ ╨┤╤А╤Г╨│╨╕╤Е ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ ╨╜╨╛╨┤╤Л, ╨┤╨╛ ╤Н╤В╨╛╨│╨╛ ╨╜╨╡ ╨┤╨╛╤Е╨╛╨┤╤П╤В */
+            /** @description Устройства, которые доходят до других подключений ноды, до этого не доходят */
             cut_off: boolean;
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╤П╤П ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨░╤П ╤Б╨╝╨╡╨╜╨░ */
+            /** @description Последняя автоматическая смена */
             last?: components["schemas"]["AutoEvent"];
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨╕╨╖ ╨┐╤А╨╛╨▓╨╡╤А╤П╤О╤Й╨╕╤Е ╨▓╤Б╨╡ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓ ╨┤╨╛ ╨╜╨╡╨│╨╛ ╨┤╨╛╤И╨╗╨╕
+             * @description Сколько из проверяющих все подключения устройств до него дошли
              */
             reached: number;
             /** Format: date-time */
             since?: string;
             /**
-             * @description ╨Я╨╛╤З╨╡╨╝╤Г ╨╛╤В╤А╨╡╨╖╨░╨╜╨╜╨╛╨╡ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨║╨░╨║ ╨╡╤Б╤В╤М
+             * @description Почему отрезанное подключение остаётся как есть
              * @enum {string}
              */
             stuck?: "off" | "waiting" | "no_port" | "no_target" | "exhausted";
@@ -2883,49 +2883,49 @@ export interface components {
             target_ok?: boolean;
         };
         BackupView: {
-            /** @description ╨з╨░╤В ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░ ╨┐╨╛╨┤╨║╨╗╤О╤З╤С╨╜ ╨║ ╨▒╨╛╤В╤Г (╨▓╨║╨╗╨░╨┤╨║╨░ ┬л╨Ш╨╜╤Д╤А╨░╤Б╤В╤А╤Г╨║╤В╤Г╤А╨░┬╗) */
+            /** @description Чат администратора подключён к боту (вкладка «Инфраструктура») */
             admin_chat_set: boolean;
-            /** @description ╨б╨╗╨░╤В╤М ╨▒╨░╨╖╤Г ╨▓ ╤З╨░╤В ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░ ╤А╨░╨╖ ╨▓ ╤Б╤Г╤В╨║╨╕ */
+            /** @description Слать базу в чат администратора раз в сутки */
             enabled: boolean;
             /**
              * Format: int64
-             * @description ╨з╨░╤Б ╨╛╤В╨┐╤А╨░╨▓╨║╨╕ (UTC)
+             * @description Час отправки (UTC)
              */
             hour: number;
-            /** @description ╨Ъ╨╛╨┤ ╨╛╤И╨╕╨▒╨║╨╕ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╣ ╨┐╨╛╨┐╤Л╤В╨║╨╕ */
+            /** @description Код ошибки последней попытки */
             last_error?: string;
             /**
              * Format: date-time
-             * @description ╨Ъ╨╛╨│╨┤╨░ ╤Г╤И╤С╨╗ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╣ ╨▒╤Н╨║╨░╨┐
+             * @description Когда ушёл последний бэкап
              */
             last_ok?: string;
             /**
              * Format: int64
-             * @description ╨а╨░╨╖╨╝╨╡╤А ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨│╨╛ ╤Д╨░╨╣╨╗╨░, ╨▒╨░╨╣╤В
+             * @description Размер последнего файла, байт
              */
             last_size?: number;
             /** Format: date-time */
             last_try?: string;
-            /** @description ╨Я╨░╤А╨╛╨╗╤М ╤И╨╕╤Д╤А╨╛╨▓╨░╨╜╨╕╤П ╨╖╨░╨┤╨░╨╜; ╤Б╨░╨╝ ╨┐╨░╤А╨╛╨╗╤М ╨╜╨╡ ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╨╡╤В╤Б╤П */
+            /** @description Пароль шифрования задан; сам пароль не возвращается */
             password_set: boolean;
-            /** @description ╨С╤Н╨║╨░╨┐ ╨┤╨╡╨╗╨░╨╡╤В╤Б╤П ╨┐╤А╤П╨╝╨╛ ╤Б╨╡╨╣╤З╨░╤Б */
+            /** @description Бэкап делается прямо сейчас */
             sending: boolean;
         };
         BotSlotInputBody: {
-            /** @description id ╨░╨┤╨┤╨╛╨╜╨░ ╤Б ╨┐╤А╨░╨▓╨╛╨╝ bot ╨╕╨╗╨╕ ╨┐╤Г╤Б╤В╨╛ */
+            /** @description id аддона с правом bot или пусто */
             addon: string;
         };
         BotSlotView: {
-            /** @description ╨Р╨┤╨┤╨╛╨╜, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╨▓ ╨▒╨╛╤В╨╡; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╜╨╕╨║╤В╨╛, ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П ╨╢╨┤╤Г╤В ╨▓ ╨▒╤Г╤Д╨╡╤А╨╡ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Аддон, который отвечает в боте; пусто — никто, обновления ждут в буфере панели */
             addon: string;
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╤Б╨░╨╝╨░ ╤Б╤В╨░╨▓╨╕╤В ╨╛╤Д╨╕╤Ж╨╕╨░╨╗╤М╨╜╨╛╨│╨╛ ╨▒╨╛╤В╨░, ╨┐╨╛╨║╨░ ╨▒╨╛╤В ╨▓╨║╨╗╤О╤З╤С╨╜ ╨╕ ╨╜╨╕╨║╤В╨╛ ╨╜╨╡ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В; false тАФ ╨░╨┤╨╝╨╕╨╜ ╤Г╨┤╨░╨╗╨╕╨╗ ╨▒╨╛╤В╨░ */
+            /** @description Панель сама ставит официального бота, пока бот включён и никто не отвечает; false — админ удалил бота */
             auto: boolean;
         };
         BoundDeviceView: {
             app: string;
             /** Format: date-time */
             created_at: string;
-            /** @description ID ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╨╛╤В ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╛╨▒╤Й╨╡╨╡ ╨╝╨╡╤Б╤В╨╛ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╣ ╨▒╨╡╨╖ ID */
+            /** @description ID устройства от приложения; пусто — общее место приложений без ID */
             hwid: string;
             /** Format: int64 */
             id: number;
@@ -2933,24 +2933,24 @@ export interface components {
             /** Format: date-time */
             last_seen: string;
             model: string;
-            /** @description ╨б╨▓╨╛╤С ╨╕╨╝╤П ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╨╛╤В ╨░╨┤╨╝╨╕╨╜╨░ ╨╕╨╗╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║╨░; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╕╨╝╤П ╨╛╤В ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П (╨╝╨╛╨┤╨╡╨╗╤М, ╤Б╨╕╤Б╤В╨╡╨╝╨░) */
+            /** @description Своё имя устройства от админа или подписчика; пусто — имя от приложения (модель, система) */
             name: string;
             online: boolean;
             os: string;
             os_version: string;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л ╨║ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╤Г ╤Б ╤В╨╡╤Е ╨┐╨╛╤А, ╨║╨░╨║ ╨╛╨╜╨╛ ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╛
+             * @description Байты к устройству с тех пор, как оно привязано
              */
             traffic_down: number;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л ╨╛╤В ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╤Б ╤В╨╡╤Е ╨┐╨╛╤А, ╨║╨░╨║ ╨╛╨╜╨╛ ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╛ (╨┤╨╛ 0.5.0.5 ╨╜╨╡ ╤Б╤З╨╕╤В╨░╨╗╨╕╤Б╤М)
+             * @description Байты от устройства с тех пор, как оно привязано (до 0.5.0.5 не считались)
              */
             traffic_up: number;
         };
         BroadcastInputBody: {
-            /** @description ╨в╨╡╨║╤Б╤В ╤Б Markdown, ╨║╨░╨║ ╤В╨╡╨║╤Б╤В╤Л ╨▒╨╛╤В╨░; {brand} тАФ ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡ ╤Б╨╡╤А╨▓╨╕╤Б╨░ */
+            /** @description Текст с Markdown, как тексты бота; {brand} — название сервиса */
             text: string;
         };
         BroadcastOutputBody: {
@@ -2959,18 +2959,18 @@ export interface components {
         };
         BulkInputBody: {
             /**
-             * @description hide ╨╕ unhide ╨┐╤А╤П╤З╤Г╤В ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╨╕╨╖ ╤Б╨┐╨╕╤Б╨║╨░ ╨╕ ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╤О╤В, move ╨║╨╗╨░╨┤╤С╤В ╨▓ ╨┐╨░╨┐╨║╤Г: ╨╜╨╕ ╤В╨╛ ╨╜╨╕ ╨┤╤А╤Г╨│╨╛╨╡ ╨╜╨╡ ╨╝╨╡╨╜╤П╨╡╤В ╨┤╨╛╤Б╤В╤Г╨┐
+             * @description hide и unhide прячут пользователей из списка и возвращают, move кладёт в папку: ни то ни другое не меняет доступ
              * @enum {string}
              */
             action: "extend" | "reset" | "disable" | "enable" | "delete" | "hide" | "unhide" | "move";
             /**
              * Format: int64
-             * @description ╨Ф╨╗╤П extend; ╨╜╨╡ ╨╖╨░╨┤╨░╨╜╨╛ тАФ ╨╜╨░ ╨╛╨┤╨╕╨╜ ╨┐╨╡╤А╨╕╨╛╨┤: ╨┤╨╛ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨│╨╛ ╨┤╨╜╤П ╨╛╨┐╨╗╨░╤В╤Л ╨╕╨╗╨╕ ╨╜╨░ 30 ╨┤╨╜╨╡╨╣
+             * @description Для extend; не задано — на один период: до следующего дня оплаты или на 30 дней
              */
             days?: number;
             /**
              * Format: int64
-             * @description ╨Ф╨╗╤П move: ╨┐╨░╨┐╨║╨░; 0 ╨╕╨╗╨╕ ╨╜╨╡ ╨╖╨░╨┤╨░╨╜╨╛ тАФ ╤Г╨▒╤А╨░╤В╤М ╨╕╨╖ ╨┐╨░╨┐╨╛╨║
+             * @description Для move: папка; 0 или не задано — убрать из папок
              */
             folder_id?: number;
             ids: number[];
@@ -2980,14 +2980,14 @@ export interface components {
             affected: number;
         };
         CascadeExit: {
-            /** @description ╨Я╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╤Н╤В╨╛╨╣ ╨╜╨╛╨┤╤Л, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨▓╤Л╤Е╨╛╨┤╤П╤В ╤З╨╡╤А╨╡╨╖ ╤В╤Г ╨╜╨╛╨┤╤Г */
+            /** @description Подключения этой ноды, которые выходят через ту ноду */
             inbounds: string[];
             name: string;
             /** Format: int64 */
             node_id: number;
-            /** @description ╨Я╤А╨╛╨▓╨╡╤А╨║╨░ ╤Б ╤Н╤В╨╛╨╣ ╨╜╨╛╨┤╤Л: ╨║╨░╨║╨╛╨╣ IP ╨▓╨╕╨┤╤П╤В ╤Б╨░╨╣╤В╤Л ╤З╨╡╤А╨╡╨╖ ╤Ж╨╡╨┐╨╛╤З╨║╤Г */
+            /** @description Проверка с этой ноды: какой IP видят сайты через цепочку */
             probe?: components["schemas"]["ProbeView"];
-            /** @description ╨з╨╡╤А╨╡╨╖ ╨╜╨╡╤С ╨╕╨┤╤С╤В ╨╕ ╤В╤А╨░╤Д╨╕╨║, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨┤╤А╤Г╨│╨╕╨╡ ╨╜╨╛╨┤╤Л ╨┐╨╡╤А╨╡╨┤╨░╤О╤В ╤З╨╡╤А╨╡╨╖ ╤Н╤В╤Г */
+            /** @description Через неё идёт и трафик, который другие ноды передают через эту */
             relay: boolean;
         };
         CascadeHop: {
@@ -2999,70 +2999,70 @@ export interface components {
             /** Format: int64 */
             exit_node_id?: number;
             /**
-             * @description ╨Ъ╤Г╨┤╨░ ╨▓╤Л╨┐╤Г╤Б╨║╨░╤В╤М ╤В╤А╨░╤Д╨╕╨║ ╨┤╤А╤Г╨│╨╕╤Е ╨╜╨╛╨┤, ╨┐╤А╨╕╤И╨╡╨┤╤И╨╕╨╣ ╤З╨╡╤А╨╡╨╖ ╤Н╤В╤Г
+             * @description Куда выпускать трафик других нод, пришедший через эту
              * @enum {string}
              */
             outbound: "direct" | "warp" | "node";
         };
         CascadeRelay: {
-            /** @description ╨Я╨╛╤З╨╡╨╝╤Г ╤Б╨╗╤Г╨╢╨╡╨▒╨╜╤Л╨╣ ╨▓╤Е╨╛╨┤ ╨╜╨╡ ╨╖╨░╨┐╤Г╤Б╤В╨╕╨╗╤Б╤П, ╨║╨░╨║ ╤Б╨║╨░╨╖╨░╨╗╨░ ╨╜╨╛╨┤╨░ */
+            /** @description Почему служебный вход не запустился, как сказала нода */
             error?: string;
             /** Format: int64 */
             exit_node_id?: number;
             /**
-             * @description ╨б╨╗╤Г╤И╨░╨╡╤В ╨╗╨╕ ╨╜╨╛╨┤╨░ ╨┐╨╛╤А╤В ╤Б╨╗╤Г╨╢╨╡╨▒╨╜╨╛╨│╨╛ ╨▓╤Е╨╛╨┤╨░: busy, ╨╡╤Б╨╗╨╕ ╨┐╨╛╤А╤В ╨╖╨░╨╜╤П╤В ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨╛╨╣
+             * @description Слушает ли нода порт служебного входа: busy, если порт занят другой программой
              * @enum {string}
              */
             listener: "ok" | "busy" | "failed" | "unknown";
             /**
-             * @description ╨Ъ╤Г╨┤╨░ ╤Н╤В╨░ ╨╜╨╛╨┤╨░ ╨▓╤Л╨┐╤Г╤Б╨║╨░╨╡╤В ╨╕╤Е ╤В╤А╨░╤Д╨╕╨║
+             * @description Куда эта нода выпускает их трафик
              * @enum {string}
              */
             outbound: "direct" | "warp" | "node";
             port: string;
-            /** @description ╨Э╨╛╨┤╤Л, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨▓╤Л╤Е╨╛╨┤╤П╤В ╤З╨╡╤А╨╡╨╖ ╤Н╤В╤Г */
+            /** @description Ноды, которые выходят через эту */
             sources: components["schemas"]["CascadeHop"][];
         };
         CascadeRuleView: {
-            /** @description ╨Ш╨╝╤П ╨╜╨╛╨┤╤Л ╨▓╤Л╤Е╨╛╨┤╨░ */
+            /** @description Имя ноды выхода */
             exit_name: string;
             /**
              * Format: int64
-             * @description ╨Э╨╛╨┤╨░, ╤З╨╡╤А╨╡╨╖ ╨║╨╛╤В╨╛╤А╤Г╤О ╤Г╤Е╨╛╨┤╨╕╤В ╨┐╨╛╨┤╤Е╨╛╨┤╤П╤Й╨╕╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Нода, через которую уходит подходящий трафик
              */
             exit_node_id: number;
             /** Format: int64 */
             id: number;
-            /** @description ╨Ш╨╝╤П ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П */
+            /** @description Имя подключения */
             inbound?: string;
             /**
              * Format: int64
-             * @description ╨Я╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╤Н╤В╨╛╨╣ ╨╜╨╛╨┤╤Л; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╗╤О╨▒╨╛╨╣ ╤Б╨╗╤Г╤И╨░╤В╨╡╨╗╤М, ╤Б╨╗╤Г╨╢╨╡╨▒╨╜╤Л╨╣ ╨▓╤Е╨╛╨┤ ╨▓╨║╨╗╤О╤З╨╕╤В╨╡╨╗╤М╨╜╨╛
+             * @description Подключение этой ноды; пусто — любой слушатель, служебный вход включительно
              */
             inbound_id?: number;
-            /** @description ╨Ъ╨░╨╜╨╛╨╜╨╕╤З╨╡╤Б╨║╨╛╨╡ ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨▒╨╡╨╖ ╤Ж╨╡╨╗╨╕: DOMAIN-SUFFIX,example.com, DST-PORT,25-53, IP-CIDR,203.0.113.0/24 */
+            /** @description Каноническое правило без цели: DOMAIN-SUFFIX,example.com, DST-PORT,25-53, IP-CIDR,203.0.113.0/24 */
             match: string;
             /**
              * Format: int64
-             * @description ╨Я╨╛╤А╤П╨┤╨╛╨║ ╨┐╤А╨░╨▓╨╕╨╗
+             * @description Порядок правил
              */
             position: number;
         };
         CascadeView: {
-            /** @description ╨Э╨╛╨┤╤Л, ╤З╨╡╤А╨╡╨╖ ╨║╨╛╤В╨╛╤А╤Л╨╡ ╤Н╤В╨░ ╨╜╨╛╨┤╨░ ╨▓╤Л╨┐╤Г╤Б╨║╨░╨╡╤В ╤В╤А╨░╤Д╨╕╨║ */
+            /** @description Ноды, через которые эта нода выпускает трафик */
             exits: components["schemas"]["CascadeExit"][];
-            /** @description ╨б╨╗╤Г╨╢╨╡╨▒╨╜╤Л╨╣ ╨▓╤Е╨╛╨┤ ╨┤╨╗╤П ╨┤╤А╤Г╨│╨╕╤Е ╨╜╨╛╨┤; ╨╡╤Б╤В╤М, ╨║╨╛╨│╨┤╨░ ╨║╤В╨╛-╤В╨╛ ╨▓╤Л╤Е╨╛╨┤╨╕╤В ╤З╨╡╤А╨╡╨╖ ╤Н╤В╤Г ╨╜╨╛╨┤╤Г */
+            /** @description Служебный вход для других нод; есть, когда кто-то выходит через эту ноду */
             relay?: components["schemas"]["CascadeRelay"];
         };
         CertCheck: {
-            /** @description ╨з╤В╨╛ ╨╕╨╝╨╡╨╜╨╜╨╛, ╤В╨╡╨║╤Б╤В тАФ certCheck.<code> ╨▓ ╤П╨╖╤Л╨║╨╡ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Что именно, текст — certCheck.<code> в языке панели */
             code: string;
-            /** @description ╨Я╨╛╨┤╤А╨╛╨▒╨╜╨╛╤Б╤В╨╕ ╨║╨░╨║ ╨╡╤Б╤В╤М: ╨╛╤И╨╕╨▒╨║╨░ ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╤П ╨╕╨╗╨╕ ╨╛╤В╨▓╨╡╤В ╤Ж╨╡╨╜╤В╤А╨░ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤Ж╨╕╨╕ */
+            /** @description Подробности как есть: ошибка соединения или ответ центра сертификации */
             detail?: string;
             fix?: components["schemas"]["CertFix"];
-            /** @description ╨з╤В╨╛ ╨┐╤А╨╛╨▓╨╡╤А╨╡╨╜╨╛: served, compat, dns, port80, acme, node_cert, node_port */
+            /** @description Что проверено: served, compat, dns, port80, acme, node_cert, node_port */
             id: string;
-            /** @description ╨Ш╨╝╤П ╨╜╨╛╨┤╤Л, ╨╡╤Б╨╗╨╕ ╨┐╤А╨╛╨▓╨╡╤А╨║╨░ ╨┐╤А╨╛ ╨╜╨╛╨┤╤Г */
+            /** @description Имя ноды, если проверка про ноду */
             node?: string;
             /** Format: int64 */
             node_id?: number;
@@ -3075,15 +3075,15 @@ export interface components {
         CertFix: {
             /** @enum {string} */
             action: "renew" | "renew_node" | "use_zerossl" | "update_node" | "copy";
-            /** @description ╨Ъ╨╛╨╝╨░╨╜╨┤╨░ ╨┤╨╗╤П ╤Б╨╡╤А╨▓╨╡╤А╨░ (action copy) */
+            /** @description Команда для сервера (action copy) */
             command?: string;
             /** Format: int64 */
             node_id?: number;
         };
         CertInputBody: {
-            /** @description ╨ж╨╡╨┐╨╛╤З╨║╨░ ╨▓ PEM: ╤Б╨╜╨░╤З╨░╨╗╨░ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В, ╨╖╨░ ╨╜╨╕╨╝ ╨┐╤А╨╛╨╝╨╡╨╢╤Г╤В╨╛╤З╨╜╤Л╨╡ (fullchain.pem) */
+            /** @description Цепочка в PEM: сначала сертификат, за ним промежуточные (fullchain.pem) */
             cert: string;
-            /** @description ╨Ч╨░╨║╤А╤Л╤В╤Л╨╣ ╨║╨╗╤О╤З ╨▓ PEM (privkey.pem): RSA ╨╛╤В 2048 ╨▒╨╕╤В, ECDSA P-256/384/521 ╨╕╨╗╨╕ Ed25519 */
+            /** @description Закрытый ключ в PEM (privkey.pem): RSA от 2048 бит, ECDSA P-256/384/521 или Ed25519 */
             key: string;
         };
         CertReport: {
@@ -3092,24 +3092,24 @@ export interface components {
             checks: components["schemas"]["CertCheck"][];
         };
         Channel: {
-            /** @description ╨Я╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ @username ╨║╨░╨╜╨░╨╗╨░ ╨╕╨╗╨╕ ╨╡╨│╨╛ ╤З╨╕╤Б╨╗╨╛╨▓╨╛╨╣ ID (-100тАж); ╨▒╨╛╤В ╨┤╨╛╨╗╨╢╨╡╨╜ ╨▒╤Л╤В╤М ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨╛╨╝ ╨║╨░╨╜╨░╨╗╨░ */
+            /** @description Публичный @username канала или его числовой ID (-100…); бот должен быть администратором канала */
             chat: string;
-            /** @description ╨Ю╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨░╤П ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░: ╨▒╨╡╨╖ ╨╜╨╡╤С ╨▒╨╛╤В ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╨▓╨╝╨╡╤Б╤В╨╛ ╨╝╨╡╨╜╤О ╤Н╨║╤А╨░╨╜ ╤Б ╨║╨╜╨╛╨┐╨║╨╛╨╣ ╨║╨░╨╜╨░╨╗╨░ */
+            /** @description Обязательная подписка: без неё бот показывает вместо меню экран с кнопкой канала */
             required: boolean;
-            /** @description ╨б╤Б╤Л╨╗╨║╨░, ╨┐╨╛ ╨║╨╛╤В╨╛╤А╨╛╨╣ ╨▓╤Б╤В╤Г╨┐╨░╤О╤В (https://t.me/тАж); ╨┐╤Г╤Б╤В╨╛: t.me/<username>. ╨Ф╨╗╤П ╨║╨░╨╜╨░╨╗╨░ ╨┐╨╛ ╤З╨╕╤Б╨╗╨╛╨▓╨╛╨╝╤Г ID ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨░ */
+            /** @description Ссылка, по которой вступают (https://t.me/…); пусто: t.me/<username>. Для канала по числовому ID обязательна */
             url?: string;
         };
         CheckItem: {
-            /** @description ╨Я╨╛╤З╨╡╨╝╤Г ╨╜╨╡ ok: timeout, refused, pin_mismatch, behind, skew, busy ╨╕ ╨┤╤А╤Г╨│╨╕╨╡ */
+            /** @description Почему не ok: timeout, refused, pin_mismatch, behind, skew, busy и другие */
             code?: string;
-            /** @description ╨б╨╗╨╛╨▓╨░ ╨╛╤И╨╕╨▒╨║╨╕ ╨║╨░╨║ ╨╡╤Б╤В╤М, ╨┤╨╗╤П ┬л╨┐╨╛╨┤╤А╨╛╨▒╨╜╨╡╨╡┬╗ */
+            /** @description Слова ошибки как есть, для «подробнее» */
             detail?: string;
             /**
-             * @description ╨з╤В╨╛ ╨╕╤Б╨┐╤А╨░╨▓╨╕╤В: ╨║╨╜╨╛╨┐╨║╨░ ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕╨╗╨╕ ╨║╨╛╨╝╨░╨╜╨┤╨░ ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡
+             * @description Что исправит: кнопка в панели или команда на сервере
              * @enum {string}
              */
             fix?: "rekey" | "update_node" | "old_node" | "open_port" | "start_node" | "check_host" | "check_dns" | "free_port" | "sync_time" | "update_panel" | "free_disk" | "check_outbound" | "disable_ipv6" | "restart_panel" | "exit_node";
-            /** @description ╨з╤В╨╛ ╨┐╤А╨╛╨▓╨╡╤А╨╡╨╜╨╛: link, hello, version, update, skew, listeners, listener, port, relay, cascade, node_dns, node_internet, node_ipv6, node_github, node_ghcr, node_disk, node_memory, diagnose, local_node, dns, internet, ipv6, github, ghcr, disk, memory, clock, updates */
+            /** @description Что проверено: link, hello, version, update, skew, listeners, listener, port, relay, cascade, node_dns, node_internet, node_ipv6, node_github, node_ghcr, node_disk, node_memory, diagnose, local_node, dns, internet, ipv6, github, ghcr, disk, memory, clock, updates */
             id: string;
             params?: {
                 [key: string]: string;
@@ -3120,62 +3120,62 @@ export interface components {
         CheckTargetInputBody: {
             /** @description host:port */
             dest: string;
-            /** @description ╨Ш╨╝╤П ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓; ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О тАФ ╤Е╨╛╤Б╤В ╨╕╨╖ dest */
+            /** @description Имя для клиентов; по умолчанию — хост из dest */
             sni?: string;
         };
         CheckView: {
             /** Format: date-time */
             at: string;
             items: components["schemas"]["CheckItem"][];
-            /** @description ╨Ю╤В╤З╤С╤В ╨┤╨╗╤П ╤З╨░╤В╨░: ╨░╨┤╤А╨╡╤Б╨░, ╨┤╨╛╨╝╨╡╨╜╤Л, ╨┐╨╛╤А╤В API ╨╕ ╨║╨╗╤О╤З╨╕ ╤Б╨║╤А╤Л╤В╤Л */
+            /** @description Отчёт для чата: адреса, домены, порт API и ключи скрыты */
             report: string;
         };
         ClientEndpoint: {
             /**
              * Format: int64
-             * @description ╨Я╨╛╤А╤В ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓; 0 тАФ ╨┐╨╛╤А╤В ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П
+             * @description Порт для клиентов; 0 — порт подключения
              */
             port: number;
-            /** @description ╨Р╨┤╤А╨╡╤Б ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓; ╨┐╤Г╤Б╤В╨╛ тАФ ╨░╨┤╤А╨╡╤Б ╨╜╨╛╨┤╤Л */
+            /** @description Адрес для клиентов; пусто — адрес ноды */
             server: string;
-            /** @description SNI ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓; ╨┐╤Г╤Б╤В╨╛ тАФ ╨║╨░╨║ ╨╛╨▒╤Л╤З╨╜╨╛ */
+            /** @description SNI для клиентов; пусто — как обычно */
             sni: string;
         };
         Config: {
-            /** @description ╨Ъ╨╜╨╛╨┐╨║╨╕ ╨│╨╗╨░╨▓╨╜╨╛╨│╨╛ ╨╝╨╡╨╜╤О ╨┐╨╛ ╨┐╨╛╤А╤П╨┤╨║╤Г */
+            /** @description Кнопки главного меню по порядку */
             buttons: components["schemas"]["MenuButton"][];
             channel: components["schemas"]["Channel"];
-            /** @description ╨г╨┤╨░╨╗╤П╤В╤М ╤Б╨╛╨╛╨▒╤Й╨╡╨╜╨╕╤П ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П, ╤З╤В╨╛╨▒╤Л ╨▓ ╤З╨░╤В╨╡ ╨▒╤Л╨╗╨╛ ╨╛╨┤╨╜╨╛ ╨╝╨╡╨╜╤О */
+            /** @description Удалять сообщения пользователя, чтобы в чате было одно меню */
             clean_chat: boolean;
             /**
-             * @description ╨п╨╖╤Л╨║ ╨▓╤Б╤В╤А╨╛╨╡╨╜╨╜╤Л╤Е ╨╜╨░╨┤╨┐╨╕╤Б╨╡╨╣ ╨▒╨╛╤В╨░
+             * @description Язык встроенных надписей бота
              * @enum {string}
              */
             lang: "ru" | "en";
-            /** @description ╨Ъ╨╜╨╛╨┐╨║╨░ Mini App ╤Б╨╛ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡╨╣ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ */
+            /** @description Кнопка Mini App со страницей подписки */
             mini_app: boolean;
             notify: components["schemas"]["Notify"];
-            /** @description ╨Ъ╨╜╨╛╨┐╨║╨░ ┬л╨Я╤А╨╛╨╝╨╛╨║╨╛╨┤╤Л┬╗ ╨▓ ╨│╨╗╨░╨▓╨╜╨╛╨╝ ╨╝╨╡╨╜╤О (╨╜╤Г╨╢╨╡╨╜ Mini App) */
+            /** @description Кнопка «Промокоды» в главном меню (нужен Mini App) */
             promo_button: boolean;
-            /** @description ╨г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╤П ╤Б 22:00 ╨┤╨╛ 9:00 ╨Ь╨б╨Ъ ╨┐╤А╨╕╤Е╨╛╨┤╤П╤В ╨▒╨╡╨╖ ╨╖╨▓╤Г╨║╨░ */
+            /** @description Уведомления с 22:00 до 9:00 МСК приходят без звука */
             quiet_night: boolean;
             texts: components["schemas"]["Texts"];
         };
         CreateAPIKeyInputBody: {
             /**
              * Format: int64
-             * @description ╨б╤А╨╛╨║ ╨▓ ╨┤╨╜╤П╤Е; 0 тАФ ╨┐╨╛╨║╨░ ╨╜╨╡ ╨╛╤В╨╖╨╛╨▓╤Г╤В
+             * @description Срок в днях; 0 — пока не отзовут
              */
             expire_days?: number;
             name: string;
-            /** @description ╨Я╨░╤А╨╛╨╗╤М ╨░╨┤╨╝╨╕╨╜╨░: ╨║╨╗╤О╤З ╨╜╨╡ ╨▓╤Л╨┐╤Г╤Б╨║╨░╨╡╤В╤Б╤П ╨╕╨╖ ╨╛╨┤╨╜╨╛╨╣ ╨╗╨╕╤И╤М ╤Г╨║╤А╨░╨┤╨╡╨╜╨╜╨╛╨╣ ╤Б╨╡╤Б╤Б╨╕╨╕ */
+            /** @description Пароль админа: ключ не выпускается из одной лишь украденной сессии */
             password: string;
             /**
-             * @description read тАФ ╤В╨╛╨╗╤М╨║╨╛ GET-╨╖╨░╨┐╤А╨╛╤Б╤Л, ╨▒╨╡╨╖ ╤Б╤Б╤Л╨╗╨╛╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨╛╨║ ╨╕ ╤Б╨╡╨║╤А╨╡╤В╨╜╤Л╤Е ╨░╨┤╤А╨╡╤Б╨╛╨▓; full тАФ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╤П, ╨║╤А╨╛╨╝╨╡ ╨▓╤Е╨╛╨┤╨░, ╤Б╨╡╤Б╤Б╨╕╨╣, ╨║╨╗╤О╤З╨╡╨╣ ╨╕ ╨╛╨┐╨╡╤А╨░╤Ж╨╕╨╣, ╨│╨┤╨╡ ╤Г╤Е╨╛╨┤╤П╤В ╨┤╨╡╨╜╤М╨│╨╕, ╨║╨╗╤О╤З╨╕ ╨╕ ╨░╨┤╤А╨╡╤Б╨░ ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓ (╨▓ ╤Б╨┐╤А╨░╨▓╨╛╤З╨╜╨╕╨║╨╡ ╨┐╨╛╨╝╨╡╤З╨╡╨╜╤Л ┬л╤В╨╛╨╗╤М╨║╨╛ ╤Б╨╡╤Б╤Б╨╕╤П┬╗)
+             * @description read — только GET-запросы, без ссылок подписок и секретных адресов; full — изменения, кроме входа, сессий, ключей и операций, где уходят деньги, ключи и адреса клиентов (в справочнике помечены «только сессия»)
              * @enum {string}
              */
             scope: "read" | "full";
-            /** @description ╨Ъ╨╛╨┤ ╨╕╨╖ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П, ╨╡╤Б╨╗╨╕ ╨▓╨║╨╗╤О╤З╨╡╨╜╨░ 2FA */
+            /** @description Код из приложения, если включена 2FA */
             totp?: string;
         };
         CreateAPIKeyOutputBody: {
@@ -3185,13 +3185,13 @@ export interface components {
             expires_at?: string;
             /** Format: int64 */
             id: number;
-            /** @description ╨б╨░╨╝ ╨║╨╗╤О╤З: ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В╤Б╤П ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ */
+            /** @description Сам ключ: показывается один раз */
             key: string;
             last_ip?: string;
             /** Format: date-time */
             last_used_at?: string;
             name: string;
-            /** @description ╨Я╨╡╤А╨▓╤Л╨╡ ╤Б╨╕╨╝╨▓╨╛╨╗╤Л ╨║╨╗╤О╤З╨░, ╤З╤В╨╛╨▒╤Л ╨╛╤В╨╗╨╕╤З╨░╤В╤М ╨║╨╗╤О╤З╨╕ */
+            /** @description Первые символы ключа, чтобы отличать ключи */
             prefix: string;
             /** @enum {string} */
             scope: "read" | "full";
@@ -3199,33 +3199,33 @@ export interface components {
         CreateCascadeRuleInputBody: {
             /**
              * Format: int64
-             * @description ╨Ъ╤Г╨┤╨░ ╨╛╤В╨┐╤А╨░╨▓╨╗╤П╤В╤М: ╨┤╤А╤Г╨│╨░╤П ╨╜╨╛╨┤╨░ ╨┐╨░╨╜╨╡╨╗╨╕
+             * @description Куда отправлять: другая нода панели
              */
             exit_node_id: number;
             /**
              * Format: int64
-             * @description ╨в╨╛╨╗╤М╨║╨╛ ╤В╤А╨░╤Д╨╕╨║ ╤Н╤В╨╛╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨╜╨╛╨┤╤Л; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╗╤О╨▒╨╛╨╣ ╤Б╨╗╤Г╤И╨░╤В╨╡╨╗╤М
+             * @description Только трафик этого подключения ноды; пусто — любой слушатель
              */
             inbound_id?: number;
-            /** @description ╨з╤В╨╛ ╨╗╨╛╨▓╨╕╤В╤М: TYPE,VALUE тАФ DOMAIN-SUFFIX,example.com, DOMAIN-KEYWORD,example, DST-PORT,25, IP-CIDR,203.0.113.0/24, DOMAIN-REGEX,тАж */
+            /** @description Что ловить: TYPE,VALUE — DOMAIN-SUFFIX,example.com, DOMAIN-KEYWORD,example, DST-PORT,25, IP-CIDR,203.0.113.0/24, DOMAIN-REGEX,… */
             match: string;
         };
         CreateExternalSubInputBody: {
-            /** @description ╨Т╨║╨╗╤О╤З╨╡╨╜╨░ ╨╗╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░; ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О ╨┤╨░ */
+            /** @description Включена ли подписка; по умолчанию да */
             enabled?: boolean;
-            /** @description ╨У╤А╤Г╨┐╨┐╨░ ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡ ╨║╨╗╨╕╨╡╨╜╤В╨░ */
+            /** @description Группа в подписке клиента */
             name: string;
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д, ╨║ ╨║╨╛╤В╨╛╤А╨╛╨╝╤Г ╨╛╤В╨╜╨╛╤Б╨╕╤В╤Б╤П ╨▓╨╜╨╡╤И╨╜╤П╤П ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░
+             * @description Тариф, к которому относится внешняя подписка
              */
             tariff_id: number;
-            /** @description ╨б╤Б╤Л╨╗╨║╨░ ╨╜╨░ ╤З╤Г╨╢╤Г╤О ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г (https) */
+            /** @description Ссылка на чужую подписку (https) */
             url: string;
         };
         CreateFolderInputBody: {
             /**
-             * @description ╨Э╨╡ ╨╖╨░╨┤╨░╨╜ тАФ gray
+             * @description Не задан — gray
              * @enum {string}
              */
             color?: "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "purple" | "pink";
@@ -3233,13 +3233,13 @@ export interface components {
             name: string;
         };
         CreateInboundInputBody: {
-            /** @description ╨и╨░╨▒╨╗╨╛╨╜ ╨╗╨╕╤Б╤В╨╡╨╜╨╡╤А╨░ (YAML) ╨┤╨╗╤П preset=custom */
+            /** @description Шаблон листенера (YAML) для preset=custom */
             config?: string;
-            /** @description host:port ╨┤╨╗╤П REALITY */
+            /** @description host:port для REALITY */
             dest?: string;
             /**
              * Format: int64
-             * @description ╨Э╨╛╨┤╨░; ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О тАФ ╤Б╨▓╨╛╤П ╨╜╨╛╨┤╨░ ╨┐╨░╨╜╨╡╨╗╨╕
+             * @description Нода; по умолчанию — своя нода панели
              */
             node_id?: number;
             port?: string;
@@ -3249,12 +3249,12 @@ export interface components {
         CreateNodeInputBody: {
             /**
              * Format: int64
-             * @description ╨Я╨╛╤А╤В API ╨╜╨╛╨┤╤Л; ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О ╤Б╨╗╤Г╤З╨░╨╣╨╜╤Л╨╣
+             * @description Порт API ноды; по умолчанию случайный
              */
             api_port?: number;
-            /** @description ╨Ф╨╛╨╝╨╡╨╜ ╨┤╨╗╤П Hysteria2/TUIC ╨╕ ╤Б╤Б╤Л╨╗╨╛╨║ (╨╜╨╡╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨╛) */
+            /** @description Домен для Hysteria2/TUIC и ссылок (необязательно) */
             domain?: string;
-            /** @description IP ╨╕╨╗╨╕ ╨╕╨╝╤П ╤Б╨╡╤А╨▓╨╡╤А╨░ ╨╜╨╛╨┤╤Л */
+            /** @description IP или имя сервера ноды */
             host: string;
             name: string;
         };
@@ -3277,21 +3277,21 @@ export interface components {
             servers: string[];
         };
         DeviceBanView: {
-            /** @description ╨Ъ╤В╨╛ ╨╖╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╗; ╨┐╤Г╤Б╤В╨╛ тАФ ╨║╨╗╤О╤З API ╨╕╨╗╨╕ ╤Г╨┤╨░╨╗╤С╨╜╨╜╤Л╨╣ ╨░╨┤╨╝╨╕╨╜ */
+            /** @description Кто заблокировал; пусто — ключ API или удалённый админ */
             admin: string;
             /** Format: date-time */
             banned_at: string;
-            /** @description ╨Я╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╛╤В╨▓╤П╨╖╨░╨╗ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛, ╨░ ╨▓╨╡╤А╨╜╤Г╤В╤М ╨╡╨│╨╛ ╨╝╨╛╨╢╨╡╤В ╤В╨╛╨╗╤М╨║╨╛ ╨░╨┤╨╝╨╕╨╜ (until ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В╤Б╤П) */
+            /** @description Подписчик отвязал устройство, а вернуть его может только админ (until не показывается) */
             forever?: boolean;
-            /** @description ID ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, ╨║╨╛╤В╨╛╤А╨╛╨╝╤Г ╨╖╨░╨║╤А╤Л╤В╨░ ╨┐╤А╨╕╨▓╤П╨╖╨║╨░ */
+            /** @description ID устройства, которому закрыта привязка */
             hwid: string;
             /** Format: int64 */
             id: number;
-            /** @description ╨Ъ╨░╨║ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛ ╨╜╨░╨╖╤Л╨▓╨░╨╗╨╛╤Б╤М, ╨║╨╛╨│╨┤╨░ ╨╡╨│╨╛ ╨╖╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╗╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╨╜╨╕╤З╨╡╨│╨╛ ╨╛ ╤Б╨╡╨▒╨╡ ╨╜╨╡ ╤Б╨╛╨╛╨▒╤Й╨╕╨╗╨╛ */
+            /** @description Как устройство называлось, когда его заблокировали; пусто — приложение ничего о себе не сообщило */
             label: string;
             /**
              * Format: date-time
-             * @description ╨Я╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╤Б╨░╨╝ ╨╛╤В╨▓╤П╨╖╨░╨╗ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛: ╨╛╨╜╨╛ ╤Б╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╕╨▓╤П╨╖╨░╤В╤М╤Б╤П ╤Б╨╜╨╛╨▓╨░ ╤Б ╤Н╤В╨╛╨│╨╛ ╨╝╨╛╨╝╨╡╨╜╤В╨░; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╖╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╜╨╛ ╨░╨┤╨╝╨╕╨╜╨╛╨╝ ╨╜╨░╨▓╤Б╨╡╨│╨┤╨░
+             * @description Подписчик сам отвязал устройство: оно сможет привязаться снова с этого момента; пусто — заблокировано админом навсегда
              */
             until?: string;
         };
@@ -3304,22 +3304,22 @@ export interface components {
             online: boolean;
         };
         EgressFilter: {
-            /** @description ╨Ф╨╛╨╝╨╡╨╜╤Л ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б ╨┐╨╛╨┤╨┤╨╛╨╝╨╡╨╜╨░╨╝╨╕: example.com */
+            /** @description Домены вместе с поддоменами: example.com */
             domains: string[];
-            /** @description ╨Э╨╛╨┤╤Л ╨╜╨╡ ╨┐╤А╨╛╨┐╤Г╤Б╨║╨░╤О╤В ╤В╤А╨░╤Д╨╕╨║ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╤В╤Г╨┤╨░, ╤З╤В╨╛ ╤Г╨║╨░╨╖╨░╨╜╨╛ ╨╜╨╕╨╢╨╡ */
+            /** @description Ноды не пропускают трафик пользователей туда, что указано ниже */
             enabled: boolean;
-            /** @description ╨Ч╨░╨║╤А╤Л╤В╤М ╨┐╨╛╤З╤В╨╛╨▓╤Л╨╡ ╨┐╨╛╤А╤В╤Л 465, 587 ╨╕ 2525 (25 ╨╖╨░╨║╤А╤Л╤В ╨▓╤Б╨╡╨│╨┤╨░): ╤Б ╨╛╨▒╤Й╨╡╨│╨╛ ╨░╨┤╤А╨╡╤Б╨░ VPN, ╤Б ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╤И╨╗╤О╤В ╨┐╨╛╤З╤В╤Г, ╨░╨┤╤А╨╡╤Б ╨▒╤Л╤Б╤В╤А╨╛ ╨┐╨╛╨┐╨░╨┤╨░╨╡╤В ╨▓ ╤З╤С╤А╨╜╤Л╨╡ ╤Б╨┐╨╕╤Б╨║╨╕ */
+            /** @description Закрыть почтовые порты 465, 587 и 2525 (25 закрыт всегда): с общего адреса VPN, с которого шлют почту, адрес быстро попадает в чёрные списки */
             mail: boolean;
-            /** @description ╨б╨╡╤В╨╕ ╨╕ ╨░╨┤╤А╨╡╤Б╨░: 203.0.113.0/24, 198.51.100.7, 2001:db8::/32 */
+            /** @description Сети и адреса: 203.0.113.0/24, 198.51.100.7, 2001:db8::/32 */
             networks: string[];
-            /** @description ╨Я╨╛╤А╤В╤Л ╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜╤Л: 6881, 6881-6889 */
+            /** @description Порты и диапазоны: 6881, 6881-6889 */
             ports: string[];
         };
         "Enable-promocodeRequest": {
             enabled: boolean;
         };
         EnableExternalServersInputBody: {
-            /** @description true тАФ ╨▓╨║╨╗╤О╤З╨╕╤В╤М ╨▓╤Б╨╡ ╤Б╨╡╤А╨▓╨╡╤А╤Л, false тАФ ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М */
+            /** @description true — включить все серверы, false — выключить */
             enabled: boolean;
         };
         ErrorDetail: {
@@ -3386,29 +3386,29 @@ export interface components {
             warp?: boolean;
         };
         ExitDNSInfo: {
-            /** @description ╨б╨╡╤А╨▓╨╡╤А╤Л ╨│╨╛╤В╨╛╨▓╤Л╤Е ╨▓╨░╤А╨╕╨░╨╜╤В╨╛╨▓ */
+            /** @description Серверы готовых вариантов */
             presets: {
                 [key: string]: string[];
             };
             /**
-             * @description DNS-╤Б╨╡╤А╨▓╨╡╤А ╨╜╨╛╨┤╤Л: host тАФ DNS ╤Б╨░╨╝╨╛╨│╨╛ ╤Б╨╡╤А╨▓╨╡╤А╨░, cloudflare, google, quad9 тАФ ╨╕╤Е DoH, custom тАФ ╤Б╨▓╨╛╨╣ ╤Б╨┐╨╕╤Б╨╛╨║
+             * @description DNS-сервер ноды: host — DNS самого сервера, cloudflare, google, quad9 — их DoH, custom — свой список
              * @enum {string}
              */
             resolver: "host" | "cloudflare" | "google" | "quad9" | "custom";
-            /** @description ╨б╨▓╨╛╨╕ ╤Б╨╡╤А╨▓╨╡╤А╤Л ╨┤╨╗╤П custom: 1.1.1.1, tls://dns.google, https://1.1.1.1/dns-query, quic://dns.adguard-dns.com; ╤Е╤А╨░╨╜╤П╤В╤Б╤П ╨╕ ╨┐╤А╨╕ ╨┤╤А╤Г╨│╨╛╨╝ ╨▓╤Л╨▒╨╛╤А╨╡ */
+            /** @description Свои серверы для custom: 1.1.1.1, tls://dns.google, https://1.1.1.1/dns-query, quic://dns.adguard-dns.com; хранятся и при другом выборе */
             servers: string[];
-            /** @description ╨Э╨╛╨┤╨░ ╤Б╨░╨╝╨░ ╤Г╨╖╨╜╨░╤С╤В, ╨╜╨░ ╨║╨░╨║╨╛╨╣ ╤Б╨░╨╣╤В ╨╕╨┤╤С╤В ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М (TLS, HTTP, QUIC ╨╜╨░ ╨┐╨╛╤А╤В╨░╤Е 443, 8443, 80, 8080тАУ8880), ╨╕ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╨╡╤В╤Б╤П ╨║ ╨╜╨╡╨╝╤Г ╨╕╨╖ ╤Б╨▓╨╛╨╡╨╣ ╤Б╤В╤А╨░╨╜╤Л: ╤Б╨░╨╣╤В╤Л ╨▓╨╕╨┤╤П╤В ╤Б╤В╤А╨░╨╜╤Г ╨╜╨╛╨┤╤Л, ╨░ ╨╜╨╡ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+            /** @description Нода сама узнаёт, на какой сайт идёт пользователь (TLS, HTTP, QUIC на портах 443, 8443, 80, 8080–8880), и подключается к нему из своей страны: сайты видят страну ноды, а не пользователя */
             sniff: boolean;
         };
         ExitDNSView: {
             /**
-             * @description DNS-╤Б╨╡╤А╨▓╨╡╤А ╨╜╨╛╨┤╤Л: host тАФ DNS ╤Б╨░╨╝╨╛╨│╨╛ ╤Б╨╡╤А╨▓╨╡╤А╨░, cloudflare, google, quad9 тАФ ╨╕╤Е DoH, custom тАФ ╤Б╨▓╨╛╨╣ ╤Б╨┐╨╕╤Б╨╛╨║
+             * @description DNS-сервер ноды: host — DNS самого сервера, cloudflare, google, quad9 — их DoH, custom — свой список
              * @enum {string}
              */
             resolver: "host" | "cloudflare" | "google" | "quad9" | "custom";
-            /** @description ╨б╨▓╨╛╨╕ ╤Б╨╡╤А╨▓╨╡╤А╤Л ╨┤╨╗╤П custom: 1.1.1.1, tls://dns.google, https://1.1.1.1/dns-query, quic://dns.adguard-dns.com; ╤Е╤А╨░╨╜╤П╤В╤Б╤П ╨╕ ╨┐╤А╨╕ ╨┤╤А╤Г╨│╨╛╨╝ ╨▓╤Л╨▒╨╛╤А╨╡ */
+            /** @description Свои серверы для custom: 1.1.1.1, tls://dns.google, https://1.1.1.1/dns-query, quic://dns.adguard-dns.com; хранятся и при другом выборе */
             servers: string[];
-            /** @description ╨Э╨╛╨┤╨░ ╤Б╨░╨╝╨░ ╤Г╨╖╨╜╨░╤С╤В, ╨╜╨░ ╨║╨░╨║╨╛╨╣ ╤Б╨░╨╣╤В ╨╕╨┤╤С╤В ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М (TLS, HTTP, QUIC ╨╜╨░ ╨┐╨╛╤А╤В╨░╤Е 443, 8443, 80, 8080тАУ8880), ╨╕ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╨╡╤В╤Б╤П ╨║ ╨╜╨╡╨╝╤Г ╨╕╨╖ ╤Б╨▓╨╛╨╡╨╣ ╤Б╤В╤А╨░╨╜╤Л: ╤Б╨░╨╣╤В╤Л ╨▓╨╕╨┤╤П╤В ╤Б╤В╤А╨░╨╜╤Г ╨╜╨╛╨┤╤Л, ╨░ ╨╜╨╡ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+            /** @description Нода сама узнаёт, на какой сайт идёт пользователь (TLS, HTTP, QUIC на портах 443, 8443, 80, 8080–8880), и подключается к нему из своей страны: сайты видят страну ноды, а не пользователя */
             sniff: boolean;
         };
         ExtendInputBody: {
@@ -3416,7 +3416,7 @@ export interface components {
             days?: number;
             /**
              * Format: int64
-             * @description ╨Ь╨╡╤Б╤П╤Ж╨░╨╝╨╕: ╨┤╨╛ ╨┤╨╜╤П ╨╛╨┐╨╗╨░╤В╤Л ╨╕╨╗╨╕ ╤В╨╛╨│╨╛ ╨╢╨╡ ╤З╨╕╤Б╨╗╨░
+             * @description Месяцами: до дня оплаты или того же числа
              */
             months?: number;
         };
@@ -3443,7 +3443,7 @@ export interface components {
             id: number;
             /**
              * Format: int64
-             * @description ╨Ш╨╜╤В╨╡╤А╨▓╨░╨╗ ╨░╨▓╤В╨╛╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П, ╤Б╨╡╨║╤Г╨╜╨┤╤Л; 0 тАФ ╤З╨░╤Б ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О, ╨╝╨╕╨╜╨╕╨╝╤Г╨╝ 300 ╤Б╨╡╨║
+             * @description Интервал автообновления, секунды; 0 — час по умолчанию, минимум 300 сек
              */
             interval_sec: number;
             /** Format: int64 */
@@ -3454,7 +3454,7 @@ export interface components {
             name: string;
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д, ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║╨░╨╝ ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╤А╨░╨╖╨┤╨░╤О╤В╤Б╤П ╤Б╨╡╤А╨▓╨╡╤А╤Л ╤Н╤В╨╛╨╣ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕
+             * @description Тариф, подписчикам которого раздаются серверы этой подписки
              */
             tariff_id: number;
             /** Format: date-time */
@@ -3464,20 +3464,20 @@ export interface components {
         FiltersView: {
             egress: components["schemas"]["EgressFilter"];
             ingress: components["schemas"]["IngressFilter"];
-            /** @description ╨з╤В╨╛ ╨╖╨░╨║╤А╤Л╨▓╨░╨╡╤В ╨┐╨╛╤З╤В╨╛╨▓╤Л╨╣ ╨┐╤А╨╡╤Б╨╡╤В */
+            /** @description Что закрывает почтовый пресет */
             mail_ports: string[];
         };
         FolderView: {
             /** @enum {string} */
             color: "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "purple" | "pink";
-            /** @description ╨Ч╨╜╨░╤З╨╛╨║ ╨┐╨╡╤А╨╡╨┤ ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡╨╝; ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨┐╤Г╤Б╤В╤Л╨╝ */
+            /** @description Значок перед названием; может быть пустым */
             emoji: string;
             /** Format: int64 */
             id: number;
             name: string;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╨▓ ╨┐╨░╨┐╨║╨╡, ╤Б╨║╤А╤Л╤В╤Л╨╡ ╤В╨╛╨╢╨╡
+             * @description Сколько пользователей в папке, скрытые тоже
              */
             users: number;
         };
@@ -3519,23 +3519,23 @@ export interface components {
         GrantInputBody: {
             /**
              * Format: int64
-             * @description ╨Ю╤В 1 ╨У╨С ╨┤╨╛ 100 ╨в╨С
+             * @description От 1 ГБ до 100 ТБ
              */
             bytes: number;
             /** Format: int64 */
             days?: number;
             /** @enum {string} */
             lifetime: "used" | "period" | "days";
-            /** @description ╨Ч╨░ ╤З╤В╨╛: ╨▒╨╛╨╜╤Г╤Б, ╨║╨╛╨╝╨┐╨╡╨╜╤Б╨░╤Ж╨╕╤П */
+            /** @description За что: бонус, компенсация */
             note?: string;
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░; ╨╜╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜ тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул трафика; не передан — основной трафик
              */
             pool_id?: number;
         };
         GrantView: {
-            /** @description ╨Х╤Й╤С ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П: ╨╜╨╡ ╨╕╨╖╤А╨░╤Б╤Е╨╛╨┤╨╛╨▓╨░╨╜ ╨╕ ╨╜╨╡ ╨╕╤Б╤В╤С╨║ */
+            /** @description Ещё считается: не израсходован и не истёк */
             active: boolean;
             /** Format: int64 */
             bytes: number;
@@ -3548,13 +3548,13 @@ export interface components {
             /** @enum {string} */
             lifetime: "used" | "period" | "days";
             note: string;
-            /** @description ╨Э╨░╨╖╨▓╨░╨╜╨╕╨╡ ╨┐╨░╨║╨╡╤В╨░; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╜╨░╤З╨╕╤Б╨╗╨╡╨╜╨╛ ╨▓╤А╤Г╤З╨╜╤Г╤О */
+            /** @description Название пакета; пусто — начислено вручную */
             package_name: string;
             /** Format: int64 */
             payment_id: number | null;
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░; null тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул трафика; null — основной трафик
              */
             pool_id: number | null;
             /** Format: int64 */
@@ -3563,7 +3563,7 @@ export interface components {
             source: "purchase" | "admin";
         };
         HappLinkOutputBody: {
-            /** @description happ://crypt5/тАж: Happ ╨╛╤В╨║╤А╤Л╨▓╨░╨╡╤В ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г, ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤П ╨╡╤С ╨░╨┤╤А╨╡╤Б; ╨┐╤Г╤Б╤В╨╛ тАФ ╤И╨╕╤Д╤А╨╛╨▓╨░╨╜╨╜╨░╤П ╤Б╤Б╤Л╨╗╨║╨░ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨░ */
+            /** @description happ://crypt5/…: Happ открывает подписку, не показывая её адрес; пусто — шифрованная ссылка выключена */
             link: string;
         };
         HostStatus: {
@@ -3581,7 +3581,7 @@ export interface components {
             password?: string;
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д, ╨╜╨░ ╨║╨╛╤В╨╛╤А╨╛╨╝ ╨┐╨╛╤П╨▓╤П╤В╤Б╤П ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕; ╨╗╨╕╨╝╨╕╤В, ╤Б╤А╨╛╨║ ╨╕ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╨▒╨╡╤А╤Г╤В╤Б╤П ╨╕╨╖ ╤Б╤В╨░╤А╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕, ╤Б╨▒╤А╨╛╤Б ╤В╤А╨░╤Д╨╕╨║╨░, ╨┐╤А╨╛╤В╨╛╨║╨╛╨╗╤Л ╨╕ ╨┐╤Г╨╗╤Л тАФ ╨╕╨╖ ╤В╨░╤А╨╕╤Д╨░
+             * @description Тариф, на котором появятся пользователи; лимит, срок и устройства берутся из старой панели, сброс трафика, протоколы и пулы — из тарифа
              */
             tariff_id: number;
             token?: string;
@@ -3592,77 +3592,77 @@ export interface components {
             /** @enum {string} */
             kind: "marzban" | "pasarguard" | "remnawave";
             password?: string;
-            /** @description Remnawave: API-╤В╨╛╨║╨╡╨╜; PasarGuard: API-╨║╨╗╤О╤З ╨▓╨╝╨╡╤Б╤В╨╛ ╨╗╨╛╨│╨╕╨╜╨░ */
+            /** @description Remnawave: API-токен; PasarGuard: API-ключ вместо логина */
             token?: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б ╤Б╤В╨░╤А╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕: https://panel.example.com; http:// тАФ ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П ╤Н╤В╨╛╨│╨╛ ╤Б╨╡╤А╨▓╨╡╤А╨░ ╨╕╨╗╨╕ ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨╣ ╤Б╨╡╤В╨╕ */
+            /** @description Адрес старой панели: https://panel.example.com; http:// — только для этого сервера или локальной сети */
             url: string;
-            /** @description Marzban, PasarGuard: ╨╗╨╛╨│╨╕╨╜ ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░ */
+            /** @description Marzban, PasarGuard: логин администратора */
             username?: string;
         };
         InboundView: {
-            /** @description ╨Я╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П, ╨║╨╛╤В╨╛╤А╤Л╨╝ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨┐╨╛╨┐╨░╨┤╨░╨╡╤В ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г: mihomo, xray, singbox, stash, other */
+            /** @description Приложения, которым подключение попадает в подписку: mihomo, xray, singbox, stash, other */
             apps: string[];
             auto: components["schemas"]["AutoView"];
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╤Б╨░╨╝╨░ ╨┐╨╡╤А╨╡╨╜╨╛╤Б╨╕╤В ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨╜╨░ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╨╛╤А╤В, ╨╡╤Б╨╗╨╕ ╨╡╨│╨╛ ╨▒╨╗╨╛╨║╨╕╤А╤Г╤О╤В (╨╕ ╨▓╨║╨╗╤О╤З╨╡╨╜╨╛ ╨▓ ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨░╤Е) */
+            /** @description Панель сама переносит подключение на другой порт, если его блокируют (и включено в настройках) */
             auto_port: boolean;
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╤Б╨░╨╝╨░ ╨╝╨╡╨╜╤П╨╡╤В ╤Б╨░╨╣╤В ╨╝╨░╤Б╨║╨╕╤А╨╛╨▓╨║╨╕ REALITY, ╨╡╤Б╨╗╨╕ ╨╛╨╜ ╨┐╨╡╤А╨╡╤Б╤В╨░╨╗ ╨┐╨╛╨┤╤Е╨╛╨┤╨╕╤В╤М (╨╕ ╨▓╨║╨╗╤О╤З╨╡╨╜╨╛ ╨▓ ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨░╤Е) */
+            /** @description Панель сама меняет сайт маскировки REALITY, если он перестал подходить (и включено в настройках) */
             auto_sni: boolean;
-            /** @description ╨Ъ╤Г╨┤╨░ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╤О╤В╤Б╤П ╨║╨╗╨╕╨╡╨╜╤В╤Л, ╨╡╤Б╨╗╨╕ ╨╜╨╡ ╨║ ╨╜╨╛╨┤╨╡ ╨╜╨░╨┐╤А╤П╨╝╤Г╤О (mikan.client ╨▓ ╤И╨░╨▒╨╗╨╛╨╜╨╡) */
+            /** @description Куда подключаются клиенты, если не к ноде напрямую (mikan.client в шаблоне) */
             client: components["schemas"]["ClientEndpoint"];
-            /** @description ╨Ь╨╛╨╢╨╜╨╛ ╨╗╨╕ ╨╖╨░╨┤╨░╤В╤М ╨║╨╗╨╕╨╡╨╜╤В╨░╨╝ ╤Б╨▓╨╛╨╣ SNI: ╤Г REALITY ╨╕╨╝╤П ╨╖╨░╨┤╨░╤С╤В ╤Б╨░╨╣╤В ╨╝╨░╤Б╨║╨╕╤А╨╛╨▓╨║╨╕ */
+            /** @description Можно ли задать клиентам свой SNI: у REALITY имя задаёт сайт маскировки */
             client_sni: boolean;
-            /** @description ╨и╨░╨▒╨╗╨╛╨╜ ╨╗╨╕╤Б╤В╨╡╨╜╨╡╤А╨░ (YAML) */
+            /** @description Шаблон листенера (YAML) */
             config: string;
-            /** @description ╨б╨░╨╣╤В ╨┤╨╗╤П ╨╝╨░╤Б╨║╨╕╤А╨╛╨▓╨║╨╕ REALITY */
+            /** @description Сайт для маскировки REALITY */
             dest?: string;
-            /** @description ╨б╨▓╨╛╤С ╨╕╨╝╤П ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╕╨╝╤П ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О */
+            /** @description Своё имя в подписке; пусто — имя по умолчанию */
             display_name: string;
             enabled: boolean;
             error?: string;
             /**
              * Format: int64
-             * @description ╨Э╨╛╨┤╨░, ╤З╨╡╤А╨╡╨╖ ╨║╨╛╤В╨╛╤А╤Г╤О ╨▓╤Л╤Е╨╛╨┤╨╕╤В ╤В╤А╨░╤Д╨╕╨║, ╨╡╤Б╨╗╨╕ outbound=node
+             * @description Нода, через которую выходит трафик, если outbound=node
              */
             exit_node_id?: number;
-            /** @description ╨Ю╤В╨┐╨╡╤З╨░╤В╨╛╨║ TLS (uTLS) ╤Г ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╛╨▒╤Й╨╕╨╣ ╨╕╨╖ ╨╜╨░╤Б╤В╤А╨╛╨╡╨║ */
+            /** @description Отпечаток TLS (uTLS) у клиентов; пусто — общий из настроек */
             fingerprint?: string;
             /** Format: int64 */
             id: number;
-            /** @description ╨Р╨┤╤А╨╡╤Б, ╨╜╨░ ╨║╨╛╤В╨╛╤А╨╛╨╝ ╨╜╨╛╨┤╨░ ╤Б╨╗╤Г╤И╨░╨╡╤В: ╨┐╤Г╤Б╤В╨╛ тАФ ╨▓╤Б╨╡ ╨░╨┤╤А╨╡╤Б╨░, 127.0.0.1 тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б╨░╨╝ ╤Б╨╡╤А╨▓╨╡╤А (╨╖╨░ nginx ╨╕╨╗╨╕ HAProxy) */
+            /** @description Адрес, на котором нода слушает: пусто — все адреса, 127.0.0.1 — только сам сервер (за nginx или HAProxy) */
             listen: string;
             name: string;
             network: string;
-            /** @description ╨а╨░╨▒╨╛╤В╨░╨╡╤В ╨╜╨░ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В╨╡ ╨╜╨╛╨┤╤Л (Hysteria2, TUIC, AnyTLS, TrustTunnel, VLESS TLS): ╤Б ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╝ ╨▓ sing-box ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е ╨╜╨╡ ╨┐╨╛╤П╨▓╨╕╤В╤Б╤П */
+            /** @description Работает на сертификате ноды (Hysteria2, TUIC, AnyTLS, TrustTunnel, VLESS TLS): с самоподписанным в sing-box приложениях не появится */
             node_cert?: boolean;
             /** Format: int64 */
             node_id: number;
-            /** @description Hysteria2: salamander, gecko ╨╕╨╗╨╕ ╨┐╤Г╤Б╤В╨╛ (╨▒╨╡╨╖ ╨╛╨▒╤Д╤Г╤Б╨║╨░╤Ж╨╕╨╕); ╤Г ╨┤╤А╤Г╨│╨╕╤Е ╤В╨╕╨┐╨╛╨▓ ╨┐╨╛╨╗╤П ╨╜╨╡╤В */
+            /** @description Hysteria2: salamander, gecko или пусто (без обфускации); у других типов поля нет */
             obfs?: string;
             /**
-             * @description ╨Т╤Л╤Е╨╛╨┤ ╨▓ ╨╕╨╜╤В╨╡╤А╨╜╨╡╤В: ╨╜╨░╨┐╤А╤П╨╝╤Г╤О ╤Б ╤Б╨╡╤А╨▓╨╡╤А╨░, ╤З╨╡╤А╨╡╨╖ WARP ╨╜╨╛╨┤╤Л ╨╕╨╗╨╕ ╤З╨╡╤А╨╡╨╖ ╨┤╤А╤Г╨│╤Г╤О ╨╜╨╛╨┤╤Г (╨║╨░╤Б╨║╨░╨┤)
+             * @description Выход в интернет: напрямую с сервера, через WARP ноды или через другую ноду (каскад)
              * @enum {string}
              */
             outbound: "direct" | "warp" | "node";
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░, ╨▓ ╨║╨╛╤В╨╛╤А╤Л╨╣ ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡; ╨╜╨╡╤В тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул трафика, в который считается подключение; нет — основной трафик
              */
             pool_id?: number;
             port: string;
             preset: string;
             server_names?: string[];
-            /** @description ╨Ю╨┤╨╕╨╜ ╨║╨╗╤О╤З ╨╜╨░ ╨▓╤Б╨╡╤Е: ╤Г╤З╤С╤В, ╨╗╨╕╨╝╨╕╤В╤Л ╨╕ ╨╛╤В╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨┐╨╛ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П╨╝ ╨╜╨╡ ╤А╨░╨▒╨╛╤В╨░╤О╤В */
+            /** @description Один ключ на всех: учёт, лимиты и отключение по пользователям не работают */
             shared?: boolean;
             /** @enum {string} */
             status: "ok" | "error" | "unknown";
-            /** @description ╨Ш╨╝╤П, ╨║╨╛╤В╨╛╤А╨╛╨╡ ╤Г╨▓╨╕╨┤╨╕╤В ╨║╨╗╨╕╨╡╨╜╤В */
+            /** @description Имя, которое увидит клиент */
             sub_name: string;
             title: string;
-            /** @description ╨в╨╕╨┐ ╨╗╨╕╤Б╤В╨╡╨╜╨╡╤А╨░ mihomo */
+            /** @description Тип листенера mihomo */
             type: string;
             /** Format: date-time */
             updated_at: string;
-            /** @description ╨в╨╛╨╜╨║╨░╤П ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨░ XHTTP; ╤Г ╨┤╤А╤Г╨│╨╕╤Е ╤В╤А╨░╨╜╤Б╨┐╨╛╤А╤В╨╛╨▓ ╨┐╨╛╨╗╤П ╨╜╨╡╤В */
+            /** @description Тонкая настройка XHTTP; у других транспортов поля нет */
             xhttp?: components["schemas"]["XHTTPTuning"];
         };
         Info: {
@@ -3683,11 +3683,11 @@ export interface components {
             url: string;
         };
         IngressFilter: {
-            /** @description true тАФ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╤В╤М╤Б╤П ╨╝╨╛╨╢╨╜╨╛ ╤В╨╛╨╗╤М╨║╨╛ ╨╕╨╖ ╤Б╨╡╤В╨╡╨╣ ╤Б╨┐╨╕╤Б╨║╨░; false тАФ ╨╕╨╖ ╤Б╨╡╤В╨╡╨╣ ╤Б╨┐╨╕╤Б╨║╨░ ╨╜╨╡╨╗╤М╨╖╤П */
+            /** @description true — подключаться можно только из сетей списка; false — из сетей списка нельзя */
             allow: boolean;
-            /** @description ╨Э╨╛╨┤╤Л ╨┐╤А╨╛╨▓╨╡╤А╤П╤О╤В, ╨╛╤В╨║╤Г╨┤╨░ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╤О╤В╤Б╤П */
+            /** @description Ноды проверяют, откуда подключаются */
             enabled: boolean;
-            /** @description ╨б╨╡╤В╨╕ ╨╕ ╨░╨┤╤А╨╡╤Б╨░. ╨Ф╤А╤Г╨│╨╕╨╡ ╨╜╨╛╨┤╤Л ╨┐╨░╨╜╨╡╨╗╨╕ (╨║╨░╤Б╨║╨░╨┤) ╨┐╤А╨╛╨▓╨╡╤А╨║╤Г ╨╜╨╡ ╨┐╤А╨╛╤Е╨╛╨┤╤П╤В: ╨╕╤Е ╨┐╤Г╤Б╨║╨░╤О╤В ╨▓╤Б╨╡╨│╨┤╨░ */
+            /** @description Сети и адреса. Другие ноды панели (каскад) проверку не проходят: их пускают всегда */
             networks: string[];
         };
         Item: {
@@ -3700,21 +3700,21 @@ export interface components {
         JobState: {
             /** Format: int64 */
             done: number;
-            /** @description ╨Ъ╨╛╨┤ ╨╛╤И╨╕╨▒╨║╨╕, ╨║╨╛╨│╨┤╨░ state = failed */
+            /** @description Код ошибки, когда state = failed */
             error?: string;
             /** Format: date-time */
             finished?: string;
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╨╕ ╨╡╤С ╨░╨┤╤А╨╡╤Б (╨▒╨╡╨╖ ╨┐╤Г╤В╨╕ ╨╕ ╨┤╨░╨╜╨╜╤Л╤Е ╨┤╨╗╤П ╨▓╤Е╨╛╨┤╨░) */
+            /** @description Панель и её адрес (без пути и данных для входа) */
             from?: string;
             /** @enum {string} */
             mode?: "preview" | "import";
             preview?: components["schemas"]["Preview"];
-            /** @description ╨з╤В╨╛ ╤Б╨┤╨╡╨╗╨░╨╜╨╛; ╨┐╤А╨╕ ╨╛╤И╨╕╨▒╨║╨╡ ╨┐╨╛╤Б╤А╨╡╨┤╨╕ ╨╕╨╝╨┐╨╛╤А╤В╨░ тАФ ╤Б╨┤╨╡╨╗╨░╨╜╨╜╨╛╨╡ ╨┤╨╛ ╨╜╨╡╤С */
+            /** @description Что сделано; при ошибке посреди импорта — сделанное до неё */
             report?: components["schemas"]["Report"];
             /** Format: date-time */
             started?: string;
             /**
-             * @description idle тАФ ╨╡╤Й╤С ╨╜╨╡ ╨▒╤Л╨╗╨╛; fetching тАФ ╤З╨╕╤В╨░╨╡╤В╤Б╤П ╤Б╤В╨░╤А╨░╤П ╨┐╨░╨╜╨╡╨╗╤М; importing тАФ ╤Б╨╛╨╖╨┤╨░╤О╤В╤Б╤П ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕
+             * @description idle — ещё не было; fetching — читается старая панель; importing — создаются пользователи
              * @enum {string}
              */
             state: "idle" | "fetching" | "checking" | "importing" | "done" | "failed";
@@ -3722,67 +3722,67 @@ export interface components {
             total: number;
         };
         LegacyLinks: {
-            /** @description ╨б╤В╨░╤А╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╤Б╨╡╨╣╤З╨░╤Б ╨╛╤В╨║╤А╤Л╨▓╨░╤О╤В╤Б╤П: ╨╖╨░╨┤╨░╨╜ ╨╕╤Е ╨┐╤Г╤В╤М, ╨░ ╨┤╨╗╤П ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╤Е ╨╡╤Й╤С ╨╕ ╤Б╨╡╨║╤А╨╡╤В ╤Б╤В╨░╤А╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Старые ссылки сейчас открываются: задан их путь, а для подписанных ещё и секрет старой панели */
             active: boolean;
-            /** @description ╨Ш╨╖ ╨║╨░╨║╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕: marzban, pasarguard ╨╕╨╗╨╕ remnawave */
+            /** @description Из какой панели: marzban, pasarguard или remnawave */
             source: string;
-            /** @description ╨б╤Б╤Л╨╗╨║╨░ ╤Ж╨╡╨╗╨╕╨║╨╛╨╝. ╨в╨╛╨╗╤М╨║╨╛ ╤Г Remnawave: ╤В╨╛╨║╨╡╨╜ Marzban ╨╕ PasarGuard ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜, ╨╕╨╝╨┐╨╛╤А╤В ╨╡╨│╨╛ ╨╜╨╡ ╨▓╨╕╨┤╨╡╨╗ ╨╕ ╨╜╨╡ ╤Е╤А╨░╨╜╨╕╤В, ╨░ ╤Б╤Б╤Л╨╗╨║╨╕, ╤З╤В╨╛ ╤Г╨╢╨╡ ╤Г ╨╗╤О╨┤╨╡╨╣, ╨┐╤А╨╛╨▓╨╡╤А╤П╤О╤В╤Б╤П ╨┐╨╛ ╨┐╨╛╨┤╨┐╨╕╤Б╨╕ */
+            /** @description Ссылка целиком. Только у Remnawave: токен Marzban и PasarGuard подписан, импорт его не видел и не хранит, а ссылки, что уже у людей, проверяются по подписи */
             url?: string;
         };
         LegacyView: {
-            /** @description ╨з╤М╨╕ ╤Б╤Б╤Л╨╗╨║╨╕: marzban, pasarguard ╨╕╨╗╨╕ remnawave; ╨╕╨╝╨┐╨╛╤А╤В ╤Б╤В╨░╨▓╨╕╤В ╨╡╨│╨╛ ╤Б╨░╨╝ */
+            /** @description Чьи ссылки: marzban, pasarguard или remnawave; импорт ставит его сам */
             kind: string;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Б╤В╨░╤А╤Л╤Е ╤Б╤Б╤Л╨╗╨╛╨║ ╨╕ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╨╖╨░╨▓╨╡╨┤╨╡╨╜╨╛
+             * @description Сколько старых ссылок и пользователей заведено
              */
             links: number;
-            /** @description ╨Я╤Г╤В╤М ╤Б╤В╨░╤А╤Л╤Е ╤Б╤Б╤Л╨╗╨╛╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕: sub ╤Г Marzban ╨╕ PasarGuard, api/sub ╤Г Remnawave; ╨┐╤Г╤Б╤В╨╛ тАФ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╛ */
+            /** @description Путь старых ссылок подписки: sub у Marzban и PasarGuard, api/sub у Remnawave; пусто — выключено */
             path: string;
-            /** @description ╨б╨╡╨║╤А╨╡╤В ╤Б╤В╨░╤А╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╖╨░╨┤╨░╨╜; ╤Б╨░╨╝ ╨╛╨╜ ╨╜╨╡ ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╨╡╤В╤Б╤П */
+            /** @description Секрет старой панели задан; сам он не возвращается */
             secret_set: boolean;
         };
         LiftTorrentOutputBody: {
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨▒╨░╨╜╨╛╨▓ ╤Б╨╜╤П╤В╨╛
+             * @description Сколько банов снято
              */
             lifted: number;
         };
         List: {
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨▓╤Б╨╡╨│╨╛
+             * @description Сколько всего
              */
             count: number;
-            /** @description ╨Я╨╡╤А╨▓╤Л╨╡ 50 */
+            /** @description Первые 50 */
             names: string[];
         };
         ListUsersOutputBody: {
-            /** @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨┐╨╛ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╤П╨╝ ╤Б╤А╨╡╨┤╨╕ ╨┐╨╛╨┤╤Е╨╛╨┤╤П╤Й╨╕╤Е ╨┐╨╛╨┤ ╨┐╨░╨┐╨║╤Г, ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ ╨╕ ╤Б╨║╤А╤Л╤В╤Л╤Е; ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╨╡ ╨╕ ╨┐╨╛╨╕╤Б╨║ ╨╜╨╡ ╤Г╤З╨╕╤В╤Л╨▓╨░╤О╤В╤Б╤П */
+            /** @description Пользователи по состояниям среди подходящих под папку, источник и скрытых; состояние и поиск не учитываются */
             counts: components["schemas"]["UserCounts"];
-            /** @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨┐╨╛ ╨┐╨░╨┐╨║╨░╨╝ (╨║╨╗╤О╤З тАФ id ╨┐╨░╨┐╨║╨╕, none тАФ ╨▓╨╜╨╡ ╨┐╨░╨┐╨╛╨║) ╤Б╤А╨╡╨┤╨╕ ╨┐╨╛╨┤╤Е╨╛╨┤╤П╤Й╨╕╤Е ╨┐╨╛╨┤ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ ╨╕ ╤Б╨║╤А╤Л╤В╤Л╤Е */
+            /** @description Пользователи по папкам (ключ — id папки, none — вне папок) среди подходящих под источник и скрытых */
             folder_counts: {
                 [key: string]: number;
             };
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨╕╨╖ ╨╜╨╕╤Е ╤Б╨║╤А╤Л╤В╨╛
+             * @description Сколько из них скрыто
              */
             hidden_total: number;
             items: components["schemas"]["UserView"][];
-            /** @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨┐╨╛ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░╨╝ (admin, bot, trial, import) ╤Б╤А╨╡╨┤╨╕ ╨┐╨╛╨┤╤Е╨╛╨┤╤П╤Й╨╕╤Е ╨┐╨╛╨┤ ╨┐╨░╨┐╨║╤Г ╨╕ ╤Б╨║╤А╤Л╤В╤Л╤Е */
+            /** @description Пользователи по источникам (admin, bot, trial, import) среди подходящих под папку и скрытых */
             source_counts: {
                 [key: string]: number;
             };
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨┐╨╛╨┤╤Е╨╛╨┤╨╕╤В ╨┐╨╛╨┤ ╤Д╨╕╨╗╤М╤В╤А
+             * @description Сколько подходит под фильтр
              */
             total: number;
             /**
              * Format: int64
-             * @description ╨Т╤Б╨╡ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨┐╨░╨╜╨╡╨╗╨╕, ╨║╨░╨║ ╨▒╤Л ╨╜╨╕ ╨▒╤Л╨╗ ╨╖╨░╨┤╨░╨╜ ╤Д╨╕╨╗╤М╤В╤А
+             * @description Все пользователи панели, как бы ни был задан фильтр
              */
             users_total: number;
         };
@@ -3794,7 +3794,7 @@ export interface components {
         };
         LoginInputBody: {
             password: string;
-            /** @description ╨Ъ╨╛╨┤ ╨╕╨╖ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П ╨╕╨╗╨╕ ╤А╨╡╨╖╨╡╤А╨▓╨╜╤Л╨╣ ╨║╨╛╨┤ */
+            /** @description Код из приложения или резервный код */
             totp?: string;
             username: string;
         };
@@ -3802,103 +3802,103 @@ export interface components {
             description: {
                 [key: string]: string;
             };
-            /** @description ╨Ф╨░╨╣╨┤╨╢╨╡╤Б╤В ╨╛╨▒╤А╨░╨╖╨░ ╨╖╨░╨┐╨╕╤Б╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░ */
+            /** @description Дайджест образа записи источника */
             digest?: string;
             homepage: string;
             id: string;
-            /** @description ╨Ю╨▒╤А╨░╨╖ ╨╖╨░╨┐╨╕╤Б╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░: ╨░╨┤╨╝╨╕╨╜ ╨▓╨╕╨┤╨╕╤В, ╤З╤В╨╛ ╨╕╨╝╨╡╨╜╨╜╨╛ ╨▒╤Г╨┤╨╡╤В ╨╖╨░╨┐╤Г╤Й╨╡╨╜╨╛ ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡; ╤Г ╨╖╨░╨┐╨╕╤Б╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨┐╤Г╤Б╤В╨╛ */
+            /** @description Образ записи источника: админ видит, что именно будет запущено на сервере; у записи подписанного каталога пусто */
             image?: string;
             installed: boolean;
             /** @enum {string} */
             kind: "bot" | "ui" | "generic";
             /** @enum {string} */
             mode: "http" | "client";
-            /** @description ╨Э╨░╨╖╨▓╨░╨╜╨╕╨╡ ╨┐╨╛ ╤П╨╖╤Л╨║╨░╨╝ */
+            /** @description Название по языкам */
             name: {
                 [key: string]: string;
             };
-            /** @description ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║ ╨╜╨╡╨╛╤Д╨╕╤Ж╨╕╨░╨╗╤М╨╜╨╛╨│╨╛ ╨░╨┤╨┤╨╛╨╜╨░; ╨╜╨╡╤В ╤Г ╨░╨┤╨┤╨╛╨╜╨░ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░ */
+            /** @description Источник неофициального аддона; нет у аддона подписанного каталога */
             origin?: components["schemas"]["MarketOrigin"];
-            /** @description ╨з╤В╨╛ ╨░╨┤╨┤╨╛╨╜ ╨┐╤А╨╛╤Б╨╕╤В: ╤Н╤В╨╛ ╨╕ ╨╛╨┤╨╛╨▒╤А╤П╨╡╤В ╨░╨┤╨╝╨╕╨╜ ╨┐╤А╨╕ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨╡ */
+            /** @description Что аддон просит: это и одобряет админ при установке */
             permissions: string[];
-            /** @description ╨г╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜, ╨░ ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨╕╨╗╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨╡ ╨┤╤А╤Г╨│╨░╤П ╤Б╨▒╨╛╤А╨║╨░ */
+            /** @description Установлен, а в каталоге или источнике другая сборка */
             update: boolean;
             version: string;
-            /** @description ╨б╨▒╨╛╤А╨║╨░ ╨┐╤А╨╛╤Б╨╕╤В ╨▒╨╛╨╗╤М╤И╨╡ ╨┐╤А╨░╨▓, ╤З╨╡╨╝ ╨╛╨┤╨╛╨▒╤А╨╡╨╜╨╛: ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╢╨┤╤С╤В ╨╜╨╛╨▓╨╛╨│╨╛ ╨╛╨┤╨╛╨▒╤А╨╡╨╜╨╕╤П */
+            /** @description Сборка просит больше прав, чем одобрено: обновление ждёт нового одобрения */
             wider: boolean;
         };
         MarketExternalInputBody: {
-            /** @description ╨Р╨┤╨╝╨╕╨╜ ╨┐╨╛╨┤╤В╨▓╨╡╤А╨┤╨╕╨╗, ╤З╤В╨╛ ╨┤╨╛╨▓╨╡╤А╤П╨╡╤В ╤Н╤В╨╛╨╝╤Г ╨║╨╛╨┤╤Г: Hikari ╨╡╨│╨╛ ╨╜╨╡ ╨┐╤А╨╛╨▓╨╡╤А╤П╨╗ */
+            /** @description Админ подтвердил, что доверяет этому коду: Hikari его не проверял */
             confirm: boolean;
-            /** @description ╨Ш╨╝╤П ╨░╨┤╨┤╨╛╨╜╨░: a-z, 0-9 ╨╕ ╨┤╨╡╤Д╨╕╤Б, ╨╜╨╡ ╨╕╨╖ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨╕ ╨╜╨╡ ╨╕╨╖ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░ */
+            /** @description Имя аддона: a-z, 0-9 и дефис, не из каталога и не из источника */
             id: string;
             /** @enum {string} */
             kind: "bot" | "ui" | "generic";
             /**
-             * @description http тАФ ╨░╨┤╨┤╨╛╨╜ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╨┐╨░╨╜╨╡╨╗╨╕ ╨╜╨░ /v2/*; client тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б╨░╨╝ ╤Е╨╛╨┤╨╕╤В ╨▓ ╨┐╨░╨╜╨╡╨╗╤М
+             * @description http — аддон отвечает панели на /v2/*; client — только сам ходит в панель
              * @enum {string}
              */
             mode: "http" | "client";
-            /** @description ╨Я╤А╨░╨▓╨░, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨░╨┤╨╝╨╕╨╜ ╨┤╨░╤С╤В ╨░╨┤╨┤╨╛╨╜╤Г */
+            /** @description Права, которые админ даёт аддону */
             permissions: string[];
-            /** @description http://127.0.0.1:<╨┐╨╛╤А╤В>; ╨║╨╗╨╕╨╡╨╜╤В╤Г ╨┐╨░╨╜╨╡╨╗╨╕ (mode client) ╨╝╨╛╨╢╨╜╨╛ ╨╜╨╡ ╤Г╨║╨░╨╖╤Л╨▓╨░╤В╤М */
+            /** @description http://127.0.0.1:<порт>; клиенту панели (mode client) можно не указывать */
             url?: string;
         };
         MarketInstallInputBody: {
-            /** @description ╨Я╤А╨░╨▓╨░, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨░╨┤╨╝╨╕╨╜ ╨▓╨╕╨┤╨╡╨╗ ╨╕ ╨╛╨┤╨╛╨▒╤А╨╕╨╗: ╤А╨╛╨▓╨╜╨╛ ╤В╨╡, ╤З╤В╨╛ ╨┐╤А╨╛╤Б╨╕╤В ╤Б╨▒╨╛╤А╨║╨░ */
+            /** @description Права, которые админ видел и одобрил: ровно те, что просит сборка */
             permissions: string[];
         };
         MarketInstalled: {
-            /** @description ╨Ф╨░╨╣╨┤╨╢╨╡╤Б╤В ╨╛╨▒╤А╨░╨╖╨░ ╨╜╨╡╨╛╤Д╨╕╤Ж╨╕╨░╨╗╤М╨╜╨╛╨│╨╛ ╨░╨┤╨┤╨╛╨╜╨░ (custom) */
+            /** @description Дайджест образа неофициального аддона (custom) */
             digest?: string;
-            /** @description ╨Ю╨┤╨╛╨▒╤А╨╡╨╜╨╜╤Л╨╡ ╨┐╤А╨░╨▓╨░ */
+            /** @description Одобренные права */
             granted: string[];
             id: string;
-            /** @description ╨Ю╨▒╤А╨░╨╖ ╨╜╨╡╨╛╤Д╨╕╤Ж╨╕╨░╨╗╤М╨╜╨╛╨│╨╛ ╨░╨┤╨┤╨╛╨╜╨░ (custom) */
+            /** @description Образ неофициального аддона (custom) */
             image?: string;
             /** @enum {string} */
             kind: "bot" | "ui" | "generic";
             /**
              * Format: int64
-             * @description ╨Я╨░╨╝╤П╤В╤М ╨║╨╛╨╜╤В╨╡╨╣╨╜╨╡╤А╨░, ╨Ь╨С; 0 тАФ ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О 128
+             * @description Память контейнера, МБ; 0 — по умолчанию 128
              */
             mem_mb?: number;
             /** @enum {string} */
             mode: "http" | "client";
-            /** @description ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║, ╨╕╨╖ ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨┐╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜ ╨░╨┤╨┤╨╛╨╜ (custom) */
+            /** @description Источник, из которого поставлен аддон (custom) */
             origin?: components["schemas"]["MarketOrigin"];
             /**
-             * @description official тАФ ╨╕╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░; custom тАФ ╨╛╨▒╤А╨░╨╖ ╨╕╨╖ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░ ╨╕╨╗╨╕, ╤Г ╤Б╤В╨░╤А╤Л╤Е ╤Г╤Б╤В╨░╨╜╨╛╨▓╨╛╨║, ╤Б╨▓╨╛╨╣ ╨╛╨▒╤А╨░╨╖ ╨░╨┤╨╝╨╕╨╜╨░; external тАФ ╤Б╨▓╨╛╨╣ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б ╨░╨┤╨╝╨╕╨╜╨░; ╨╜╨╡╨╛╤Д╨╕╤Ж╨╕╨░╨╗╤М╨╜╤Л╨╡ Hikari ╨╜╨╡ ╨┐╤А╨╛╨▓╨╡╤А╤П╨╗
+             * @description official — из подписанного каталога; custom — образ из источника или, у старых установок, свой образ админа; external — свой процесс админа; неофициальные Hikari не проверял
              * @enum {string}
              */
             source: "official" | "custom" | "external";
             /** @enum {string} */
             status: "running";
-            /** @description ╨Р╨┤╤А╨╡╤Б ╨▓╨╜╨╡╤И╨╜╨╡╨│╨╛ ╨░╨┤╨┤╨╛╨╜╨░ (external); ╨┐╤Г╤Б╤В╨╛ ╤Г ╨║╨╗╨╕╨╡╨╜╤В╨░ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Адрес внешнего аддона (external); пусто у клиента панели */
             url?: string;
-            /** @description ╨Ю╨┤╨╛╨▒╤А╨╡╨╜╨╜╨░╤П ╨▓╨╡╤А╤Б╨╕╤П ╤Г ╨░╨┤╨┤╨╛╨╜╨░ ╨╕╨╖ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░; ╨┐╤Г╤Б╤В╨╛ ╤Г ╨░╨┤╨┤╨╛╨╜╨░ ╨░╨┤╨╝╨╕╨╜╨░ ╨▒╨╡╨╖ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░: ╨▓╨╡╤А╤Б╨╕╤О ╨╖╨╜╨░╨╡╤В ╤В╨╛╨╗╤М╨║╨╛ ╨║╨░╤В╨░╨╗╨╛╨│ */
+            /** @description Одобренная версия у аддона из источника; пусто у аддона админа без источника: версию знает только каталог */
             version: string;
         };
         MarketOrigin: {
             /** Format: int64 */
             id: number;
-            /** @description ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜ ╨╖╨░╨║╤А╨╡╨┐╨╗╤С╨╜╨╜╤Л╨╝ ╨║╨╗╤О╤З╨╛╨╝; ╨▒╨╡╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨╕ ╤В╨╛╤В, ╨║╤В╨╛ ╤Г╨┐╤А╨░╨▓╨╗╤П╨╡╤В ╨░╨┤╤А╨╡╤Б╨╛╨╝, ╤Г╨┐╤А╨░╨▓╨╗╤П╨╡╤В ╨╕ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П╨╝╨╕ */
+            /** @description Источник подписан закреплённым ключом; без подписи тот, кто управляет адресом, управляет и обновлениями */
             signed: boolean;
             title: string;
         };
         MarketView: {
-            /** @description ╨Я╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ ╨╕ ╨╖╨░╨┐╨╕╤Б╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨╛╨▓, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨░╨┤╨╝╨╕╨╜ ╨┤╨╛╨▒╨░╨▓╨╕╨╗ */
+            /** @description Подписанный каталог и записи источников, которые админ добавил */
             catalog: components["schemas"]["MarketEntry"][];
-            /** @description catalog_unavailable тАФ ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨╡ ╨╖╨░╨│╤А╤Г╨╖╨╕╨╗╤Б╤П */
+            /** @description catalog_unavailable — каталог не загрузился */
             catalog_error?: string;
-            /** @description Hikari ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╤Г╨╝╨╡╨╡╤В ╨░╨┤╨┤╨╛╨╜╤Л ╨┐╤А╨╛╤В╨╛╨║╨╛╨╗╨░ 2; ╨╕╨╜╨░╤З╨╡ ╤Б╨╜╨░╤З╨░╨╗╨░ ╨╛╨▒╨╜╨╛╨▓╨╕╤В╤М ╤Б╨╡╤А╨▓╨╡╤А */
+            /** @description Hikari на сервере умеет аддоны протокола 2; иначе сначала обновить сервер */
             host_ready: boolean;
             installed: components["schemas"]["MarketInstalled"][];
-            /** @description ╨Ъ╨░╨║ ╤Б╨╡╤А╨▓╨╡╤А ╨▓╤Л╨┐╨╛╨╗╨╜╨╕╨╗ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╤О╤О ╨╖╨░╤П╨▓╨║╤Г */
+            /** @description Как сервер выполнил последнюю заявку */
             last?: components["schemas"]["AddonResult"];
-            /** @description ╨Т╤Б╨╡ ╨╖╨░╤П╨▓╨║╨╕, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╤Б╨╡╤А╨▓╨╡╤А ╨╡╤Й╤С ╨╜╨╡ ╨▓╨╖╤П╨╗, ╨┐╨╛ ╨┐╨╛╤А╤П╨┤╨║╤Г */
+            /** @description Все заявки, которые сервер ещё не взял, по порядку */
             queue?: components["schemas"]["AddonRequest"][];
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╨▓╨╕╨┤╨╕╤В ╨║╨░╤В╨░╨╗╨╛╨│ ╨┤╨░╨╜╨╜╤Л╤Е ╤Б╨╡╤А╨▓╨╡╤А╨░; ╨╕╨╜╨░╤З╨╡ ╤Б╤В╨░╨▓╨╕╤В╤М ╨░╨┤╨┤╨╛╨╜╤Л ╨╜╨╡╨╗╤М╨╖╤П */
+            /** @description Панель видит каталог данных сервера; иначе ставить аддоны нельзя */
             supported: boolean;
         };
         MeBody: {
@@ -3908,147 +3908,147 @@ export interface components {
         MenuButton: {
             /** @enum {string} */
             action: "sub" | "devices" | "connect" | "renew" | "support" | "app" | "url" | "page";
-            /** @description ╨Я╨╛╤Б╤В╨╛╤П╨╜╨╜╤Л╨╣ id ╨║╨╜╨╛╨┐╨║╨╕ */
+            /** @description Постоянный id кнопки */
             id: string;
             label: string;
             on: boolean;
-            /** @description ╨Т ╨╛╨┤╨╜╨╛╨╝ ╤А╤П╨┤╤Г ╤Б ╨┐╤А╨╡╨┤╤Л╨┤╤Г╤Й╨╡╨╣ */
+            /** @description В одном ряду с предыдущей */
             row: boolean;
-            /** @description ╨Ф╨╗╤П action=page: ╤В╨╡╨║╤Б╤В ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л */
+            /** @description Для action=page: текст страницы */
             text?: string;
-            /** @description ╨Ф╨╗╤П action=url: https:// ╨╕╨╗╨╕ tg:// */
+            /** @description Для action=url: https:// или tg:// */
             url?: string;
         };
         NodeCertInputBody: {
-            /** @description ╨ж╨╡╨┐╨╛╤З╨║╨░ ╨▓ PEM: ╤Б╨╜╨░╤З╨░╨╗╨░ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В, ╨╖╨░ ╨╜╨╕╨╝ ╨┐╤А╨╛╨╝╨╡╨╢╤Г╤В╨╛╤З╨╜╤Л╨╡ (fullchain.pem) */
+            /** @description Цепочка в PEM: сначала сертификат, за ним промежуточные (fullchain.pem) */
             cert: string;
-            /** @description ╨Ч╨░╨║╤А╤Л╤В╤Л╨╣ ╨║╨╗╤О╤З ╨▓ PEM (privkey.pem): RSA ╨╛╤В 2048 ╨▒╨╕╤В, ECDSA P-256/384/521 ╨╕╨╗╨╕ Ed25519 */
+            /** @description Закрытый ключ в PEM (privkey.pem): RSA от 2048 бит, ECDSA P-256/384/521 или Ed25519 */
             key: string;
         };
         NodeCertView: {
-            /** @description custom_expired, custom_invalid тАФ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨╜╨╡ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П, ╨╜╨╛╨┤╨░ ╨╜╨░ ╤Б╨▓╨╛╤С╨╝ ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨╝ */
+            /** @description custom_expired, custom_invalid — сертификат не используется, нода на своём самоподписанном */
             error?: string;
             issuer: string;
-            /** @description ╨Ф╨╛╨╝╨╡╨╜╤Л ╨╕ IP, ╨╜╨░ ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨╛╨╜ ╨▓╤Л╨┐╨╕╤Б╨░╨╜ */
+            /** @description Домены и IP, на которые он выписан */
             names: string[];
             /** Format: date-time */
             not_after: string;
-            /** @description ╨Я╤Г╨▒╨╗╨╕╤З╨╜╨╛ ╨┤╨╛╨▓╨╡╤А╨╡╨╜╨╜╤Л╨╣ ╨┤╨╗╤П ╨░╨┤╤А╨╡╤Б╨░: ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П ╨┐╤А╨╕╨╜╨╕╨╝╨░╤О╤В ╨╡╨│╨╛ ╨▒╨╡╨╖ ╨┐╨╕╨╜╨░ */
+            /** @description Публично доверенный для адреса: приложения принимают его без пина */
             trusted: boolean;
         };
         NodeHello: {
             /** Format: date-time */
             at: string;
             code?: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б ╨╜╨╛╨┤╤Л ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Адрес ноды в панели */
             host?: string;
-            /** @description Hello ╨┐╤А╨╕╤И╤С╨╗ ╨╜╨╡ ╤Б ╤В╨╛╨│╨╛ IP, ╤З╤В╨╛ ╤Г╨║╨░╨╖╨░╨╜ ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Hello пришёл не с того IP, что указан в панели */
             ip_differs: boolean;
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╨┤╨╛╤Б╤В╤Г╤З╨░╨╗╨░╤Б╤М ╨┤╨╛ ╨╜╨╛╨┤╤Л ╨▓ ╨╛╤В╨▓╨╡╤В ╨╜╨░ ╨╡╤С hello */
+            /** @description Панель достучалась до ноды в ответ на её hello */
             ok: boolean;
             params?: {
                 [key: string]: string;
             };
-            /** @description ╨Р╨┤╤А╨╡╤Б, ╤Б ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨┐╤А╨╕╤И╤С╨╗ hello */
+            /** @description Адрес, с которого пришёл hello */
             seen_ip?: string;
         };
         NodeInfo: {
-            /** @description host:port API ╨╜╨╛╨┤╤Л; ╨┐╤Г╤Б╤В╨╛ ╤Г ╤Б╨▓╨╛╨╡╨╣ ╨╜╨╛╨┤╤Л */
+            /** @description host:port API ноды; пусто у своей ноды */
             address: string;
-            /** @description ╨Э╨╛╨┤╨░ ╤Б╤В╨░╤А╨╡╨╡ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Нода старее панели */
             behind: boolean;
-            /** @description ╨Я╨░╨╜╨╡╨╗╤М ╨╝╨╛╨╢╨╡╤В ╨╛╨▒╨╜╨╛╨▓╨╕╤В╤М ╨╜╨╛╨┤╤Г ╤Б╨░╨╝╨░: ╤Г╨┤╨░╨╗╤С╨╜╨╜╨░╤П, ╨╛╤В╨▓╨╡╤З╨░╨╡╤В, ╨▓╨╡╤А╤Б╨╕╤П 0.5.0.2 ╨╕╨╗╨╕ ╨╜╨╛╨▓╨╡╨╡; ╤Б╤В╨░╤А╤Г╤О ╨╛╨▒╨╜╨╛╨▓╨╗╤П╤О╤В ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ ╨▓╤А╤Г╤З╨╜╤Г╤О ╨║╨╛╨╝╨░╨╜╨┤╨╛╨╣ hikari update ╨╜╨░ ╨╡╤С ╤Б╨╡╤А╨▓╨╡╤А╨╡ */
+            /** @description Панель может обновить ноду сама: удалённая, отвечает, версия 0.5.0.2 или новее; старую обновляют один раз вручную командой hikari update на её сервере */
             can_update: boolean;
             certificate?: components["schemas"]["NodeCertView"];
             /**
              * Format: int64
-             * @description ╨и╨╕╤А╨╕╨╜╨░ ╨║╨░╨╜╨░╨╗╨░ ╨╜╨╛╨┤╤Л, ╨Ь╨▒╨╕╤В/╤Б ╨▓ ╨║╨░╨╢╨┤╤Г╤О ╤Б╤В╨╛╤А╨╛╨╜╤Г; null тАФ ╨╜╨╡ ╨╖╨░╨┤╨░╨╜╨░
+             * @description Ширина канала ноды, Мбит/с в каждую сторону; null — не задана
              */
             channel_mbps: number | null;
             /** Format: date-time */
             checked_at?: string;
             /**
              * Format: int64
-             * @description ╨з╨░╤Б╤Л ╨╜╨╛╨┤╤Л ╨╝╨╕╨╜╤Г╤Б ╤З╨░╤Б╤Л ╨┐╨░╨╜╨╡╨╗╨╕, ╤Б╨╡╨║╤Г╨╜╨┤╤Л; ╨╜╨╡╤В ╤Г ╤Б╤В╨░╤А╤Л╤Е ╨╜╨╛╨┤
+             * @description Часы ноды минус часы панели, секунды; нет у старых нод
              */
             clock_skew?: number;
             /** Format: int64 */
             conns: number;
             /**
              * Format: double
-             * @description ╨Ч╨░╨│╤А╤Г╨╖╨║╨░ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А╨░ ╨▓╤Б╨╡╨│╨╛ ╤Б╨╡╤А╨▓╨╡╤А╨░, ╨╜╨╡ ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨╛╨┤╤Л
+             * @description Загрузка процессора всего сервера, не только ноды
              */
             cpu_percent: number;
             domain: string;
             enabled: boolean;
-            /** @description ╨б╨╗╨╛╨▓╨░ ╨╛╤И╨╕╨▒╨║╨╕ ╤Б╨▓╤П╨╖╨╕ ╨║╨░╨║ ╨╡╤Б╤В╤М, ╨┤╨╗╤П ┬л╨┐╨╛╨┤╤А╨╛╨▒╨╜╨╡╨╡┬╗ */
+            /** @description Слова ошибки связи как есть, для «подробнее» */
             error?: string;
             /**
-             * @description ╨Я╨╛╤З╨╡╨╝╤Г ╨┐╨░╨╜╨╡╨╗╤М ╨╜╨╡ ╨┤╨╛╤Б╤В╤Г╤З╨░╨╗╨░╤Б╤М ╨┤╨╛ ╨╜╨╛╨┤╤Л
+             * @description Почему панель не достучалась до ноды
              * @enum {string}
              */
             error_code?: "timeout" | "refused" | "unreachable" | "dns" | "pin_mismatch" | "tls" | "http_status" | "unknown";
-            /** @description host ╨╕ port ╨░╨┤╤А╨╡╤Б╨░ API ╨╜╨╛╨┤╤Л, status ╨╛╤В╨▓╨╡╤В╨░ */
+            /** @description host и port адреса API ноды, status ответа */
             error_params?: {
                 [key: string]: string;
             };
             /**
              * Format: date-time
-             * @description ╨б ╨║╨░╨║╨╛╨│╨╛ ╨╝╨╛╨╝╨╡╨╜╤В╨░ ╨╜╨╡╤В ╤Б╨▓╤П╨╖╨╕
+             * @description С какого момента нет связи
              */
             error_since?: string;
-            /** @description ╨Ъ╨░╨╜╨░╨╗ ╨╜╨╛╨┤╤Л ╨┤╨╡╨╗╨╕╤В╤Б╤П ╨┐╨╛╤А╨╛╨▓╨╜╤Г ╨╝╨╡╨╢╨┤╤Г ╤В╨╡╨╝╨╕, ╨║╤В╨╛ ╤Б╨╡╨╣╤З╨░╤Б ╨║╨░╤З╨░╨╡╤В */
+            /** @description Канал ноды делится поровну между теми, кто сейчас качает */
             fair_share: boolean;
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╣ hello ╨╜╨╛╨┤╤Л ╨┐╨╛╤Б╨╗╨╡ ╨╖╨░╨┐╤Г╤Б╨║╨░: ╨┤╨╛╤Б╤В╤Г╤З╨░╨╗╨░╤Б╤М ╨╗╨╕ ╨┐╨░╨╜╨╡╨╗╤М ╨▓ ╨╛╤В╨▓╨╡╤В */
+            /** @description Последний hello ноды после запуска: достучалась ли панель в ответ */
             hello?: components["schemas"]["NodeHello"];
-            /** @description ╨Р╨┤╤А╨╡╤Б ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓ */
+            /** @description Адрес для клиентов */
             host: string;
             /** Format: int64 */
             id: number;
             /** Format: int64 */
             inbounds: number;
-            /** @description ╨Т╨║╨╗╤О╤З╨╡╨╜ ╨╗╨╕ IPv6 ╨╜╨░ ╨╜╨╛╨┤╨╡ */
+            /** @description Включен ли IPv6 на ноде */
             ipv6: boolean;
             /**
              * Format: date-time
-             * @description ╨Ъ╨╛╨│╨┤╨░ ╨╜╨╛╨┤╨░ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╣ ╤А╨░╨╖ ╨╛╤В╨▓╨╡╤З╨░╨╗╨░ (╤Б ╨╖╨░╨┐╤Г╤Б╨║╨░ ╨┐╨░╨╜╨╡╨╗╨╕)
+             * @description Когда нода последний раз отвечала (с запуска панели)
              */
             last_ok_at?: string;
             /** Format: int64 */
             listeners: number;
             /** Format: int64 */
             listeners_ok: number;
-            /** @description ╨б╨▓╨╛╤П ╨╜╨╛╨┤╨░ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Своя нода панели */
             local: boolean;
             /** Format: int64 */
             mem_total: number;
             /** Format: int64 */
             mem_used: number;
-            /** @description ╨У╤А╤Г╨┐╨┐╨░ ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡, ╨╜╨░╨┐╤А╨╕╨╝╨╡╤А ┬лЁЯЗ│ЁЯЗ▒ ╨Э╨╕╨┤╨╡╤А╨╗╨░╨╜╨┤╤Л┬╗; ╨╡╤С ╤Д╨╗╨░╨│ тАФ ╨┐╤А╨╡╤Д╨╕╨║╤Б ╨╕╨╝╤С╨╜ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ */
+            /** @description Группа в подписке, например «🇳🇱 Нидерланды»; её флаг — префикс имён подключений */
             name: string;
             /**
              * Format: double
-             * @description ╨Ф╨╛╨╗╤П ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╛╤А╨░ ╤Б╨░╨╝╨╛╨│╨╛ ╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨░ ╨╜╨╛╨┤╤Л (╨▓╤Б╤П ╨╝╨░╤И╨╕╨╜╨░ = 100); ╨╜╨╡╤В ╤Г ╨╜╨╛╨┤ ╨┤╨╛ 0.5.0.4
+             * @description Доля процессора самого процесса ноды (вся машина = 100); нет у нод до 0.5.0.4
              */
             proc_cpu_percent?: number;
-            /** @description ╨Я╤Г╨▒╨╗╨╕╤З╨╜╨╛╨╡ ╨╕╨╝╤П ╨┤╨╗╤П ╨║╨░╨╜╨░╨╗╨░ ╤Б╨╛╤Б╤В╨╛╤П╨╜╨╕╤П; ╨┐╤Г╤Б╤В╨╛╨╡ тАФ ╨╜╨╛╨┤╨░ ╤Б╨║╤А╤Л╤В╨░ ╨╕╨╖ ╤Б╨┐╨╕╤Б╨║╨░ */
+            /** @description Публичное имя для канала состояния; пустое — нода скрыта из списка */
             public_name: string;
             /** @enum {string} */
             status: "ok" | "error" | "unknown";
             tls?: components["schemas"]["NodeTLSView"];
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Г╨╜╨╡╤Б╨╗╨░ ╨╜╨╛╨┤╨░ ╨╖╨░ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╡ ╤Б╤Г╤В╨║╨╕ (╨▓╨▓╨╡╤А╤Е ╨╕ ╨▓╨╜╨╕╨╖ ╨▓╨╝╨╡╤Б╤В╨╡), ╨▒╨░╨╣╤В╤Л; ╤Г ╤В╨╛╨╗╤М╨║╨╛ ╤З╤В╨╛ ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╜╨╛╨╣ ╨╜╨╛╨┤╤Л 0
+             * @description Сколько унесла нода за последние сутки (вверх и вниз вместе), байты; у только что добавленной ноды 0
              */
             traffic_24h: number;
-            /** @description ╨Ъ╨░╨║ ╨╕╨┤╤С╤В ╨╕╨╗╨╕ ╨┐╤А╨╛╤И╨╗╨╛ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╜╨╛╨┤╤Л */
+            /** @description Как идёт или прошло обновление ноды */
             update?: components["schemas"]["UpdateStatus"];
             version?: string;
         };
         NodeKeyOutputBody: {
-            /** @description ╨Ъ╨╛╨╝╨░╨╜╨┤╨░ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨╕ ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨╜╨╛╨┤╤Л */
+            /** @description Команда установки на сервере ноды */
             command: string;
-            /** @description ╨Ъ╨╗╤О╤З ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨╜╨╛╨┤╤Л: ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В╤Б╤П ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ */
+            /** @description Ключ подключения ноды: показывается один раз */
             key: string;
             node: components["schemas"]["NodeInfo"];
         };
@@ -4062,32 +4062,32 @@ export interface components {
             down: number;
             /** Format: int64 */
             id: number;
-            /** @description ╨б╨▓╨╛╤П ╨╜╨╛╨┤╨░ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Своя нода панели */
             local: boolean;
-            /** @description ╨Ш╨╝╤П ╨╜╨╛╨┤╤Л; ╤Г ╤Б╨▓╨╛╨╡╨╣ ╨╜╨╛╨┤╤Л ╨┐╨░╨╜╨╡╨╗╨╕ ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨┐╤Г╤Б╤В╤Л╨╝ */
+            /** @description Имя ноды; у своей ноды панели может быть пустым */
             name: string;
             /** Format: int64 */
             up: number;
         };
         NodeSharesOutputBody: {
-            /** @description ╨Т╤Б╨╡ ╨╜╨╛╨┤╤Л, ╨▒╨╛╨╗╤М╤И╨╡ ╨▓╤Б╨╡╤Е ╤Б╨▓╨╡╤А╤Е╤Г */
+            /** @description Все ноды, больше всех сверху */
             items: components["schemas"]["NodeShare"][];
             /**
              * Format: date-time
-             * @description ╨г╤З╤С╤В ╨┐╨╛ ╨╜╨╛╨┤╨░╨╝ ╨╜╨░╤З╨░╨╗╤Б╤П ╨┐╨╛╨╖╨╢╨╡ ╨╜╨░╤З╨░╨╗╨░ ╨┐╨╡╤А╨╕╨╛╨┤╨░: ╨┤╨╡╨╜╤М, ╤Б ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨╛╨╜ ╨╕╨┤╤С╤В
+             * @description Учёт по нодам начался позже начала периода: день, с которого он идёт
              */
             since?: string;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Г╨╜╨╡╤Б╨╗╨╕ ╨▓╤Б╨╡ ╨╜╨╛╨┤╤Л ╨▓╨╝╨╡╤Б╤В╨╡
+             * @description Сколько унесли все ноды вместе
              */
             total: number;
         };
         NodeStatus: {
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╡ ╨┐╨╛╨┐╤Л╤В╨║╨╕ ╨┐╨╛╨╗╤Г╤З╨╕╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В, ╤Б╨▓╨╡╨╢╨╕╨╡ ╨┐╨╡╤А╨▓╤Л╨╝╨╕ */
+            /** @description Последние попытки получить сертификат, свежие первыми */
             attempts?: components["schemas"]["Attempt"][];
             /**
-             * @description ╨Ъ╤В╨╛ ╨▓╤Л╨┤╨░╨╗ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╤Г ╨╜╨╛╨┤╤Л ╤Б╨╡╨╣╤З╨░╤Б
+             * @description Кто выдал сертификат, который у ноды сейчас
              * @enum {string}
              */
             ca?: "letsencrypt" | "zerossl" | "google";
@@ -4095,7 +4095,7 @@ export interface components {
             ca_wanted?: "letsencrypt" | "zerossl" | "google";
             /** Format: date-time */
             checked_at?: string;
-            /** @description ╨Ъ╨╛╨┤ errors.acme: node_outdated тАФ ╨╜╨╛╨┤╨░ ╤Б╤В╨░╤А╨╡╨╡ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕ ╨╜╨╡ ╤Г╨╝╨╡╨╡╤В ╨┐╨╛╨╗╤Г╤З╨░╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В */
+            /** @description Код errors.acme: node_outdated — нода старее панели и не умеет получать сертификат */
             error?: string;
             error_detail?: string;
             holder?: string;
@@ -4114,14 +4114,14 @@ export interface components {
             ca?: "letsencrypt" | "zerossl" | "google";
             issuer?: string;
             /**
-             * @description custom тАФ ╤Б╨▓╨╛╨╣, acme тАФ ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣, ╨┐╨╛╨╗╤Г╤З╨╡╨╜╨╜╤Л╨╣ ╨┐╨░╨╜╨╡╨╗╤М╤О ╨┤╨╗╤П ╨╜╨╛╨┤╤Л, panel тАФ ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┐╨░╨╜╨╡╨╗╨╕ (╤Б╨▓╨╛╤П ╨╜╨╛╨┤╨░), self-signed тАФ ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣
+             * @description custom — свой, acme — публичный, полученный панелью для ноды, panel — публичный сертификат панели (своя нода), self-signed — самоподписанный
              * @enum {string}
              */
             kind: "custom" | "acme" | "panel" | "self-signed";
             names?: string[];
             /** Format: date-time */
             not_after?: string;
-            /** @description ╨б╤Б╤Л╨╗╨║╨╕ ╨╖╨░╨║╤А╨╡╨┐╨╗╤П╤О╤В ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В: ╨▓ sing-box ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е (SFA, SFI) ╨┐╤А╨╛╤В╨╛╨║╨╛╨╗╤Л ╨╜╨╛╨┤╤Л ╨╜╨░ TLS ╨╜╨╡ ╨┐╨╛╤П╨▓╤П╤В╤Б╤П, TUIC ╨▒╨╡╨╖ ╨┐╤А╨╛╨▓╨╡╤А╨║╨╕ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В╨░ */
+            /** @description Ссылки закрепляют самоподписанный сертификат: в sing-box приложениях (SFA, SFI) протоколы ноды на TLS не появятся, TUIC без проверки сертификата */
             pinned: boolean;
         };
         NodeView: {
@@ -4146,19 +4146,19 @@ export interface components {
             traffic_90: boolean;
         };
         OrderCascadeRulesInputBody: {
-            /** @description ╨Т╤Б╨╡ ╨┐╤А╨░╨▓╨╕╨╗╨░ ╨╜╨╛╨┤╤Л, ╨║╨░╨╢╨┤╨░╤П ╨╛╨┤╨╕╨╜ ╤А╨░╨╖, ╨▓ ╨╜╨╛╨▓╨╛╨╝ ╨┐╨╛╤А╤П╨┤╨║╨╡ */
+            /** @description Все правила ноды, каждая один раз, в новом порядке */
             ids: number[];
         };
         OrderFoldersInputBody: {
-            /** @description ╨Т╤Б╨╡ ╨┐╨░╨┐╨║╨╕, ╨║╨░╨╢╨┤╨░╤П ╨╛╨┤╨╕╨╜ ╤А╨░╨╖, ╨▓ ╤В╨╛╨╝ ╨┐╨╛╤А╤П╨┤╨║╨╡, ╨▓ ╨║╨░╨║╨╛╨╝ ╨╕╤Е ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╤Б╨┐╨╕╤Б╨╛╨║ */
+            /** @description Все папки, каждая один раз, в том порядке, в каком их показывает список */
             ids: number[];
         };
         OrderNodesInputBody: {
-            /** @description ╨Т╤Б╨╡ ╨╜╨╛╨┤╤Л ╨┐╨░╨╜╨╡╨╗╨╕, ╨║╨░╨╢╨┤╨░╤П ╨╛╨┤╨╕╨╜ ╤А╨░╨╖, ╨▓ ╤В╨╛╨╝ ╨┐╨╛╤А╤П╨┤╨║╨╡, ╨▓ ╨║╨░╨║╨╛╨╝ ╨╕╤Е ╤Б╨╡╤А╨▓╨╡╤А╤Л ╨╕╨┤╤Г╤В ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░╤Е */
+            /** @description Все ноды панели, каждая один раз, в том порядке, в каком их серверы идут в подписках */
             ids: number[];
         };
         OrderSubDocsInputBody: {
-            /** @description ╨Т╤Б╨╡ ╨╕╨╜╤Б╤В╤А╤Г╨║╤Ж╨╕╨╕ ╨▓ ╨╜╨╛╨▓╨╛╨╝ ╨┐╨╛╤А╤П╨┤╨║╨╡ */
+            /** @description Все инструкции в новом порядке */
             ids: number[];
         };
         OverviewOutputBody: {
@@ -4185,27 +4185,27 @@ export interface components {
         PackageBody: {
             /**
              * Format: int64
-             * @description ╨Ю╤В 1 ╨У╨С ╨┤╨╛ 100 ╨в╨С
+             * @description От 1 ГБ до 100 ТБ
              */
             bytes: number;
             /**
              * Format: int64
-             * @description ╨Ф╨╗╤П lifetime=days: 1тАУ3650
+             * @description Для lifetime=days: 1–3650
              */
             days?: number;
             /** @enum {string} */
             lifetime: "used" | "period" | "days";
             name: string;
-            /** @description ╨Я╤А╨╛╨┤╨░╨▓╨░╤В╤М ╨▓ ╨▒╨╛╤В╨╡ ╨╕ Mini App; ╨╜╤Г╨╢╨╜╨░ ╤Е╨╛╤В╤П ╨▒╤Л ╨╛╨┤╨╜╨░ ╤Ж╨╡╨╜╨░ */
+            /** @description Продавать в боте и Mini App; нужна хотя бы одна цена */
             on_sale?: boolean;
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░; ╨╜╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜ тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул трафика; не передан — основной трафик
              */
             pool_id?: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е: 7900 тАФ 79 тВ╜
+             * @description Цена в копейках: 7900 — 79 ₽
              */
             price_rub?: number;
             /** Format: int64 */
@@ -4218,13 +4218,13 @@ export interface components {
             bytes: number;
             /**
              * Format: int64
-             * @description ╨б╤А╨╛╨║ ╨▓ ╨┤╨╜╤П╤Е ╨┤╨╗╤П lifetime=days
+             * @description Срок в днях для lifetime=days
              */
             days: number;
             /** Format: int64 */
             id: number;
             /**
-             * @description used тАФ ╨┐╨╛╨║╨░ ╨╜╨╡ ╨╕╨╖╤А╨░╤Б╤Е╨╛╨┤╨╛╨▓╨░╨╜, period тАФ ╨┤╨╛ ╨║╨╛╨╜╤Ж╨░ ╨┐╨╡╤А╨╕╨╛╨┤╨░, days тАФ N ╨┤╨╜╨╡╨╣ ╤Б ╨┐╨╛╨║╤Г╨┐╨║╨╕
+             * @description used — пока не израсходован, period — до конца периода, days — N дней с покупки
              * @enum {string}
              */
             lifetime: "used" | "period" | "days";
@@ -4232,17 +4232,17 @@ export interface components {
             on_sale: boolean;
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░; null тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул трафика; null — основной трафик
              */
             pool_id: number | null;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е; null тАФ ╨╜╨╡ ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨╖╨░ ╤А╤Г╨▒╨╗╨╕
+             * @description Цена в копейках; null — не продаётся за рубли
              */
             price_rub: number | null;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ Telegram Stars; null тАФ ╨╜╨╡ ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨╖╨░ Stars
+             * @description Цена в Telegram Stars; null — не продаётся за Stars
              */
             price_stars: number | null;
             /** Format: int64 */
@@ -4250,10 +4250,10 @@ export interface components {
         };
         Page: {
             apps: components["schemas"]["PageApps"];
-            /** @description ╨С╨╗╨╛╨║╨╕ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨▓ ╨╕╤Е ╨┐╨╛╤А╤П╨┤╨║╨╡; ╨▓╤Б╤В╤А╨╛╨╡╨╜╨╜╤Л╨╡ тАФ ╨┐╨╛ ╨╛╨┤╨╜╨╛╨╝╤Г, ╤Б╨▓╨╛╨╕╤Е (text, links) тАФ ╨┤╨╛ 12 */
+            /** @description Блоки страницы в их порядке; встроенные — по одному, своих (text, links) — до 12 */
             blocks: components["schemas"]["PageBlock"][];
             brand: components["schemas"]["PageBrand"];
-            /** @description ╨б╨▓╨╛╨╣ CSS ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ (╨╜╨╡ ╨░╨┤╨╝╨╕╨╜╨║╨╕), ╨┤╨╛ 20 ╨Ъ╨С; @import ╨╕ < ╤Г╨▒╨╕╤А╨░╤О╤В╤Б╤П */
+            /** @description Свой CSS страницы подписки (не админки), до 20 КБ; @import и < убираются */
             css: string;
             look: components["schemas"]["PageLook"];
             og: components["schemas"]["PageOG"];
@@ -4268,11 +4268,11 @@ export interface components {
             linux: components["schemas"]["PageAppList"];
             macos: components["schemas"]["PageAppList"];
             /**
-             * @description ╨Т╨║╨╗╨░╨┤╨║╨░, ╨╛╤В╨║╤А╤Л╤В╨░╤П ╤Б╨╜╨░╤З╨░╨╗╨░; auto тАФ ╨┐╨╛ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╤Г ╨┐╨╛╤Б╨╡╤В╨╕╤В╨╡╨╗╤П
+             * @description Вкладка, открытая сначала; auto — по устройству посетителя
              * @enum {string}
              */
             platform: "auto" | "ios" | "android" | "windows" | "macos" | "linux";
-            /** @description ╨Ъ╨╜╨╛╨┐╨║╨░ QR-╨║╨╛╨┤╨░ ╨▓ ╨▒╨╗╨╛╨║╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ */
+            /** @description Кнопка QR-кода в блоке ссылки */
             qr: boolean;
             windows: components["schemas"]["PageAppList"];
         };
@@ -4288,18 +4288,18 @@ export interface components {
         PageBackground: {
             /**
              * Format: int64
-             * @description ╨Э╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╨╡ ╨│╤А╨░╨┤╨╕╨╡╨╜╤В╨░ ╨▓ ╨│╤А╨░╨┤╤Г╤Б╨░╤Е
+             * @description Направление градиента в градусах
              */
             angle: number;
             /**
              * Format: int64
-             * @description ╨Ч╨░╤В╨╡╨╝╨╜╨╡╨╜╨╕╨╡ ╨║╨░╤А╤В╨╕╨╜╨║╨╕, %
+             * @description Затемнение картинки, %
              */
             dim: number;
             /** @description #RRGGBB */
             from: string;
             /**
-             * @description theme тАФ ╤Д╨╛╨╜ ╤В╨╡╨╝╤Л, solid тАФ ╤Ж╨▓╨╡╤В from, gradient тАФ ╨╛╤В from ╨║ to, image тАФ ╨╖╨░╨│╤А╤Г╨╢╨╡╨╜╨╜╨░╤П ╨║╨░╤А╤В╨╕╨╜╨║╨░
+             * @description theme — фон темы, solid — цвет from, gradient — от from к to, image — загруженная картинка
              * @enum {string}
              */
             kind: "theme" | "solid" | "gradient" | "image";
@@ -4308,12 +4308,12 @@ export interface components {
         };
         PageBlock: {
             id: string;
-            /** @description ╨С╨╗╨╛╨║ links: ╨║╨╜╨╛╨┐╨║╨╕-╤Б╤Б╤Л╨╗╨║╨╕ */
+            /** @description Блок links: кнопки-ссылки */
             links?: components["schemas"]["PageLink"][];
             on: boolean;
-            /** @description ╨С╨╗╨╛╨║ text: Markdown */
+            /** @description Блок text: Markdown */
             text?: string;
-            /** @description ╨б╨▓╨╛╨╣ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ (╤Г ╨║╨╜╨╛╨┐╨╛╨║ тАФ ╤В╨╡╨║╤Б╤В ╨║╨╜╨╛╨┐╨║╨╕); ╨┐╤Г╤Б╤В╨╛ тАФ ╨╛╨▒╤Л╤З╨╜╤Л╨╣ */
+            /** @description Свой заголовок (у кнопок — текст кнопки); пусто — обычный */
             title: string;
             /** @enum {string} */
             type: "announce" | "status" | "promo" | "shop" | "traffic" | "devices" | "apps" | "guide" | "instructions" | "link" | "reissue" | "locations" | "telegram" | "support" | "text" | "links";
@@ -4321,43 +4321,43 @@ export interface components {
         PageBrand: {
             emoji: string;
             /**
-             * @description letter тАФ ╨┐╨╡╤А╨▓╨░╤П ╨▒╤Г╨║╨▓╨░ ╨▒╤А╨╡╨╜╨┤╨░, image тАФ ╨╖╨░╨│╤А╤Г╨╢╨╡╨╜╨╜╤Л╨╣ ╨╗╨╛╨│╨╛╤В╨╕╨┐, emoji, none тАФ ╨▒╨╡╨╖ ╨╖╨╜╨░╤З╨║╨░
+             * @description letter — первая буква бренда, image — загруженный логотип, emoji, none — без значка
              * @enum {string}
              */
             logo: "letter" | "image" | "emoji" | "none";
-            /** @description ╨б╤В╤А╨╛╨║╨░ ╨┐╨╛╨┤ ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡╨╝; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╜╨╡╤В */
+            /** @description Строка под названием; пусто — нет */
             subtitle: string;
         };
         PageLink: {
             emoji?: string;
             label: string;
-            /** @description https://, http:// ╨╕╨╗╨╕ tg:// */
+            /** @description https://, http:// или tg:// */
             url: string;
         };
         PageLook: {
             /**
-             * @description theme тАФ ╤Ж╨▓╨╡╤В ╨┐╨░╨╗╨╕╤В╤А╤Л, brand тАФ ╤Ж╨▓╨╡╤В ╨▒╤А╨╡╨╜╨┤╨░ (brand_accent)
+             * @description theme — цвет палитры, brand — цвет бренда (brand_accent)
              * @enum {string}
              */
             accent: "theme" | "brand";
             background: components["schemas"]["PageBackground"];
             /**
-             * @description glass тАФ ╨┐╨╛╨╗╤Г╨┐╤А╨╛╨╖╤А╨░╤З╨╜╤Л╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕, solid тАФ ╨╜╨╡╨┐╤А╨╛╨╖╤А╨░╤З╨╜╤Л╨╡
+             * @description glass — полупрозрачные карточки, solid — непрозрачные
              * @enum {string}
              */
             cards: "glass" | "solid";
             /**
-             * @description default тАФ Unbounded ╨╕ Onest, onest тАФ ╤В╨╛╨╗╤М╨║╨╛ Onest, system тАФ ╤И╤А╨╕╤Д╤В ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, rounded тАФ ╤Б╨║╤А╤Г╨│╨╗╤С╨╜╨╜╤Л╨╣ ╤Б╨╕╤Б╤В╨╡╨╝╨╜╤Л╨╣
+             * @description default — Unbounded и Onest, onest — только Onest, system — шрифт устройства, rounded — скруглённый системный
              * @enum {string}
              */
             font: "default" | "onest" | "system" | "rounded";
             /**
-             * @description light, dark (╨║╨░╨║ Midnight) ╨╕╨╗╨╕ system тАФ ╨║╨░╨║ ╤Г ╨┐╨╛╤Б╨╡╤В╨╕╤В╨╡╨╗╤П
+             * @description light, dark (как Midnight) или system — как у посетителя
              * @enum {string}
              */
             mode: "light" | "dark" | "system";
             /**
-             * @description ╨в╨╡╨╝╨░, ╨║╨░╨║ ╤В╨╡╨╝╤Л ╨┐╨░╨╜╨╡╨╗╨╕. mikan, ocean, sakura ╨╕ forest ╤Б╨╗╨╡╨┤╤Г╤О╤В mode; ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╨╡ ╤Б╨▓╨╡╤В╨╗╤Л╨╡ ╨╕╨╗╨╕ ╤В╤С╨╝╨╜╤Л╨╡ ╤Б╨░╨╝╨╕
+             * @description Тема, как темы панели. mikan, ocean, sakura и forest следуют mode; остальные светлые или тёмные сами
              * @enum {string}
              */
             palette: "mikan" | "ocean" | "sakura" | "forest" | "latte" | "snow" | "dawn" | "dune" | "graphite" | "abyss" | "ember" | "plum" | "moss" | "terminal" | "nord" | "mocha" | "tokyo" | "dracula" | "aurora" | "cosmos";
@@ -4366,21 +4366,21 @@ export interface components {
         };
         PageOG: {
             description: string;
-            /** @description ╨Ы╨╛╨│╨╛╤В╨╕╨┐ ╨║╨░╤А╤В╨╕╨╜╨║╨╛╨╣ ╨┐╤А╨╡╨▓╤М╤О */
+            /** @description Логотип картинкой превью */
             image: boolean;
-            /** @description ╨Ч╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ ╨┐╤А╨╡╨▓╤М╤О; ╨┐╤Г╤Б╤В╨╛ тАФ ╨▒╤А╨╡╨╜╨┤ */
+            /** @description Заголовок превью; пусто — бренд */
             title: string;
         };
         PasswordInputBody: {
             current: string;
-            /** @description ╨Э╨╡ ╨║╨╛╤А╨╛╤З╨╡ 12 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ */
+            /** @description Не короче 12 символов */
             new: string;
-            /** @description ╨Ю╤В╨╛╨╖╨▓╨░╤В╤М ╨╕ ╨║╨╗╤О╤З╨╕ API (╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О ╨┤╨░): ╨┤╤А╤Г╨│╨╕╨╡ ╤Б╨╡╤Б╤Б╨╕╨╕ ╨╖╨░╨▓╨╡╤А╤И╨░╤О╤В╤Б╤П ╨┐╤А╨╕ ╤Б╨╝╨╡╨╜╨╡ ╨┐╨░╤А╨╛╨╗╤П, ╨║╨╗╤О╤З, ╨▓╤Л╨┐╤Г╤Й╨╡╨╜╨╜╤Л╨╣ ╨╕╨╖ ╤Г╨│╨╜╨░╨╜╨╜╨╛╨╣ ╤Б╨╡╤Б╤Б╨╕╨╕, ╨┐╨╡╤А╨╡╨╢╨╕╨╗ ╨▒╤Л ╤Н╤В╨╛ */
+            /** @description Отозвать и ключи API (по умолчанию да): другие сессии завершаются при смене пароля, ключ, выпущенный из угнанной сессии, пережил бы это */
             revoke_keys?: boolean;
         };
         PatchAddonInputBody: {
             enabled?: boolean;
-            /** @description ╨в╨╛╨╗╤М╨║╨╛ ╤В╨╛, ╤З╤В╨╛ ╨╝╨╡╨╜╤П╨╡╤В╤Б╤П; ╤Б╨╡╨║╤А╨╡╤В ╨┐╤Г╤Б╤В╨╛╨╣ ╤Б╤В╤А╨╛╨║╨╛╨╣ тАФ ╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╨┐╤А╨╡╨╢╨╜╨╕╨╣ */
+            /** @description Только то, что меняется; секрет пустой строкой — оставить прежний */
             settings?: {
                 [key: string]: unknown;
             };
@@ -4389,7 +4389,7 @@ export interface components {
             enabled?: boolean;
             /** Format: int64 */
             hour?: number;
-            /** @description ╨Я╨░╤А╨╛╨╗╤М, ╨║╨╛╤В╨╛╤А╤Л╨╝ ╤И╨╕╤Д╤А╤Г╨╡╤В╤Б╤П ╤Д╨░╨╣╨╗: ╨╛╤В 20 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓. ╨д╨░╨╣╨╗ ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨▓ ╨╕╤Б╤В╨╛╤А╨╕╨╕ ╤З╨░╤В╨░ ╨╜╨░╨▓╤Б╨╡╨│╨┤╨░; ╨▒╨╡╨╖ ╨┐╨░╤А╨╛╨╗╤П ╨╡╨│╨╛ ╨╜╨╡ ╨╛╤В╨║╤А╤Л╤В╤М */
+            /** @description Пароль, которым шифруется файл: от 20 символов. Файл остаётся в истории чата навсегда; без пароля его не открыть */
             password?: string;
         };
         PatchCascadeRuleInputBody: {
@@ -4397,7 +4397,7 @@ export interface components {
             exit_node_id?: number;
             /**
              * Format: int64
-             * @description 0 тАФ ╨╗╤О╨▒╨╛╨╣ ╤Б╨╗╤Г╤И╨░╤В╨╡╨╗╤М
+             * @description 0 — любой слушатель
              */
             inbound_id?: number;
             match?: string;
@@ -4413,90 +4413,90 @@ export interface components {
             enabled?: boolean;
             /**
              * Format: int64
-             * @description ╨Ъ╨░╨║ ╤З╨░╤Б╤В╨╛ ╨╛╨▒╨╜╨╛╨▓╨╗╤П╤В╤М ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г, ╤Б╨╡╨║╤Г╨╜╨┤╤Л; 0 тАФ ╤З╨░╤Б ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О
+             * @description Как часто обновлять подписку, секунды; 0 — час по умолчанию
              */
             interval_sec?: number;
             name?: string;
             url?: string;
         };
         PatchFiltersInputBody: {
-            /** @description ╨Т╨╡╤Б╤М ╨╕╤Б╤Е╨╛╨┤╤П╤Й╨╕╨╣ ╤Д╨╕╨╗╤М╤В╤А */
+            /** @description Весь исходящий фильтр */
             egress?: components["schemas"]["EgressFilter"];
-            /** @description ╨Т╨╡╤Б╤М ╨▓╤Е╨╛╨┤╤П╤Й╨╕╨╣ ╤Д╨╕╨╗╤М╤В╤А */
+            /** @description Весь входящий фильтр */
             ingress?: components["schemas"]["IngressFilter"];
         };
         PatchFolderInputBody: {
             /** @enum {string} */
             color?: "gray" | "red" | "orange" | "yellow" | "green" | "teal" | "blue" | "purple" | "pink";
-            /** @description ╨Я╤Г╤Б╤В╨░╤П ╤Б╤В╤А╨╛╨║╨░ ╤Г╨▒╨╕╤А╨░╨╡╤В ╨╖╨╜╨░╤З╨╛╨║ */
+            /** @description Пустая строка убирает значок */
             emoji?: string;
             name?: string;
         };
         PatchInboundInputBody: {
-            /** @description ╨Э╨╡╨╗╤М╨╖╤П ╨▓╨║╨╗╤О╤З╨╕╤В╤М, ╨┐╨╛╨║╨░ ╤Г ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╤Б╨▓╨╛╨╣ ╨░╨┤╤А╨╡╤Б (listen) */
+            /** @description Нельзя включить, пока у подключения свой адрес (listen) */
             auto_port?: boolean;
-            /** @description ╨Э╨╡╨╗╤М╨╖╤П ╨▓╨║╨╗╤О╤З╨╕╤В╤М, ╨┐╨╛╨║╨░ ╤Г ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╤Б╨▓╨╛╨╣ ╨░╨┤╤А╨╡╤Б (listen) */
+            /** @description Нельзя включить, пока у подключения свой адрес (listen) */
             auto_sni?: boolean;
-            /** @description ╨Ъ╤Г╨┤╨░ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╤О╤В╤Б╤П ╨║╨╗╨╕╨╡╨╜╤В╤Л: ╨░╨┤╤А╨╡╤Б, ╨┐╨╛╤А╤В ╨╕ SNI ╨┐╤А╨╛╨║╤Б╨╕ ╨┐╨╡╤А╨╡╨┤ ╨╜╨╛╨┤╨╛╨╣; ╨╖╨░╨╝╨╡╨╜╤П╨╡╤В ╨▓╤Б╨╡ ╤В╤А╨╕ */
+            /** @description Куда подключаются клиенты: адрес, порт и SNI прокси перед нодой; заменяет все три */
             client?: components["schemas"]["ClientEndpoint"];
-            /** @description ╨и╨░╨▒╨╗╨╛╨╜ ╨╗╨╕╤Б╤В╨╡╨╜╨╡╤А╨░ (YAML) */
+            /** @description Шаблон листенера (YAML) */
             config?: string;
             dest?: string;
-            /** @description ╨Ь╨╛╨╢╨╜╨╛ ╤Б ╤Н╨╝╨╛╨┤╨╖╨╕: ┬лЁЯЗ│ЁЯЗ▒ ╨Э╨╕╨┤╨╡╤А╨╗╨░╨╜╨┤╤Л┬╗. ╨Я╤Г╤Б╤В╨╛ тАФ ╨╕╨╝╤П ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О */
+            /** @description Можно с эмодзи: «🇳🇱 Нидерланды». Пусто — имя по умолчанию */
             display_name?: string;
             enabled?: boolean;
             /**
              * Format: int64
-             * @description ╨Ф╨╗╤П outbound=node: ╤З╨╡╤А╨╡╨╖ ╨║╨░╨║╤Г╤О ╨╜╨╛╨┤╤Г
+             * @description Для outbound=node: через какую ноду
              */
             exit_node_id?: number;
-            /** @description ╨Ю╤В╨┐╨╡╤З╨░╤В╨╛╨║ TLS ╤Г ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓: ╨╕╨╖ ╤Б╨┐╨╕╤Б╨║╨░ (chrome, firefox, safari, ios, android, edge, 360, qq, random, randomized) ╨╕╨╗╨╕ ╤Б╨▓╨╛╤С тАФ ╨╗╨░╤В╨╕╨╜╨╕╤Ж╨░, ╤Ж╨╕╤Д╤А╤Л, _; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╛╨▒╤Й╨╕╨╣ ╨╕╨╖ ╨╜╨░╤Б╤В╤А╨╛╨╡╨║ */
+            /** @description Отпечаток TLS у клиентов: из списка (chrome, firefox, safari, ios, android, edge, 360, qq, random, randomized) или своё — латиница, цифры, _; пусто — общий из настроек */
             fingerprint?: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б, ╨╜╨░ ╨║╨╛╤В╨╛╤А╨╛╨╝ ╨╜╨╛╨┤╨░ ╤Б╨╗╤Г╤И╨░╨╡╤В: ╨┐╤Г╤Б╤В╨╛ тАФ ╨▓╤Б╨╡ ╨░╨┤╤А╨╡╤Б╨░, ╨╕╨╜╨░╤З╨╡ ╨╛╨┤╨╕╨╜ IP (127.0.0.1 тАФ ╨╖╨░ nginx ╨╕╨╗╨╕ HAProxy ╨╜╨░ ╤В╨╛╨╝ ╨╢╨╡ ╤Б╨╡╤А╨▓╨╡╤А╨╡). ╨б╨▓╨╛╨╣ ╨░╨┤╤А╨╡╤Б ╨▓╤Л╨║╨╗╤О╤З╨░╨╡╤В ╨┐╨╡╤А╨╡╨╜╨╛╤Б ╨┐╨╛╤А╤В╨░ */
+            /** @description Адрес, на котором нода слушает: пусто — все адреса, иначе один IP (127.0.0.1 — за nginx или HAProxy на том же сервере). Свой адрес выключает перенос порта */
             listen?: string;
             /**
-             * @description ╨Ю╨▒╤Д╤Г╤Б╨║╨░╤Ж╨╕╤П Hysteria2. Gecko ╨┐╨╛╨╜╨╕╨╝╨░╤О╤В ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П ╨╜╨░ ╤П╨┤╤А╨╡ mihomo 1.19.26+: ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╨╡ ╤Н╤В╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨╜╨╡ ╨┐╨╛╨╗╤Г╤З╨░╤В
+             * @description Обфускация Hysteria2. Gecko понимают только приложения на ядре mihomo 1.19.26+: остальные это подключение не получат
              * @enum {string}
              */
             obfs?: "salamander" | "gecko";
             /**
-             * @description ╨Т╤Л╤Е╨╛╨┤ ╨▓ ╨╕╨╜╤В╨╡╤А╨╜╨╡╤В: ╨╜╨░╨┐╤А╤П╨╝╤Г╤О, ╤З╨╡╤А╨╡╨╖ WARP ╨╜╨╛╨┤╤Л ╨╕╨╗╨╕ ╤З╨╡╤А╨╡╨╖ ╨┤╤А╤Г╨│╤Г╤О ╨╜╨╛╨┤╤Г
+             * @description Выход в интернет: напрямую, через WARP ноды или через другую ноду
              * @enum {string}
              */
             outbound?: "direct" | "warp" | "node";
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╤В╤А╨░╤Д╨╕╨║╨░; 0 тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул трафика; 0 — основной трафик
              */
             pool_id?: number;
             port?: string;
-            /** @description SNI ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓, ╨╡╤Б╨╗╨╕ dest тАФ IP (╤Ж╨╡╨╗╤М ╨╕╨╖ ╨┐╨╛╨┤╨▒╨╛╤А╨░ ╤Б╨╛╤Б╨╡╨┤╨╡╨╣) */
+            /** @description SNI для клиентов, если dest — IP (цель из подбора соседей) */
             server_name?: string;
-            /** @description ╨в╨╛╨╜╨║╨░╤П ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨░ XHTTP ╤Ж╨╡╨╗╨╕╨║╨╛╨╝: ╨┐╤Г╤Б╤В╨╛╨╡ ╨┐╨╛╨╗╨╡ тАФ ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ ╤П╨┤╤А╨░ ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О */
+            /** @description Тонкая настройка XHTTP целиком: пустое поле — значение ядра по умолчанию */
             xhttp?: components["schemas"]["XHTTPTuning"];
         };
         PatchLegacyInputBody: {
             /** @enum {string} */
             kind?: "marzban" | "pasarguard" | "remnawave" | "";
             path?: string;
-            /** @description ╨б╨╡╨║╤А╨╡╤В ╨╕╨╖ ╤В╨░╨▒╨╗╨╕╤Ж╤Л jwt ╨▒╨░╨╖╤Л ╤Б╤В╨░╤А╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╤Г╨▒╤А╨░╤В╤М */
+            /** @description Секрет из таблицы jwt базы старой панели; пусто — убрать */
             secret?: string;
         };
         PatchNodeInputBody: {
             /**
              * Format: int64
-             * @description ╨и╨╕╤А╨╕╨╜╨░ ╨║╨░╨╜╨░╨╗╨░ ╨╜╨╛╨┤╤Л, ╨Ь╨▒╨╕╤В/╤Б ╨▓ ╨║╨░╨╢╨┤╤Г╤О ╤Б╤В╨╛╤А╨╛╨╜╤Г
+             * @description Ширина канала ноды, Мбит/с в каждую сторону
              */
             channel_mbps?: number;
             domain?: string;
             enabled?: boolean;
-            /** @description ╨Ф╨╡╨╗╨╕╤В╤М ╨║╨░╨╜╨░╨╗ ╨╜╨╛╨┤╤Л ╨┐╨╛╤А╨╛╨▓╨╜╤Г ╨╝╨╡╨╢╨┤╤Г ╤В╨╡╨╝╨╕, ╨║╤В╨╛ ╤Б╨╡╨╣╤З╨░╤Б ╨║╨░╤З╨░╨╡╤В; ╨╜╤Г╨╢╨╡╨╜ channel_mbps */
+            /** @description Делить канал ноды поровну между теми, кто сейчас качает; нужен channel_mbps */
             fair_share?: boolean;
             host?: string;
-            /** @description ╨Т╨║╨╗╤О╤З╨╕╤В╤М ╨╕╨╗╨╕ ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М IPv6 ╨╜╨░ ╨╜╨╛╨┤╨╡ */
+            /** @description Включить или выключить IPv6 на ноде */
             ipv6?: boolean;
             name?: string;
-            /** @description ╨Я╤Г╨▒╨╗╨╕╤З╨╜╨╛╨╡ ╨╕╨╝╤П ╨╜╨╛╨┤╤Л; ╨┐╤Г╤Б╤В╨╛╨╡ тАФ ╨╜╨╡ ╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╤В╤М ╨╡╤С ╨▓ ╨║╨░╨╜╨░╨╗╨╡ */
+            /** @description Публичное имя ноды; пустое — не публиковать её в канале */
             public_name?: string;
         };
         PatchPaymentSettingsInputBody: {
@@ -4507,40 +4507,40 @@ export interface components {
             device_stars?: number;
             enabled?: boolean;
             /**
-             * @description none: ╨▒╨╡╨╖ ╤Г╤Б╨╗╨╛╨▓╨╕╨╣; channel: ╤В╨╛╨╗╤М╨║╨╛ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║╨░╨╝ ╨║╨░╨╜╨░╨╗╨░ ╨▒╨╛╤В╨░, ╨║╨░╨╜╨░╨╗ ╨┤╨╛╨╗╨╢╨╡╨╜ ╨▒╤Л╤В╤М ╤Г╨║╨░╨╖╨░╨╜ ╨╜╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ Telegram
+             * @description none: без условий; channel: только подписчикам канала бота, канал должен быть указан на странице Telegram
              * @enum {string}
              */
             free_condition?: "none" | "channel";
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨╛╨│╨╛ ╤В╨░╤А╨╕╤Д╨░, ╨╜╤Г╨╢╨╡╨╜ ╤Б╤А╨╛╨║; 0: ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М
+             * @description Тариф бесплатного тарифа, нужен срок; 0: выключить
              */
             free_tariff_id?: number;
             renew_resets_traffic?: boolean;
             stars?: boolean;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е, ╨╛╤В 100 (1 тВ╜); 0 тАФ ╨╜╨╡ ╨╖╨░ ╤А╤Г╨▒╨╗╨╕. ╨Ю╨▒╨╡ 0 тАФ ╨┐╤А╨╛╨▒╨╜╤Л╨╣ ╨┐╨╡╤А╨╕╨╛╨┤ ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╤Л╨╣
+             * @description Цена пробного периода в копейках, от 100 (1 ₽); 0 — не за рубли. Обе 0 — пробный период бесплатный
              */
             trial_rub?: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░ ╨▓ Stars; 0 тАФ ╨╜╨╡ ╨╖╨░ Stars. ╨С╨╡╨╖ ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░ (trial_tariff_id 0) ╨╛╨▒╨╡ ╤Ж╨╡╨╜╤Л ╤Б╨▒╤А╨░╤Б╤Л╨▓╨░╤О╤В╤Б╤П
+             * @description Цена пробного периода в Stars; 0 — не за Stars. Без пробного периода (trial_tariff_id 0) обе цены сбрасываются
              */
             trial_stars?: number;
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░; 0 тАФ ╨▓╤Л╨║╨╗╤О╤З╨╕╤В╤М
+             * @description Тариф пробного периода; 0 — выключить
              */
             trial_tariff_id?: number;
         };
         PatchSettingsInputBody: {
             /**
-             * @description ╨б╨╝╨╡╨╜╨░ ╤Ж╨╡╨╜╤В╤А╨░ ╨▓╤Л╨┐╤Г╤Б╨║╨░╨╡╤В ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В╤Л ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕ ╨╜╨╛╨┤ ╨╖╨░╨╜╨╛╨▓╨╛
+             * @description Смена центра выпускает сертификаты панели и нод заново
              * @enum {string}
              */
             acme_ca?: "letsencrypt" | "zerossl" | "google";
-            /** @description ╨Ъ╨╗╤О╤З HMAC (base64url); ╨┐╤Г╤Б╤В╨╛ тАФ ╤Г╨▒╤А╨░╤В╤М. ╨Ю╨▒╤А╨░╤В╨╜╨╛ ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В╤Б╤П */
+            /** @description Ключ HMAC (base64url); пусто — убрать. Обратно не показывается */
             acme_eab_hmac?: string;
             acme_eab_kid?: string;
             acme_email?: string;
@@ -4549,11 +4549,11 @@ export interface components {
             auto_port?: boolean;
             auto_sni?: boolean;
             brand?: string;
-            /** @description #RRGGBB ╨╕╨╗╨╕ ╨┐╤Г╤Б╤В╨╛ */
+            /** @description #RRGGBB или пусто */
             brand_accent?: string;
-            /** @description https://тАж ╨╕╨╗╨╕ ╨┐╤Г╤Б╤В╨╛ */
+            /** @description https://… или пусто */
             brand_logo_url?: string;
-            /** @description ╨Ш╨╖ ╤Б╨┐╨╕╤Б╨║╨░ ╨╕╨╗╨╕ ╤Б╨▓╨╛╤С: ╨╗╨░╤В╨╕╨╜╨╕╤Ж╨░ ╨▓ ╨╜╨╕╨╢╨╜╨╡╨╝ ╤А╨╡╨│╨╕╤Б╤В╤А╨╡, ╤Ж╨╕╤Д╤А╤Л ╨╕ _, ╨┤╨╛ 32 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ */
+            /** @description Из списка или своё: латиница в нижнем регистре, цифры и _, до 32 символов */
             client_fingerprint?: string;
             /** @enum {string} */
             default_lang?: "auto" | "ru" | "en";
@@ -4565,37 +4565,37 @@ export interface components {
             happ_crypt?: "off" | "api" | "local";
             happ_hide_settings?: boolean;
             happ_provider_id?: string;
-            /** @description happ://routing/тАж, auto тАФ ╤Б╨╛╨▒╤А╨░╤В╤М ╨╕╨╖ ╨╝╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╜╨╡ ╨╛╤В╨┤╨░╨▓╨░╤В╤М */
+            /** @description happ://routing/…, auto — собрать из маршрутизации; пусто — не отдавать */
             happ_routing?: string;
             link_reissue?: components["schemas"]["ReissueRules"];
             public_host?: string;
             /** Format: int64 */
             quiet_hour_utc?: number;
-            /** @description ╨б╨▓╨╛╨╣ ╨┤╨╛╨╝╨╡╨╜ ╨╕╨╗╨╕ ╨┐╨╛╨┤╨┤╨╛╨╝╨╡╨╜ ╨┤╨╗╤П SNI ╨╕ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣; ╨┐╤Г╤Б╤В╨╛ тАФ ╤Б╨▒╤А╨╛╤Б╨╕╤В╤М */
+            /** @description Свой домен или поддомен для SNI и подключений; пусто — сбросить */
             sni_domain?: string;
-            /** @description ╨Ф╨╛ 10 ╤Б╤В╤А╨╛╨║: ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨╕ Mini App ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В ╨╕╤Е ╤Б ╨┐╨╡╤А╨╡╨╜╨╛╤Б╨░╨╝╨╕, ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П ╨┐╨╛╨╗╤Г╤З╨░╤О╤В ╨╛╨┤╨╜╤Г ╤Б╤В╤А╨╛╨║╤Г ╨┤╨╛ 200 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ */
+            /** @description До 10 строк: страница подписки и Mini App показывают их с переносами, приложения получают одну строку до 200 символов */
             sub_announce?: string;
-            /** @description https://тАж ╨╕╨╗╨╕ tg://тАж */
+            /** @description https://… или tg://… */
             sub_announce_url?: string;
-            /** @description ╨б╨▓╨╛╨╣ ╨┤╨╛╨╝╨╡╨╜ ╨╕╨╗╨╕ ╨┐╨╛╨┤╨┤╨╛╨╝╨╡╨╜ ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨╛╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╤Б╨▒╤А╨╛╤Б╨╕╤В╤М */
+            /** @description Свой домен или поддомен для ссылок подписки; пусто — сбросить */
             sub_domain?: string;
             sub_group_auto?: string;
             sub_group_main?: string;
             /**
              * Format: int64
-             * @description ╨Ю╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ ╨┐╨╛╤А╤В ╨┐╨╛╨┤╨┐╨╕╤Б╨╛╨║ ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨┐╨░╨╜╨╡╨╗╨╕; 0 тАФ ╤Г╨▒╤А╨░╤В╤М. ╨б╤Б╤Л╨╗╨║╨╕ ╨┐╨╡╤А╨╡╨╡╨╖╨╢╨░╤О╤В ╨╜╨░ ╨╜╨╡╨│╨╛, ╤Б╤В╨░╤А╤Л╨╡ ╨┐╤А╨╛╨┤╨╛╨╗╨╢╨░╤О╤В ╤А╨░╨▒╨╛╤В╨░╤В╤М
+             * @description Отдельный порт подписок на сервере панели; 0 — убрать. Ссылки переезжают на него, старые продолжают работать
              */
             sub_port?: number;
             sub_routes?: components["schemas"]["Routes"];
             /** @enum {string} */
             sub_routing?: "ru_direct" | "all" | "blocked";
-            /** @description ╨б╨▓╨╛╨╕ ╨┐╤А╨░╨▓╨╕╨╗╨░ Clash, ╨┤╨╛ 500 ╤Б╤В╤А╨╛╨║; ╨╛╤И╨╕╨▒╨║╨░ ╤Г╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╨╜╨╛╨╝╨╡╤А ╤Б╤В╤А╨╛╨║╨╕ */
+            /** @description Свои правила Clash, до 500 строк; ошибка указывает номер строки */
             sub_rules?: string;
-            /** @description ╨б╨▓╨╛╨╣ ╨┐╤А╨╛╤Д╨╕╨╗╤М Clash; ╨┐╤Г╤Б╤В╨╛ тАФ ╨▓╨╡╤А╨╜╤Г╤В╤М ╨▓╤Б╤В╤А╨╛╨╡╨╜╨╜╤Л╨╣ */
+            /** @description Свой профиль Clash; пусто — вернуть встроенный */
             sub_template?: string;
-            /** @description ╨Я╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╡ тАФ ╤Б╨╝. SettingsView.sub_title */
+            /** @description Переменные — см. SettingsView.sub_title */
             sub_title?: string;
-            /** @description https://тАж ╨╕╨╗╨╕ tg://тАж */
+            /** @description https://… или tg://… */
             support_url?: string;
             wide_sni_scan?: boolean;
         };
@@ -4603,16 +4603,16 @@ export interface components {
             config?: components["schemas"]["Config"];
             enabled?: boolean;
             infrastructure?: components["schemas"]["AlertsConfigPatch"];
-            /** @description ╨Я╨╡╤А╨╡╨┤ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╕╨╡╨╝ ╨┐╨░╨╜╨╡╨╗╤М ╨┐╤А╨╛╨▓╨╡╤А╤П╨╡╤В, ╤З╤В╨╛ Telegram ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╤Н╤В╨╕╨╝ ╨┐╤Г╤В╤С╨╝ */
+            /** @description Перед сохранением панель проверяет, что Telegram отвечает этим путём */
             route?: components["schemas"]["RouteStruct"];
-            /** @description ╨в╨╛╨║╨╡╨╜ ╨╛╤В @BotFather; ╨┐╤Г╤Б╤В╨░╤П ╤Б╤В╤А╨╛╨║╨░ тАФ ╤Г╨┤╨░╨╗╨╕╤В╤М */
+            /** @description Токен от @BotFather; пустая строка — удалить */
             token?: string;
         };
         PatchTorrentInputBody: {
             /** Format: int64 */
             ban_minutes?: number;
             enabled?: boolean;
-            /** @description ╨Т╨╡╤Б╤М ╤Б╨┐╨╕╤Б╨╛╨║ id ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣-╨╕╤Б╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ */
+            /** @description Весь список id пользователей-исключений */
             exempt?: number[];
         };
         PatchUpdatesInputBody: {
@@ -4625,14 +4625,14 @@ export interface components {
         PatchUserInputBody: {
             /**
              * Format: int64
-             * @description ╨Ф╨╡╨╜╤М ╨╛╨┐╨╗╨░╤В╤Л 1тАУ31; 0 тАФ ╤Г╨▒╤А╨░╤В╤М
+             * @description День оплаты 1–31; 0 — убрать
              */
             billing_day?: number;
             contact?: string;
             /** Format: int64 */
             device_limit?: number;
             /**
-             * @description ╨Ъ╨░╨║ ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П ╨╗╨╕╨╝╨╕╤В ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓: bound: ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, online: ╨╗╤О╨▒╨╛╨╡ ╤З╨╕╤Б╨╗╨╛, ╤Б╤З╨╕╤В╨░╤О╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╛╨╜╨╗╨░╨╣╨╜
+             * @description Как считается лимит устройств: bound: привязанные устройства, online: любое число, считаются только одновременно онлайн
              * @enum {string}
              */
             device_mode?: "bound" | "online";
@@ -4642,10 +4642,10 @@ export interface components {
             expires_at?: string;
             /**
              * Format: int64
-             * @description ╨Я╨╛╨╗╨╛╨╢╨╕╤В╤М ╨▓ ╨┐╨░╨┐╨║╤Г; 0 тАФ ╤Г╨▒╤А╨░╤В╤М ╨╕╨╖ ╨┐╨░╨┐╨║╨╕
+             * @description Положить в папку; 0 — убрать из папки
              */
             folder_id?: number;
-            /** @description ╨б╨║╤А╤Л╤В╤М ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П ╨╕╨╖ ╤Б╨┐╨╕╤Б╨║╨░ ╨╕╨╗╨╕ ╨▓╨╡╤А╨╜╤Г╤В╤М ╨▓ ╨╜╨╡╨│╨╛; ╨┤╨╛╤Б╤В╤Г╨┐ ╨╛╨╜ ╨╜╨╡ ╤В╨╡╤А╤П╨╡╤В */
+            /** @description Скрыть пользователя из списка или вернуть в него; доступ он не теряет */
             hidden?: boolean;
             inbounds?: number[];
             name?: string;
@@ -4653,15 +4653,15 @@ export interface components {
             note?: string;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╤А╨╛╤Б╤В╤М, ╨Ь╨▒╨╕╤В/╤Б ╨▓ ╨║╨░╨╢╨┤╤Г╤О ╤Б╤В╨╛╤А╨╛╨╜╤Г
+             * @description Скорость, Мбит/с в каждую сторону
              */
             speed_limit?: number;
-            /** @description ╨б╨╜╤П╤В╤М ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╨╡ ╤Б╨║╨╛╤А╨╛╤Б╤В╨╕ */
+            /** @description Снять ограничение скорости */
             speed_unlimited?: boolean;
             tags?: string[];
             /**
              * Format: int64
-             * @description ╨Я╤А╨╕╨╝╨╡╨╜╨╕╤В╤М ╤В╨░╤А╨╕╤Д: ╨╗╨╕╨╝╨╕╤В╤Л ╨╕╨╖ ╤В╨░╤А╨╕╤Д╨░, ╤Б╤А╨╛╨║ тАФ ╨╛╤В ╤Б╨╡╨│╨╛╨┤╨╜╤П
+             * @description Применить тариф: лимиты из тарифа, срок — от сегодня
              */
             tariff_id?: number;
             /** Format: int64 */
@@ -4669,63 +4669,63 @@ export interface components {
             traffic_unlimited?: boolean;
         };
         PaymentSettingsView: {
-            /** @description ╨Э╨╛╨▓╤Л╨╡ ╨╗╤О╨┤╨╕ ╨╝╨╛╨│╤Г╤В ╨║╤Г╨┐╨╕╤В╤М ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╨▓ ╨▒╨╛╤В╨╡; ╨╕╨╜╨░╤З╨╡ тАФ ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╛╨┤╨╗╨╡╨╜╨╕╨╡ */
+            /** @description Новые люди могут купить подписку в боте; иначе — только продление */
             allow_new: boolean;
-            /** @description ╨з╤В╨╛ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В ╨╛╨┐╨╗╨░╤В╤Г ╨┐╤А╤П╨╝╨╛ ╤Б╨╡╨╣╤З╨░╤Б: ╨▓╨║╨╗╤О╤З╨╡╨╜╨╛, ╨╜╨░╤Б╤В╤А╨╛╨╡╨╜╨╛, ╨┤╨╗╤П Stars тАФ ╨▒╨╛╤В ╨╖╨░╨┐╤Г╤Й╨╡╨╜ */
+            /** @description Что принимает оплату прямо сейчас: включено, настроено, для Stars — бот запущен */
             available: components["schemas"]["PaymentSettingsViewAvailableStruct"];
             /** Format: int64 */
             device_rub: number;
             /** Format: int64 */
             device_stars: number;
-            /** @description ╨Я╤А╨╛╨┤╨░╨╢╨░ ╨┐╨╛╨┤╨┐╨╕╤Б╨╛╨║: ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╛ тАФ ╨▒╨╛╤В ╨╕ Mini App ╨╜╨╕╤З╨╡╨│╨╛ ╨╜╨╡ ╨┐╤А╨╛╨┤╨░╤О╤В, ╨╜╨╛╨▓╤Л╨╡ ╤Б╤З╨╡╤В╨░ ╨╜╨╡ ╤Б╨╛╨╖╨┤╨░╤О╤В╤Б╤П, ╤Г╨╢╨╡ ╨╛╤В╨║╤А╤Л╤В╤Л╨╡ ╨╖╨░╤Б╤З╨╕╤В╤Л╨▓╨░╤О╤В╤Б╤П */
+            /** @description Продажа подписок: выключено — бот и Mini App ничего не продают, новые счета не создаются, уже открытые засчитываются */
             enabled: boolean;
             /**
-             * @description ╨г╤Б╨╗╨╛╨▓╨╕╨╡ ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨╛╨│╨╛ ╤В╨░╤А╨╕╤Д╨░: none: ╨▒╨╡╨╖ ╤Г╤Б╨╗╨╛╨▓╨╕╨╣, channel: ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░ ╨╜╨░ ╨║╨░╨╜╨░╨╗ ╨▒╨╛╤В╨░ (Telegram тЖТ ╨Ь╨╡╨╜╤О ╨╕ ╤В╨╡╨║╤Б╤В╤Л)
+             * @description Условие бесплатного тарифа: none: без условий, channel: подписка на канал бота (Telegram → Меню и тексты)
              * @enum {string}
              */
             free_condition: "none" | "channel";
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╤Л╤Е ╨┐╨╛╨┤╨┐╨╕╤Б╨╛╨║ ╨▓╤Л╨┤╨░╨╜╨╛
+             * @description Сколько бесплатных подписок выдано
              */
             free_plans: number;
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨╛╨│╨╛ ╤В╨░╤А╨╕╤Д╨░: ╨║╨╜╨╛╨┐╨║╨░ ╨▓ ╨▒╨╛╤В╨╡ ╨╕ Mini App, ╤Б╨╜╨╛╨▓╨░ ╨▓╨╖╤П╤В╤М ╨╝╨╛╨╢╨╜╨╛, ╨║╨╛╨│╨┤╨░ ╨┐╤А╨╛╤И╨╗╨░╤П ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨░╤П ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░ ╨░╨║╨║╨░╤Г╨╜╤В╨░ ╨╖╨░╨║╨╛╨╜╤З╨╕╨╗╨░╤Б╤М; null: ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨╛╨│╨╛ ╤В╨░╤А╨╕╤Д╨░ ╨╜╨╡╤В. ╨а╨░╨▒╨╛╤В╨░╨╡╤В ╨╕ ╨┐╤А╨╕ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╜╨╛╨╣ ╨┐╤А╨╛╨┤╨░╨╢╨╡
+             * @description Тариф бесплатного тарифа: кнопка в боте и Mini App, снова взять можно, когда прошлая бесплатная подписка аккаунта закончилась; null: бесплатного тарифа нет. Работает и при выключенной продаже
              */
             free_tariff_id: number | null;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤В╨░╤А╨╕╤Д╨╛╨▓ ╨▒╨╛╤В ╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╛╨┤╨░╤В╤М ╨┐╤А╤П╨╝╨╛ ╤Б╨╡╨╣╤З╨░╤Б: ┬л╨Т ╨┐╤А╨╛╨┤╨░╨╢╨╡┬╗ ╨╕ ╤Б ╤Ж╨╡╨╜╨╛╨╣ ╨┤╨╗╤П ╤Б╨┐╨╛╤Б╨╛╨▒╨░, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В ╨╛╨┐╨╗╨░╤В╤Г
+             * @description Сколько тарифов бот может продать прямо сейчас: «В продаже» и с ценой для способа, который принимает оплату
              */
             on_sale: number;
-            /** @description ╨Ю╨┐╨╗╨░╤З╨╡╨╜╨╜╨╛╨╡ ╨┐╤А╨╛╨┤╨╗╨╡╨╜╨╕╨╡ ╨╛╨▒╨╜╤Г╨╗╤П╨╡╤В ╤В╤А╨░╤Д╨╕╨║ ╨╕ ╨╜╨░╤З╨╕╨╜╨░╨╡╤В ╨╜╨╛╨▓╤Л╨╣ ╨┐╨╡╤А╨╕╨╛╨┤; ╨╕╨╜╨░╤З╨╡ ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╛╨▒╨░╨▓╨╗╤П╨╡╤В ╤Б╤А╨╛╨║ */
+            /** @description Оплаченное продление обнуляет трафик и начинает новый период; иначе только добавляет срок */
             renew_resets_traffic: boolean;
-            /** @description Telegram Stars: ╨╜╤Г╨╢╨╡╨╜ ╤В╨╛╨╗╤М╨║╨╛ ╨╖╨░╨┐╤Г╤Й╨╡╨╜╨╜╤Л╨╣ ╨▒╨╛╤В */
+            /** @description Telegram Stars: нужен только запущенный бот */
             stars: boolean;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е; ╤Б ╤Ж╨╡╨╜╨╛╨╣ ╨┐╤А╨╛╨▒╨╜╤Л╨╣ ╨┐╨╡╤А╨╕╨╛╨┤ ╨┐╨╛╨║╤Г╨┐╨░╤О╤В ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ ╨▓ ╨▒╨╛╤В╨╡ ╨╕ Mini App, ╨╜╤Г╨╢╨╜╨░ ╨▓╨║╨╗╤О╤З╤С╨╜╨╜╨░╤П ╨┐╤А╨╛╨┤╨░╨╢╨░
+             * @description Цена пробного периода в копейках; с ценой пробный период покупают один раз в боте и Mini App, нужна включённая продажа
              */
             trial_rub: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░ ╨▓ Stars; 0 ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б trial_rub тАФ ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨╛
+             * @description Цена пробного периода в Stars; 0 вместе с trial_rub — бесплатно
              */
             trial_stars: number;
             /**
              * Format: int64
-             * @description ╨в╨░╤А╨╕╤Д ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░: ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ ╨╜╨░ Telegram-╨░╨║╨║╨░╤Г╨╜╤В ╨▒╨╡╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨╕ ╨╛╨┐╨╗╨░╤В, ╨║╨╜╨╛╨┐╨║╨░ ╨▓ ╨┐╤А╨╕╨▓╨╡╤В╤Б╤В╨▓╨╕╨╕ ╨▒╨╛╤В╨░; null тАФ ╨┐╤А╨╛╨▒╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╕╨╛╨┤╨░ ╨╜╨╡╤В. ╨а╨░╨▒╨╛╤В╨░╨╡╤В ╨╕ ╨┐╤А╨╕ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜╨╜╨╛╨╣ ╨┐╤А╨╛╨┤╨░╨╢╨╡
+             * @description Тариф пробного периода: один раз на Telegram-аккаунт без подписки и оплат, кнопка в приветствии бота; null — пробного периода нет. Работает и при выключенной продаже
              */
             trial_tariff_id: number | null;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╛╨▒╨╜╤Л╤Е ╨┐╨╛╨┤╨┐╨╕╤Б╨╛╨║ ╨▓╤Л╨┤╨░╨╜╨╛
+             * @description Сколько пробных подписок выдано
              */
             trials: number;
         };
         PaymentSettingsViewAvailableStruct: {
-            /** @description ╨Р╨┤╨░╨┐╤В╨╡╤А╤Л ╨╝╨░╤А╨║╨╡╤В╨┐╨╗╨╡╨╣╤Б╨░, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨┐╤А╨╕╨╜╨╕╨╝╨░╤О╤В ╨╛╨┐╨╗╨░╤В╤Г ╨┐╤А╤П╨╝╨╛ ╤Б╨╡╨╣╤З╨░╤Б */
+            /** @description Адаптеры маркетплейса, которые принимают оплату прямо сейчас */
             addons: string[];
             stars: boolean;
         };
@@ -4740,7 +4740,7 @@ export interface components {
         PaymentView: {
             /**
              * Format: int64
-             * @description Stars ╨╕╨╗╨╕ ╨║╨╛╨┐╨╡╨╣╨║╨╕
+             * @description Stars или копейки
              */
             amount: number;
             /** Format: date-time */
@@ -4749,20 +4749,20 @@ export interface components {
             created_at: string;
             /** @enum {string} */
             currency: "XTR" | "RUB";
-            /** @description ╨Я╨╛╤З╨╡╨╝╤Г ╨╛╨┐╨╗╨░╤З╨╡╨╜╨╜╤Л╨╣ ╨┐╨╗╨░╤В╤С╨╢ ╨╡╤Й╤С ╨╜╨╡ ╨┐╤А╨╕╨╝╨╡╨╜╤С╨╜ */
+            /** @description Почему оплаченный платёж ещё не применён */
             error?: string;
-            /** @description ╨Э╨╛╨╝╨╡╤А ╨┐╨╗╨░╤В╨╡╨╢╨░ ╤Г ╨┐╤А╨╛╨▓╨░╨╣╨┤╨╡╤А╨░ */
+            /** @description Номер платежа у провайдера */
             external_id?: string;
             /** Format: int64 */
             id: number;
             /**
-             * @description package тАФ ╨┐╨░╨║╨╡╤В ╤В╤А╨░╤Д╨╕╨║╨░: tariff_name тАФ ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡ ╨┐╨░╨║╨╡╤В╨░; trial тАФ ╨┐╨╗╨░╤В╨╜╤Л╨╣ ╨┐╤А╨╛╨▒╨╜╤Л╨╣ ╨┐╨╡╤А╨╕╨╛╨┤
+             * @description package — пакет трафика: tariff_name — название пакета; trial — платный пробный период
              * @enum {string}
              */
             kind: "new" | "renew" | "package" | "trial";
             /** Format: date-time */
             paid_at?: string;
-            /** @description stars ╨╕╨╗╨╕ addon:<id> тАФ ╨░╨┤╨░╨┐╤В╨╡╤А ╨╝╨░╤А╨║╨╡╤В╨┐╨╗╨╡╨╣╤Б╨░ */
+            /** @description stars или addon:<id> — адаптер маркетплейса */
             provider: string;
             /** Format: date-time */
             refunded_at?: string;
@@ -4771,7 +4771,7 @@ export interface components {
             tariff_name: string;
             /**
              * Format: int64
-             * @description ╨Ъ╤Г╨┐╨╗╨╡╨╜╨╜╤Л╨╣ ╤Б╤А╨╛╨║ ╨▓ ╨┤╨╜╤П╤Е (0 тАФ ╨▒╨╡╤Б╤Б╤А╨╛╤З╨╜╨╛); ╨╜╨╡╤В ╤Г ╨┐╨░╨║╨╡╤В╨╛╨▓ ╨╕ ╤Г ╨┐╨╗╨░╤В╨╡╨╢╨╡╨╣ ╨┤╨╛ ╤Б╤А╨╛╨║╨╛╨▓ ╨▓ ╤В╨░╤А╨╕╤Д╨░╤Е
+             * @description Купленный срок в днях (0 — бессрочно); нет у пакетов и у платежей до сроков в тарифах
              */
             term_days?: number;
             /** Format: int64 */
@@ -4783,20 +4783,20 @@ export interface components {
         };
         PaymentsOutputBody: {
             items: components["schemas"]["PaymentView"][];
-            /** @description ╨Я╤А╨╕╨╝╨╡╨╜╤С╨╜╨╜╤Л╨╡ ╨┐╨╗╨░╤В╨╡╨╢╨╕ ╨╖╨░ 30 ╨┤╨╜╨╡╨╣ */
+            /** @description Применённые платежи за 30 дней */
             totals: components["schemas"]["PaymentTotal"][];
         };
         PoolInputBody: {
             name: string;
         };
         PoolLimit: {
-            /** @description ╨Я╤Г╨╗ ╨╖╨░╨║╤А╤Л╤В: ╨╡╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ ╨╜╨╡╤В ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡, ╨╜╨╛╨┤╤Л ╨╕╤Е ╨╜╨╡ ╨┐╤Г╤Б╨║╨░╤О╤В, ╨┐╨░╨║╨╡╤В╤Л ╤В╤А╨░╤Д╨╕╨║╨░ ╨┐╤Г╨╗╨░ ╨╜╨╡ ╨┐╤А╨╛╨┤╨░╤О╤В╤Б╤П; traffic_limit ╤В╨╛╨│╨┤╨░ ╨╜╨╡ ╨▓╨░╨╢╨╡╨╜ */
+            /** @description Пул закрыт: его подключений нет в подписке, ноды их не пускают, пакеты трафика пула не продаются; traffic_limit тогда не важен */
             excluded?: boolean;
             /** Format: int64 */
             pool_id: number;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л; null тАФ ╨▒╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░
+             * @description Байты; null — без лимита
              */
             traffic_limit: number | null;
         };
@@ -4806,29 +4806,29 @@ export interface components {
         PoolView: {
             /** Format: int64 */
             id: number;
-            /** @description ╨Я╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╤Б╤З╨╕╤В╨░╤О╤В╤Б╤П ╨▓ ╤Н╤В╨╛╤В ╨┐╤Г╨╗ */
+            /** @description Подключения, которые считаются в этот пул */
             inbounds: string[];
             name: string;
         };
         Preview: {
-            /** @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕, ╨║╨╛╤В╨╛╤А╤Л╤Е Hikari ╨╜╨╡ ╨┐╤А╨╕╨╝╨╡╤В, ╤Б ╨┐╤А╨╕╤З╨╕╨╜╨╛╨╣ */
+            /** @description Пользователи, которых Hikari не примет, с причиной */
             invalid: components["schemas"]["List"];
             /**
              * Format: int64
-             * @description ╨С╤Г╨┤╤Г╤В ╤Б╨╛╨╖╨┤╨░╨╜╤Л
+             * @description Будут созданы
              */
             new: number;
-            /** @description ╨С╤Г╨┤╤Г╤В ╨┐╨╡╤А╨╡╨╜╨╡╤Б╨╡╨╜╤Л ╨▒╨╡╨╖ ╤Б╤В╨░╤А╨╛╨╣ ╤Б╤Б╤Л╨╗╨║╨╕ */
+            /** @description Будут перенесены без старой ссылки */
             no_link: components["schemas"]["List"];
             /**
              * Format: int64
-             * @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ┬л╨╜╨░ ╨┐╨░╤Г╨╖╨╡┬╗: ╨▓ Hikari ╨╕╤Е ╤Б╤А╨╛╨║ ╨┐╨╛╨╣╨┤╤С╤В ╤Б ╨╝╨╛╨╝╨╡╨╜╤В╨░ ╨╕╨╝╨┐╨╛╤А╤В╨░
+             * @description Пользователи «на паузе»: в Hikari их срок пойдёт с момента импорта
              */
             on_hold: number;
             statuses: {
                 [key: string]: number;
             };
-            /** @description ╨Ш╨╝╨╡╨╜╨░, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╤Г╨╢╨╡ ╨╡╤Б╤В╤М ╨▓ Hikari */
+            /** @description Имена, которые уже есть в Hikari */
             taken: components["schemas"]["List"];
             /** Format: int64 */
             total: number;
@@ -4838,37 +4838,37 @@ export interface components {
             checked_at: string;
             colo?: string;
             error?: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨▓╨╕╨┤╤П╤В ╤Б╨░╨╣╤В╤Л */
+            /** @description Адрес, который видят сайты */
             ip?: string;
             ok: boolean;
         };
         PromoBody: {
             code: string;
-            /** @description ╨Ф╨╗╤П fixed: RUB ╨╕╨╗╨╕ XTR; RUB тАФ ╨║╨╛╨┐╨╡╨╣╨║╨╕, XTR тАФ Stars. ╨Ф╨╗╤П percent: ╨┐╤Г╤Б╤В╨╛ тАФ ╨╗╤О╨▒╨░╤П ╨▓╨░╨╗╤О╤В╨░, ╤В╨╛╨│╨┤╨░ min_order ╨╕ max_discount ╤А╨░╨▓╨╜╤Л 0. ╨Ф╨╗╤П ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╤Е ╤В╨╕╨┐╨╛╨▓ ╨╜╨╡ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В╤Б╤П. */
+            /** @description Для fixed: RUB или XTR; RUB — копейки, XTR — Stars. Для percent: пусто — любая валюта, тогда min_order и max_discount равны 0. Для остальных типов не используется. */
             currency: string;
             description: string;
             /**
              * Format: int64
-             * @description ╨б╤А╨╛╨║ ╨┤╨╡╨╣╤Б╤В╨▓╨╕╤П ╤А╨╡╨╖╨╡╤А╨▓╨░ ╤Б╨║╨╕╨┤╨║╨╕ ╨▓ ╤Б╨╡╨║╤Г╨╜╨┤╨░╤Е; 0 = 30 ╨╝╨╕╨╜╤Г╤В
+             * @description Срок действия резерва скидки в секундах; 0 = 30 минут
              */
             discount_ttl: number;
             enabled: boolean;
             /**
              * Format: int64
-             * @description Unix time ╨▓ ╤Б╨╡╨║╤Г╨╜╨┤╨░╤Е; ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ ╨╜╨╡ ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨▓ ╨┐╤А╨╛╤И╨╗╨╛╨╝
+             * @description Unix time в секундах; значение не может быть в прошлом
              */
             ends_at?: number;
             first_purchase_only: boolean;
             /**
              * Format: int64
-             * @description ╨Ь╨░╨║╤Б╨╕╨╝╨░╨╗╤М╨╜╨░╤П ╤Б╨║╨╕╨┤╨║╨░ ╨▓ ╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╤Л╤Е ╨╡╨┤╨╕╨╜╨╕╤Ж╨░╤Е ╨╛╨┐╨╗╨░╤В╤Л: RUB тАФ ╨║╨╛╨┐╨╡╨╣╨║╨╕, XTR тАФ Stars
+             * @description Максимальная скидка в минимальных единицах оплаты: RUB — копейки, XTR — Stars
              */
             max_discount: number;
             /** Format: int64 */
             max_uses?: number;
             /**
              * Format: int64
-             * @description ╨Ь╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╨░╤П ╤Б╤Г╨╝╨╝╨░ ╨╖╨░╨║╨░╨╖╨░ ╨▓ ╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╤Л╤Е ╨╡╨┤╨╕╨╜╨╕╤Ж╨░╤Е ╨╛╨┐╨╗╨░╤В╤Л: RUB тАФ ╨║╨╛╨┐╨╡╨╣╨║╨╕, XTR тАФ Stars
+             * @description Минимальная сумма заказа в минимальных единицах оплаты: RUB — копейки, XTR — Stars
              */
             min_order: number;
             name: string;
@@ -4877,12 +4877,12 @@ export interface components {
             per_user_limit: number;
             /**
              * Format: int64
-             * @description ╨Я╤Г╨╗ ╨┤╨╗╤П ╨▒╨╛╨╜╤Г╤Б╨╜╨╛╨│╨╛ ╤В╤А╨░╤Д╨╕╨║╨░; ╨▒╨╡╨╖ ╨╖╨╜╨░╤З╨╡╨╜╨╕╤П тАФ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╤В╤А╨░╤Д╨╕╨║
+             * @description Пул для бонусного трафика; без значения — основной трафик
              */
             pool_id?: number;
             /**
              * Format: int64
-             * @description Unix time ╨▓ ╤Б╨╡╨║╤Г╨╜╨┤╨░╤Е
+             * @description Unix time в секундах
              */
             starts_at?: number;
             tariff_ids: number[];
@@ -4890,7 +4890,7 @@ export interface components {
             type: "days" | "traffic" | "percent" | "fixed";
             /**
              * Format: int64
-             * @description days: ╨┤╨╜╨╕; traffic: ╨▒╨░╨╣╤В╤Л (╨╝╨╕╨╜╨╕╨╝╤Г╨╝ 1 GiB); percent: ╨┐╤А╨╛╤Ж╨╡╨╜╤В╤Л 1-100; fixed: ╤Б╤Г╨╝╨╝╨░ ╨▓ ╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╤Л╤Е ╨╡╨┤╨╕╨╜╨╕╤Ж╨░╤Е ╨╛╨┐╨╗╨░╤В╤Л
+             * @description days: дни; traffic: байты (минимум 1 GiB); percent: проценты 1-100; fixed: сумма в минимальных единицах оплаты
              */
             value: number;
         };
@@ -4989,12 +4989,12 @@ export interface components {
             successful_activations: number;
         };
         PutSubImageInputBody: {
-            /** @description ╨Ъ╨░╤А╤В╨╕╨╜╨║╨░ ╨▓ base64: PNG, JPEG ╨╕╨╗╨╕ WebP; ╨╗╨╛╨│╨╛╤В╨╕╨┐ ╨┤╨╛ 512 ╨Ъ╨С, ╤Д╨╛╨╜ ╨┤╨╛ 2 ╨Ь╨С. SVG ╨╜╨╡ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В╤Б╤П */
+            /** @description Картинка в base64: PNG, JPEG или WebP; логотип до 512 КБ, фон до 2 МБ. SVG не принимается */
             data: string;
         };
         PutSubPageInputBody: {
             brand?: string;
-            /** @description #RRGGBB ╨╕╨╗╨╕ ╨┐╤Г╤Б╤В╨╛ */
+            /** @description #RRGGBB или пусто */
             brand_accent?: string;
             config: components["schemas"]["Page"];
         };
@@ -5009,9 +5009,9 @@ export interface components {
             verdict: "ok" | "partial" | "blocked" | "down";
         };
         ReachInputBody: {
-            /** @description IP ╨╕╨╗╨╕ ╨┤╨╛╨╝╨╡╨╜ ╤Б╨╡╤А╨▓╨╡╤А╨░ */
+            /** @description IP или домен сервера */
             host: string;
-            /** @description TCP-╨┐╨╛╤А╤В╤Л: 22 ╤Г ╨╗╤О╨▒╨╛╨│╨╛ ╤Б╨╡╤А╨▓╨╡╤А╨░ ╤Б SSH, 443 ╤Г ╨╜╨╛╨┤╤Л */
+            /** @description TCP-порты: 22 у любого сервера с SSH, 443 у ноды */
             ports: number[];
         };
         ReachPort: {
@@ -5037,44 +5037,44 @@ export interface components {
             ports: components["schemas"]["ReachPort"][];
         };
         RecoveryOutputBody: {
-            /** @description ╨Я╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В╤Б╤П ╨╛╨┤╨╕╨╜ ╤А╨░╨╖ */
+            /** @description Показываются один раз */
             recovery_codes: string[];
         };
         ReissueRules: {
             /**
              * Format: int64
-             * @description ╨Ч╨░ ╤Б╨║╨╛╨╗╤М╨║╨╛ ╨┤╨╜╨╡╨╣ ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П ╨╗╨╕╨╝╨╕╤В (╤Б╨║╨╛╨╗╤М╨╖╤П╤Й╨╡╨╡ ╨╛╨║╨╜╨╛)
+             * @description За сколько дней считается лимит (скользящее окно)
              */
             days: number;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤А╨░╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╝╨╛╨╢╨╡╤В ╤Б╨╝╨╡╨╜╨╕╤В╤М ╤Б╤Б╤Л╨╗╨║╤Г ╨╖╨░ days; 0: ╨▒╨╡╨╖ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╤П
+             * @description Сколько раз подписчик может сменить ссылку за days; 0: без ограничения
              */
             limit: number;
-            /** @description ╨Я╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╜╨╡ ╨╝╨╡╨╜╤П╨╡╤В ╤Б╤Б╤Л╨╗╨║╤Г ╤Б╨░╨╝, ╤В╨╛╨╗╤М╨║╨╛ ╨░╨┤╨╝╨╕╨╜ */
+            /** @description Подписчик не меняет ссылку сам, только админ */
             off?: boolean;
         };
         RenameDeviceInputBody: {
-            /** @description ╨б╨▓╨╛╤С ╨╕╨╝╤П ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, ╨┤╨╛ 40 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╨╛╨┤╨╜╨╛╨╣ ╤Б╤В╤А╨╛╨║╨╛╨╣; ╨┐╤Г╤Б╤В╨╛╨╡ тАФ ╨▓╨╡╤А╨╜╤Г╤В╤М ╨╕╨╝╤П ╨╛╤В ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П */
+            /** @description Своё имя устройства, до 40 символов одной строкой; пустое — вернуть имя от приложения */
             name: string;
         };
         RenameDeviceOutputBody: {
-            /** @description ╨Ш╨╝╤П, ╨║╨░╨║ ╨╛╨╜╨╛ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╛: ╨▒╨╡╨╖ ╨┐╤А╨╛╨▒╨╡╨╗╨╛╨▓ ╨┐╨╛ ╨║╤А╨░╤П╨╝ */
+            /** @description Имя, как оно сохранено: без пробелов по краям */
             name: string;
         };
         Report: {
             /** Format: int64 */
             created: number;
-            /** @description ╨Ш╨╝╤П ╨╕ ╨┐╤А╨╕╤З╨╕╨╜╨░ ╨┤╨╗╤П ╤В╨╡╤Е, ╨║╨╛╨│╨╛ ╨╜╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╤Б╨╛╨╖╨┤╨░╤В╤М */
+            /** @description Имя и причина для тех, кого не удалось создать */
             failed: components["schemas"]["List"];
             /**
              * Format: int64
-             * @description ╨б╤В╨░╤А╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╨╕ ╨║╨╗╤О╤З╨╕, ╨╖╨░╨▓╨╡╨┤╤С╨╜╨╜╤Л╨╡ ╤Н╤В╨╕╨╝ ╨╕╨╝╨┐╨╛╤А╤В╨╛╨╝
+             * @description Старые ссылки и ключи, заведённые этим импортом
              */
             links: number;
-            /** @description ╨Я╨╡╤А╨╡╨╜╨╡╤Б╨╡╨╜╤Л ╨▒╨╡╨╖ ╤Б╤В╨░╤А╨╛╨╣ ╤Б╤Б╤Л╨╗╨║╨╕: ╨╡╤С ╤В╨╛╨║╨╡╨╜ ╤Б╨╗╨╕╤И╨║╨╛╨╝ ╨║╨╛╤А╨╛╤В╨║╨╕╨╣, ╤З╤В╨╛╨▒╤Л ╨▒╤Л╤В╤М ╤Б╨╡╨║╤А╨╡╤В╨╛╨╝ */
+            /** @description Перенесены без старой ссылки: её токен слишком короткий, чтобы быть секретом */
             no_link: components["schemas"]["List"];
-            /** @description ╨Ш╨╝╨╡╨╜╨░, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╤Г╨╢╨╡ ╨╡╤Б╤В╤М ╨▓ Hikari: ╤Н╤В╨╕ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕ ╨╜╨╡ ╨┐╨╡╤А╨╡╨╜╨╡╤Б╨╡╨╜╤Л */
+            /** @description Имена, которые уже есть в Hikari: эти пользователи не перенесены */
             skipped: components["schemas"]["List"];
         };
         ResetPathOutputBody: {
@@ -5082,19 +5082,19 @@ export interface components {
         };
         Result: {
             cert_valid: boolean;
-            /** @description host:port, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨▒╤Г╨┤╨╡╤В ╨╜╨░╨▒╨╕╤А╨░╤В╤М ╨╜╨╛╨┤╨░ */
+            /** @description host:port, который будет набирать нода */
             dest: string;
-            /** @description ╨Ш╨╝╤П ╤А╨╡╨╖╨╛╨╗╨▓╨╕╤В╤Б╤П ╨▓ ╤Н╤В╨╛╤В IP: ╤Б╨░╨╣╤В ╨╜╨░╤Б╤В╨╛╤П╤Й╨╕╨╣, ╨░ ╨╜╨╡ ╤З╤Г╨╢╨░╤П ╨╝╨░╤Б╨║╨╕╤А╨╛╨▓╨║╨░ */
+            /** @description Имя резолвится в этот IP: сайт настоящий, а не чужая маскировка */
             dns_match: boolean;
             error?: string;
             h2: boolean;
             ip: string;
             issuer?: string;
-            /** @description ╨Я╨╛╨┤╤Е╨╛╨┤╨╕╤В ╨║╨░╨║ ╤Ж╨╡╨╗╤М REALITY */
+            /** @description Подходит как цель REALITY */
             ok: boolean;
             /** Format: int64 */
             rtt_ms: number;
-            /** @description ╨Ш╨╝╤П ╤Б╨╡╤А╨▓╨╡╤А╨░, ╨║╨╛╤В╨╛╤А╨╛╨╡ ╨╛╤В╨┐╤А╨░╨▓╤П╤В ╨║╨╗╨╕╨╡╨╜╤В╤Л */
+            /** @description Имя сервера, которое отправят клиенты */
             sni: string;
             tls13: boolean;
             x25519: boolean;
@@ -5114,7 +5114,7 @@ export interface components {
         RouteService: {
             icon: string;
             id: string;
-            /** @description ╨Я╨╛-╤А╤Г╤Б╤Б╨║╨╕ */
+            /** @description По-русски */
             name: string;
             name_en: string;
         };
@@ -5123,10 +5123,10 @@ export interface components {
             mode: "direct" | "node" | "proxy";
             /**
              * Format: int64
-             * @description ╨г╨┤╨░╨╗╤С╨╜╨╜╨░╤П ╨╜╨╛╨┤╨░ ╨┐╨░╨╜╨╡╨╗╨╕ (mode=node)
+             * @description Удалённая нода панели (mode=node)
              */
             node_id?: number;
-            /** @description socks5://user:pass@host:port, http://тАж ╨╕╨╗╨╕ https://тАж; ╨╜╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜ тАФ ╨┐╤А╨╡╨╢╨╜╨╕╨╣ (mode=proxy) */
+            /** @description socks5://user:pass@host:port, http://… или https://…; не передан — прежний (mode=proxy) */
             proxy?: string;
         };
         Routes: {
@@ -5144,26 +5144,26 @@ export interface components {
             services: components["schemas"]["RouteService"][];
         };
         RoutesPreviewInputBody: {
-            /** @description ╨Т╤Б╤В╤А╨╛╨╡╨╜╨╜╤Л╨╣ ╨┐╤А╨╛╤Д╨╕╨╗╤М ╤Б ╤Н╤В╨╕╨╝╨╕ sub_routing ╨╕ sub_routes ╨║╨░╨║ ╨╜╨░╤З╨░╨╗╨╛ ╤Б╨▓╨╛╨╡╨│╨╛: ╨▒╨╡╨╖ ╤Б╨╡╤А╨▓╨╡╤А╨╛╨▓, ╨│╤А╤Г╨┐╨┐╤Л ╨┐╤А╨╛╤Б╤П╤В ╨╕╤Е ╤Б╨░╨╝╨╕ */
+            /** @description Встроенный профиль с этими sub_routing и sub_routes как начало своего: без серверов, группы просят их сами */
             starter?: boolean;
-            /** @description ╨Ш╨╝╤П ╨│╤А╤Г╨┐╨┐╤Л ╨░╨▓╤В╨╛╨▓╤Л╨▒╨╛╤А╨░ ╨▓╨╝╨╡╤Б╤В╨╛ ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜╨╜╨╛╨│╨╛ */
+            /** @description Имя группы автовыбора вместо сохранённого */
             sub_group_auto?: string;
-            /** @description ╨Ш╨╝╤П ╨│╨╗╨░╨▓╨╜╨╛╨╣ ╨│╤А╤Г╨┐╨┐╤Л ╨▓╨╝╨╡╤Б╤В╨╛ ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜╨╜╨╛╨│╨╛ */
+            /** @description Имя главной группы вместо сохранённого */
             sub_group_main?: string;
             sub_routes: components["schemas"]["Routes"];
             /** @enum {string} */
             sub_routing: "ru_direct" | "all" | "blocked";
-            /** @description ╨б╨▓╨╛╨╕ ╨┐╤А╨░╨▓╨╕╨╗╨░ ╨▓╨╝╨╡╤Б╤В╨╛ ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜╨╜╤Л╤Е */
+            /** @description Свои правила вместо сохранённых */
             sub_rules?: string;
-            /** @description ╨б╨▓╨╛╨╣ ╨┐╤А╨╛╤Д╨╕╨╗╤М Clash: ╨┐╨╛╨║╨░╨╖╨░╤В╤М ╨╡╨│╨╛ ╨▓╨╝╨╡╤Б╤В╨╛ ╨▓╤Б╤В╤А╨╛╨╡╨╜╨╜╨╛╨│╨╛ */
+            /** @description Свой профиль Clash: показать его вместо встроенного */
             sub_template?: string;
         };
         RoutesPreviewOutputBody: {
-            /** @description ╨Я╤А╨╛╤Д╨╕╨╗╤М Clash (YAML) ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П ╤Б╨╛ ╨▓╤Б╨╡╨╝╨╕ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П╨╝╨╕; ╨║╨╗╤О╤З╨╕ тАФ ╨╖╨░╨│╨╗╤Г╤И╨║╨╕ */
+            /** @description Профиль Clash (YAML) пользователя со всеми подключениями; ключи — заглушки */
             profile: string;
         };
         RussiaPort: {
-            /** @description api ╨╕╨╗╨╕ ╨╕╨╝╤П ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П */
+            /** @description api или имя подключения */
             name: string;
             /** Format: int64 */
             port: number;
@@ -5173,7 +5173,7 @@ export interface components {
             at: string;
             cached: boolean;
             host: string;
-            /** @description ╨з╤В╨╛ ╨╖╨░ ╨┐╨╛╤А╤В╤Л ╨╜╨╛╨┤╤Л ╨┐╤А╨╛╨▓╨╡╤А╨╡╨╜╤Л */
+            /** @description Что за порты ноды проверены */
             names: components["schemas"]["RussiaPort"][];
             ports: number[];
             probes: components["schemas"]["ReachProbe"][];
@@ -5181,12 +5181,12 @@ export interface components {
             verdict: "ok" | "partial" | "blocked" | "down";
         };
         ScanTargetsOutputBody: {
-            /** @description ╨Р╨┤╤А╨╡╤Б ╤Б╨╡╤А╨▓╨╡╤А╨░, ╨▓╨╛╨║╤А╤Г╨│ ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨╕╤Б╨║╨░╨╗╨╕ */
+            /** @description Адрес сервера, вокруг которого искали */
             ip: string;
             results: components["schemas"]["Result"][];
             /** Format: int64 */
             scanned: number;
-            /** @description ╨б╨▓╨╛╨╣ ╨┤╨╛╨╝╨╡╨╜ ╤Б ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В╨╛╨╝ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Свой домен с сертификатом панели */
             self_steal?: components["schemas"]["Result"];
         };
         Servers: {
@@ -5209,113 +5209,113 @@ export interface components {
         };
         SettingsView: {
             /**
-             * @description ╨ж╨╡╨╜╤В╤А ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤Ж╨╕╨╕ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕ ╨╜╨╛╨┤: letsencrypt, zerossl (╨╜╤Г╨╢╨╡╨╜ e-mail) ╨╕╨╗╨╕ google (╨╜╤Г╨╢╨╡╨╜ ╨║╨╗╤О╤З EAB). IP-╨░╨┤╤А╨╡╤Б╨░ ╨▓╤Б╨╡╨│╨┤╨░ ╨┐╨╛╨╗╤Г╤З╨░╤О╤В ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В Let's Encrypt
+             * @description Центр сертификации панели и нод: letsencrypt, zerossl (нужен e-mail) или google (нужен ключ EAB). IP-адреса всегда получают сертификат Let's Encrypt
              * @enum {string}
              */
             acme_ca: "letsencrypt" | "zerossl" | "google";
-            /** @description Google Trust Services: ╨║╨╗╤О╤З HMAC ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜ (╤Б╨░╨╝ ╨║╨╗╤О╤З ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В╤Б╤П) */
+            /** @description Google Trust Services: ключ HMAC сохранён (сам ключ не показывается) */
             acme_eab_hmac_set: boolean;
-            /** @description Google Trust Services: keyId ╨║╨╗╤О╤З╨░ EAB */
+            /** @description Google Trust Services: keyId ключа EAB */
             acme_eab_kid: string;
-            /** @description E-mail ╨┤╨╗╤П ╤Ж╨╡╨╜╤В╤А╨░ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤Ж╨╕╨╕; ZeroSSL ╨┐╤А╨╕╨▓╤П╨╖╤Л╨▓╨░╨╡╤В ╨║ ╨╜╨╡╨╝╤Г ╨░╨║╨║╨░╤Г╨╜╤В */
+            /** @description E-mail для центра сертификации; ZeroSSL привязывает к нему аккаунт */
             acme_email: string;
             admin_url: string;
-            /** @description ╨Ъ╨╛╨│╨┤╨░ ╨╖╨░╨┐╨░╤Б╨╜╤Л╨╡ ╨┐╨╛╤А╤В╤Л (2053, 2083тАж) ╨╖╨░╨╜╤П╤В╤Л, ╨┐╨░╨╜╨╡╨╗╤М ╤Б╨░╨╝╨░ ╨▒╨╡╤А╤С╤В ╨╗╤О╨▒╨╛╨╣ ╤Б╨▓╨╛╨▒╨╛╨┤╨╜╤Л╨╣ ╨╕╨╖ 20000-32767: ╨┤╨╗╤П ╨╜╨╛╨▓╨╛╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨▒╨╡╨╖ ╨┐╨╛╤А╤В╨░ ╨╕ ╨┐╤А╨╕ ╨░╨▓╤В╨╛╨┐╨╡╤А╨╡╨╜╨╛╤Б╨╡. ╨н╤В╨╕ ╨┐╨╛╤А╤В╤Л ╤Г╤Б╤В╨░╨╜╨╛╨▓╤Й╨╕╨║ ╨▓ ╤Д╨░╨╣╤А╨▓╨╛╨╗╨╡ ╨╜╨╡ ╨╛╤В╨║╤А╤Л╨▓╨░╨╡╤В */
+            /** @description Когда запасные порты (2053, 2083…) заняты, панель сама берёт любой свободный из 20000-32767: для нового подключения без порта и при автопереносе. Эти порты установщик в файрволе не открывает */
             any_port: boolean;
-            /** @description ╨С╤А╨╡╨╜╨┤╨╕╨╜╨│ ╨▓ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е, ╤З╨╕╤В╨░╤О╤Й╨╕╤Е ╨╛╨┐╨╡╤А╨░╤В╨╛╤А╤Б╨║╨╕╨╡ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╕ (ClashFest, SlothClash): ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡, ╨╗╨╛╨│╨╛╤В╨╕╨┐, ╤Ж╨▓╨╡╤В, ╤Б╤Б╤Л╨╗╨║╨╕ */
+            /** @description Брендинг в приложениях, читающих операторские заголовки (ClashFest, SlothClash): название, логотип, цвет, ссылки */
             app_branding: boolean;
-            /** @description ╨Я╨╡╤А╨╡╨╜╨╛╤Б╨╕╤В╤М ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ ╨╜╨░ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╨╛╤А╤В, ╨╡╤Б╨╗╨╕ ╨║╨╗╨╕╨╡╨╜╤В╤Л ╨┐╨╡╤А╨╡╤Б╤В╨░╨╗╨╕ ╨┤╨╛ ╨╜╨╡╨│╨╛ ╨┤╨╛╤Е╨╛╨┤╨╕╤В╤М */
+            /** @description Переносить подключение на другой порт, если клиенты перестали до него доходить */
             auto_port: boolean;
-            /** @description ╨Ь╨╡╨╜╤П╤В╤М ╤Б╨░╨╣╤В ╨╝╨░╤Б╨║╨╕╤А╨╛╨▓╨║╨╕ REALITY, ╨╡╤Б╨╗╨╕ ╨╛╨╜ ╨┐╨╡╤А╨╡╤Б╤В╨░╨╗ ╨┐╨╛╨┤╤Е╨╛╨┤╨╕╤В╤М */
+            /** @description Менять сайт маскировки REALITY, если он перестал подходить */
             auto_sni: boolean;
             brand: string;
-            /** @description ╨ж╨▓╨╡╤В ╨▒╤А╨╡╨╜╨┤╨░ #RRGGBB; ╨┐╤Г╤Б╤В╨╛ тАФ ╤Ж╨▓╨╡╤В ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П */
+            /** @description Цвет бренда #RRGGBB; пусто — цвет приложения */
             brand_accent: string;
-            /** @description ╨Ы╨╛╨│╨╛╤В╨╕╨┐: https, PNG, WebP ╨╕╨╗╨╕ JPEG ╨┤╨╛ 512 ╨Ъ╨С; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╖╨╜╨░╤З╨╛╨║ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П */
+            /** @description Логотип: https, PNG, WebP или JPEG до 512 КБ; пусто — значок приложения */
             brand_logo_url: string;
             certificate: components["schemas"]["Status"];
-            /** @description ╨Ю╤В╨┐╨╡╤З╨░╤В╨╛╨║ TLS (uTLS) ╤Г ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓, ╨╡╤Б╨╗╨╕ ╤Г ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨╜╨╡ ╨╖╨░╨┤╨░╨╜ ╤Б╨▓╨╛╨╣: chrome, firefox, safari, ios, android, edge, 360, qq, random, randomized ╨╕╨╗╨╕ ╤Б╨▓╨╛╤С ╨╖╨╜╨░╤З╨╡╨╜╨╕╨╡ */
+            /** @description Отпечаток TLS (uTLS) у клиентов, если у подключения не задан свой: chrome, firefox, safari, ios, android, edge, 360, qq, random, randomized или своё значение */
             client_fingerprint: string;
             /**
-             * @description ╨п╨╖╤Л╨║ ╨░╨┤╨╝╨╕╨╜╨║╨╕ ╨╕ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕, ╨┐╨╛╨║╨░ ╤З╨╡╨╗╨╛╨▓╨╡╨║ ╨╜╨╡ ╨▓╤Л╨▒╤А╨░╨╗ ╤Б╨▓╨╛╨╣; auto тАФ ╨┐╨╛ ╤П╨╖╤Л╨║╤Г ╨▒╤А╨░╤Г╨╖╨╡╤А╨░. ╨Э╨░ ╨╜╤С╨╝ ╨╢╨╡ ╨╜╨░╨╖╨▓╨░╨╜╨╕╤П ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О: ╨│╤А╤Г╨┐╨┐╨░ ╨░╨▓╤В╨╛╨▓╤Л╨▒╨╛╤А╨░ ╨╕ ╨╝╨╡╨╜╤О ╨╜╨╡╨╜╨░╤Б╤В╤А╨╛╨╡╨╜╨╜╨╛╨│╨╛ ╨▒╨╛╤В╨░
+             * @description Язык админки и страницы подписки, пока человек не выбрал свой; auto — по языку браузера. На нём же названия по умолчанию: группа автовыбора и меню ненастроенного бота
              * @enum {string}
              */
             default_lang: "auto" | "ru" | "en";
-            /** @description ╨Я╤А╨╕╨▓╤П╨╖╤Л╨▓╨░╤В╤М ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╨║ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░╨╝: ╤Г ╨║╨░╨╢╨┤╨╛╨│╨╛ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╤Б╨▓╨╛╨╕ ╨║╨╗╤О╤З╨╕ */
+            /** @description Привязывать подписку к устройствам: у каждого устройства свои ключи */
             device_binding: boolean;
-            /** @description ╨Э╨╡ ╨▓╤Л╨┤╨░╨▓╨░╤В╤М ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╨╝ ╨▒╨╡╨╖ ID ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ (╨╕╨╜╨░╤З╨╡ ╨╛╨╜╨╕ ╨▓╨╝╨╡╤Б╤В╨╡ ╨╖╨░╨╜╨╕╨╝╨░╤О╤В ╨╛╨┤╨╜╨╛ ╨╝╨╡╤Б╤В╨╛) */
+            /** @description Не выдавать подписку приложениям без ID устройства (иначе они вместе занимают одно место) */
             device_require_hwid: boolean;
-            /** @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╝╨╛╨╢╨╡╤В ╨╛╤В╨▓╤П╨╖╨░╤В╤М ╤Б╨░╨╝ ╨╕ ╤З╨╡╤А╨╡╨╖ ╤Б╨║╨╛╨╗╤М╨║╨╛ ╨╛╤В╨▓╤П╨╖╨░╨╜╨╜╨╛╨╡ ╨╝╨╛╨╢╨╡╤В ╨▓╨╡╤А╨╜╤Г╤В╤М╤Б╤П */
+            /** @description Сколько устройств подписчик может отвязать сам и через сколько отвязанное может вернуться */
             device_unbind: components["schemas"]["UnbindRules"];
             domain: string;
             /**
-             * @description ╨и╨╕╤Д╤А╨╛╨▓╨░╨╜╨╜╨░╤П ╤Б╤Б╤Л╨╗╨║╨░ ╨┤╨╗╤П ╨║╨╜╨╛╨┐╨║╨╕ Happ: off тАФ ╨╛╨▒╤Л╤З╨╜╨░╤П happ://add/, api тАФ ╤З╨╡╤А╨╡╨╖ ╤Б╨╡╤А╨▓╨╕╤Б Happ (╨░╨┤╤А╨╡╤Б ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╤Г╤Е╨╛╨┤╨╕╤В ╨╜╨░ crypto.happ.su), local тАФ ╨┐╨░╨╜╨╡╨╗╤М ╤И╨╕╤Д╤А╤Г╨╡╤В ╤Б╨░╨╝╨░
+             * @description Шифрованная ссылка для кнопки Happ: off — обычная happ://add/, api — через сервис Happ (адрес подписки уходит на crypto.happ.su), local — панель шифрует сама
              * @enum {string}
              */
             happ_crypt: "off" | "api" | "local";
-            /** @description ╨б╨║╤А╤Л╤В╤М ╨▓ Happ ╨╜╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╤Б╨╡╤А╨▓╨╡╤А╨╛╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ (╨╜╤Г╨╢╨╡╨╜ Provider ID) */
+            /** @description Скрыть в Happ настройки серверов подписки (нужен Provider ID) */
             happ_hide_settings: boolean;
-            /** @description Provider ID ╤Б happ-proxy.com; ╨▒╨╡╨╖ ╨╜╨╡╨│╨╛ Happ ╨╜╨╡ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В hide-settings */
+            /** @description Provider ID с happ-proxy.com; без него Happ не принимает hide-settings */
             happ_provider_id: string;
-            /** @description ╨Я╤А╨╛╤Д╨╕╨╗╤М ╨╝╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╨╕ Happ: ╤Б╤Б╤Л╨╗╨║╨░ happ://routing/onadd/тАж (╨┤╨╛╨▒╨░╨▓╨╕╤В╤М ╨╕ ╨▓╨║╨╗╤О╤З╨╕╤В╤М), happ://routing/add/тАж ╨╕╨╗╨╕ happ://routing/off; auto тАФ ╨┐╨░╨╜╨╡╨╗╤М ╤Б╨╛╨▒╨╕╤А╨░╨╡╤В ╨╡╨│╨╛ ╤Б╨░╨╝╨░ ╨╕╨╖ ╨╝╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╨╕ Clash-╨┐╤А╨╛╤Д╨╕╨╗╤П (╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ тЖТ ╨Ь╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╤П); ╤Г╤Е╨╛╨┤╨╕╤В ╤В╨╛╨╗╤М╨║╨╛ ╨▓ Happ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╛╨╝ routing */
+            /** @description Профиль маршрутизации Happ: ссылка happ://routing/onadd/… (добавить и включить), happ://routing/add/… или happ://routing/off; auto — панель собирает его сама из маршрутизации Clash-профиля (Настройки → Маршрутизация); уходит только в Happ заголовком routing */
             happ_routing: string;
-            /** @description ╨Ъ╨░╨║ ╤З╨░╤Б╤В╨╛ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╝╨╛╨╢╨╡╤В ╤Б╨╝╨╡╨╜╨╕╤В╤М ╤Б╨▓╨╛╤О ╤Б╤Б╤Л╨╗╨║╤Г ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╤Б╨░╨╝ (╨▒╨╛╤В ╨╕ Mini App) */
+            /** @description Как часто подписчик может сменить свою ссылку подписки сам (бот и Mini App) */
             link_reissue: components["schemas"]["ReissueRules"];
             /** Format: int64 */
             panel_port: number;
             public_host: string;
             /**
              * Format: int64
-             * @description ╨з╨░╤Б (UTC), ╨║╨╛╨│╨┤╨░ ╨┐╨╛╨┐╨╛╨╗╨╜╤П╨╡╤В╤Б╤П ╨┐╤Г╨╗ ╤Б╨╗╨╛╤В╨╛╨▓: ╨┐╨╡╤А╨╡╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ QUIC-╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓
+             * @description Час (UTC), когда пополняется пул слотов: переподключение QUIC-клиентов
              */
             quiet_hour_utc: number;
-            /** @description ╨Ъ╤Г╨┤╨░ ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨╝╨╛╨╢╨╡╤В ╨╜╨░╨┐╤А╨░╨▓╨╕╤В╤М ╤В╤А╨░╤Д╨╕╨║: DIRECT, REJECT, REJECT-DROP, PROXY ╨╕ ╨│╤А╤Г╨┐╨┐╤Л */
+            /** @description Куда правило может направить трафик: DIRECT, REJECT, REJECT-DROP, PROXY и группы */
             rule_targets: string[];
-            /** @description ╨б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П SNI (sni_domain) */
+            /** @description Сертификат для SNI (sni_domain) */
             sni_certificate?: components["schemas"]["Status"];
-            /** @description ╨б╨▓╨╛╨╣ ╨┤╨╛╨╝╨╡╨╜ ╨╕╨╗╨╕ ╨┐╨╛╨┤╨┤╨╛╨╝╨╡╨╜ ╨┤╨╗╤П SNI ╨╕ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣; ╨┐╤Г╤Б╤В╨╛ тАФ ╨┤╨╛╨╝╨╡╨╜ ╨╕╨╗╨╕ ╨░╨┤╤А╨╡╤Б ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Свой домен или поддомен для SNI и подключений; пусто — домен или адрес панели */
             sni_domain: string;
-            /** @description ╨Ю╨▒╤К╤П╨▓╨╗╨╡╨╜╨╕╨╡ ╨╜╨░╨┤ ╨┐╤А╨╛╤Д╨╕╨╗╨╡╨╝ ╨▓ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е (╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ announce): Happ ╨╕ v2RayTun ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В ╨╡╨│╨╛ ╨┐╨╛╨┤ ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡╨╝ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╨╜╨╡╤В. ╨в╨╡ ╨╢╨╡ ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╡, ╤З╤В╨╛ ╨▓ sub_title */
+            /** @description Объявление над профилем в приложениях (заголовок announce): Happ и v2RayTun показывают его под названием подписки; пусто — нет. Те же переменные, что в sub_title */
             sub_announce: string;
-            /** @description ╨Ъ╤Г╨┤╨░ ╨▓╨╡╨┤╤С╤В ╨╜╨░╨╢╨░╤В╨╕╨╡ ╨╜╨░ ╨╛╨▒╤К╤П╨▓╨╗╨╡╨╜╨╕╨╡ */
+            /** @description Куда ведёт нажатие на объявление */
             sub_announce_url: string;
             sub_base_url: string;
-            /** @description ╨б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ (sub_domain) */
+            /** @description Сертификат для ссылки подписки (sub_domain) */
             sub_certificate?: components["schemas"]["Status"];
-            /** @description ╨б╨▓╨╛╨╣ ╨┤╨╛╨╝╨╡╨╜ ╨╕╨╗╨╕ ╨┐╨╛╨┤╨┤╨╛╨╝╨╡╨╜ ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨╛╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ ╨┤╨╛╨╝╨╡╨╜ ╨╕╨╗╨╕ ╨░╨┤╤А╨╡╤Б ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Свой домен или поддомен для ссылок подписки; пусто — домен или адрес панели */
             sub_domain: string;
-            /** @description ╨У╤А╤Г╨┐╨┐╨░ ╨░╨▓╤В╨╛╨▓╤Л╨▒╨╛╤А╨░ ╤Б╨░╨╝╨╛╨│╨╛ ╨▒╤Л╤Б╤В╤А╨╛╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П */
+            /** @description Группа автовыбора самого быстрого подключения */
             sub_group_auto: string;
-            /** @description ╨У╨╗╨░╨▓╨╜╨░╤П ╨│╤А╤Г╨┐╨┐╨░ ╨▓ Clash-╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е */
+            /** @description Главная группа в Clash-приложениях */
             sub_group_main: string;
             /**
              * Format: int64
-             * @description ╨Ю╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ ╨┐╨╛╤А╤В ╨┐╨╛╨┤╨┐╨╕╤Б╨╛╨║; 0 тАФ ╨┐╨╛╤А╤В ╨┐╨░╨╜╨╡╨╗╨╕. ╨Я╨╛╤А╤В ╨┐╨░╨╜╨╡╨╗╨╕ ╨╛╤В╨┤╨░╤С╤В ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨▓ ╨╗╤О╨▒╨╛╨╝ ╤Б╨╗╤Г╤З╨░╨╡
+             * @description Отдельный порт подписок; 0 — порт панели. Порт панели отдаёт подписки в любом случае
              */
             sub_port: number;
-            /** @description sub_port_busy тАФ ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜╨╜╤Л╨╣ ╨┐╨╛╤А╤В ╨╖╨░╨╜╤П╤В ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡, ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨┐╨╛╨║╨░ ╨╕╨┤╤Г╤В ╤З╨╡╤А╨╡╨╖ ╨┐╨╛╤А╤В ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description sub_port_busy — сохранённый порт занят на сервере, подписки пока идут через порт панели */
             sub_port_error?: string;
-            /** @description ╨Ъ╤Г╨┤╨░ ╨╕╨┤╤Г╤В ╤Б╨╡╤А╨▓╨╕╤Б╤Л (services: id тЖТ vpn, direct, block ╨╕╨╗╨╕ node:<id>), ╨║╨░╨║╨╕╨╡ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П ╨╕ ╤Б╨░╨╣╤В╤Л ╨╕╨┤╤Г╤В ╨╝╨╕╨╝╨╛ VPN (direct) ╨╕ ╤Б╨▓╨╛╨╕ DNS (dns). ╨Ъ╨░╤В╨░╨╗╨╛╨│ тАФ GET /api/v1/settings/routes/catalog */
+            /** @description Куда идут сервисы (services: id → vpn, direct, block или node:<id>), какие приложения и сайты идут мимо VPN (direct) и свои DNS (dns). Каталог — GET /api/v1/settings/routes/catalog */
             sub_routes: components["schemas"]["Routes"];
             /**
-             * @description ╨Ь╨░╤А╤И╤А╤Г╤В╤Л ╨▓ Clash-╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е: ru_direct тАФ ╤А╨╛╤Б╤Б╨╕╨╣╤Б╨║╨╕╨╡ ╤Б╨░╨╣╤В╤Л ╨╕ IP ╨╜╨░╨┐╤А╤П╨╝╤Г╤О ╨┐╨╛ ╨│╨╡╨╛╨▒╨░╨╖╨░╨╝ mihomo, all тАФ ╨▓╤Б╤С ╤З╨╡╤А╨╡╨╖ VPN, blocked тАФ ╤З╨╡╤А╨╡╨╖ VPN ╤В╨╛╨╗╤М╨║╨╛ ╨╖╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╜╨╜╨╛╨╡ (╤Б╨┐╨╕╤Б╨║╨╕ privWL-clash), ╨╛╤Б╤В╨░╨╗╤М╨╜╨╛╨╡ ╨╜╨░╨┐╤А╤П╨╝╤Г╤О
+             * @description Маршруты в Clash-приложениях: ru_direct — российские сайты и IP напрямую по геобазам mihomo, all — всё через VPN, blocked — через VPN только заблокированное (списки privWL-clash), остальное напрямую
              * @enum {string}
              */
             sub_routing: "ru_direct" | "all" | "blocked";
-            /** @description ╨б╨▓╨╛╨╕ ╨┐╤А╨░╨▓╨╕╨╗╨░ Clash: ╨┐╨╛ ╤Б╤В╤А╨╛╨║╨╡ TYPE,VALUE,TARGET[,no-resolve]; # тАФ ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╣ */
+            /** @description Свои правила Clash: по строке TYPE,VALUE,TARGET[,no-resolve]; # — комментарий */
             sub_rules: string;
-            /** @description ╨б╨▓╨╛╨╣ ╨┐╤А╨╛╤Д╨╕╨╗╤М Clash (YAML) ╨▓╨╝╨╡╤Б╤В╨╛ ╨▓╤Б╤В╤А╨╛╨╡╨╜╨╜╨╛╨│╨╛ ╨┤╨╗╤П ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╣ ╨╜╨░ mihomo; ╨┐╤Г╤Б╤В╨╛ тАФ ╨▓╤Б╤В╤А╨╛╨╡╨╜╨╜╤Л╨╣. ╨б╨╡╤А╨▓╨╡╤А╤Л ╨┐╨░╨╜╨╡╨╗╤М ╨┐╨╛╨┤╤Б╤В╨░╨▓╨╗╤П╨╡╤В ╤Б╨░╨╝╨░: ╨▓ proxies ╨╕ ╨▓ ╨│╤А╤Г╨┐╨┐╤Л ╤Б include-all-proxies ╨╕╨╗╨╕ mikan: {nodes, types} */
+            /** @description Свой профиль Clash (YAML) вместо встроенного для приложений на mihomo; пусто — встроенный. Серверы панель подставляет сама: в proxies и в группы с include-all-proxies или mikan: {nodes, types} */
             sub_template: string;
-            /** @description ╨Э╨░╨╖╨▓╨░╨╜╨╕╨╡ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨▓ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П╤Е (╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ profile-title); ╨┐╤Г╤Б╤В╨╛ тАФ ╨▒╤А╨╡╨╜╨┤. ╨Я╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╡: {brand} тАФ ╨▒╤А╨╡╨╜╨┤, {name} тАФ ╨╕╨╝╤П ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П, {date} тАФ ╨┤╨░╤В╨░ ╨╛╨║╨╛╨╜╤З╨░╨╜╨╕╤П (╨Ф╨Ф.╨Ь╨Ь.╨У╨У╨У╨У, ╨Ь╨б╨Ъ), {days} тАФ ╨┤╨╜╨╡╨╣ ╨╛╤Б╤В╨░╨╗╨╛╤Б╤М, {used} тАФ ╨╕╨╖╤А╨░╤Б╤Е╨╛╨┤╨╛╨▓╨░╨╜╨╛, {left} тАФ ╨╛╤Б╤В╨░╨╗╨╛╤Б╤М ╤В╤А╨░╤Д╨╕╨║╨░, {total} тАФ ╨▓╤Б╨╡╨│╨╛, {devices} тАФ ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ (2/3); ╨▒╨╡╨╖ ╤Б╤А╨╛╨║╨░ ╨╕╨╗╨╕ ╨╗╨╕╨╝╨╕╤В╨░ тАФ тИЮ */
+            /** @description Название подписки в приложениях (заголовок profile-title); пусто — бренд. Переменные: {brand} — бренд, {name} — имя пользователя, {date} — дата окончания (ДД.ММ.ГГГГ, МСК), {days} — дней осталось, {used} — израсходовано, {left} — осталось трафика, {total} — всего, {devices} — привязанные устройства (2/3); без срока или лимита — ∞ */
             sub_title: string;
             support_url: string;
-            /** @description ╨Ш╤Б╨║╨░╤В╤М ╤Б╨░╨╣╤В╤Л ╨╝╨░╤Б╨║╨╕╤А╨╛╨▓╨║╨╕ REALITY ╨╜╨╡ ╤В╨╛╨╗╤М╨║╨╛ ╨▓ /24 ╨╜╨╛╨┤╤Л, ╨╜╨╛ ╨╕ ╨▓ ╤Б╨╛╤Б╨╡╨┤╨╜╨╕╤Е /24 ╨╡╤С /16, ╨┤╨╛ 20 ╨╜╨░╨╣╨┤╨╡╨╜╨╜╤Л╤Е ╤Б╨░╨╣╤В╨╛╨▓ ╨╕╨╗╨╕ 2 ╨╝╨╕╨╜╤Г╤В. ╨Ь╨╜╨╛╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣: ╤Е╨╛╤Б╤В╨╡╤А ╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╕╨╜╤П╤В╤М ╤Н╤В╨╛ ╨╖╨░ ╤Б╨║╨░╨╜╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╤Б╨╡╤В╨╕ */
+            /** @description Искать сайты маскировки REALITY не только в /24 ноды, но и в соседних /24 её /16, до 20 найденных сайтов или 2 минут. Много подключений: хостер может принять это за сканирование сети */
             wide_sni_scan: boolean;
         };
         SourceSkipView: {
-            /** @description ╨Ш╨┤╨╡╨╜╤В╨╕╤Д╨╕╨║╨░╤В╨╛╤А ╨╖╨░╨┐╨╕╤Б╨╕, ╨║╨░╨║ ╨╡╨│╨╛ ╨╜╨░╨┐╨╕╤Б╨░╨╗ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ */
+            /** @description Идентификатор записи, как его написал источник */
             id: string;
-            /** @description id_taken тАФ ╨╕╨┤╨╡╨╜╤В╨╕╤Д╨╕╨║╨░╤В╨╛╤А ╨╕╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨╕╨╗╨╕ ╨┤╤А╤Г╨│╨╛╨│╨╛ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░; payment тАФ ╨┐╨╗╨░╤В╤С╨╢╨╜╤Л╨╣ ╨░╨┤╨░╨┐╤В╨╡╤А ╨╕╨╖ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░ ╨╜╨╡ ╤Б╤В╨░╨▓╨╕╤В╤Б╤П; invalid, image_invalid, digest_invalid, version_invalid, id_invalid тАФ ╨╖╨░╨┐╨╕╤Б╤М ╨╜╨╡ ╨┐╨╛ ╨┐╤А╨░╨▓╨╕╨╗╨░╨╝; min_panel тАФ ╨╜╤Г╨╢╨╜╨░ ╨▒╨╛╨╗╨╡╨╡ ╨╜╨╛╨▓╨░╤П ╨┐╨░╨╜╨╡╨╗╤М; duplicate, too_many */
+            /** @description id_taken — идентификатор из подписанного каталога или другого источника; payment — платёжный адаптер из источника не ставится; invalid, image_invalid, digest_invalid, version_invalid, id_invalid — запись не по правилам; min_panel — нужна более новая панель; duplicate, too_many */
             reason: string;
         };
         SourceView: {
@@ -5323,33 +5323,33 @@ export interface components {
             added_at: string;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨╖╨░╨┐╨╕╤Б╨╡╨╣ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ ╨┐╤А╨╡╨┤╨╗╨░╨│╨░╨╡╤В: ╤Б╨░╨╝╨╕ ╨╖╨░╨┐╨╕╤Б╨╕ ╨▓ /marketplace
+             * @description Сколько записей источник предлагает: сами записи в /marketplace
              */
             entries: number;
-            /** @description ╨Ъ╨╛╨┤ ╨╛╤И╨╕╨▒╨║╨╕ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨│╨╛ ╤З╤В╨╡╨╜╨╕╤П: source_unreachable, source_key_changed, source_signature_invalidтАж */
+            /** @description Код ошибки последнего чтения: source_unreachable, source_key_changed, source_signature_invalid… */
             error?: string;
             /** Format: date-time */
             fetched_at?: string;
-            /** @description ╨Ю╤В╨┐╨╡╤З╨░╤В╨╛╨║ ╨╖╨░╨║╤А╨╡╨┐╨╗╤С╨╜╨╜╨╛╨│╨╛ ╨║╨╗╤О╤З╨░, ╨┤╨╗╤П ╤Б╨▓╨╡╤А╨║╨╕ ╤Б ╨░╨▓╤В╨╛╤А╨╛╨╝ */
+            /** @description Отпечаток закреплённого ключа, для сверки с автором */
             fingerprint?: string;
             /** Format: int64 */
             id: number;
-            /** @description ╨Р╨┤╨┤╨╛╨╜╤Л, ╨┐╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╨╜╤Л╨╡ ╨╕╨╖ ╤Н╤В╨╛╨│╨╛ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░: ╨┐╨╛╨║╨░ ╨╛╨╜╨╕ ╨╡╤Б╤В╤М, ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ ╨╜╨╡ ╤Г╨┤╨░╨╗╨╕╤В╤М */
+            /** @description Аддоны, поставленные из этого источника: пока они есть, источник не удалить */
             installed: string[];
-            /** @description ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜ ╤Г╨╢╨╡ ╨┤╤А╤Г╨│╨╕╨╝ ╨║╨╗╤О╤З╨╛╨╝ (error source_key_changed): ╨╛╤В╨┐╨╡╤З╨░╤В╨╛╨║ ╨╜╨╛╨▓╨╛╨│╨╛, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨░╨┤╨╝╨╕╨╜ ╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╕╨╜╤П╤В╤М */
+            /** @description Источник подписан уже другим ключом (error source_key_changed): отпечаток нового, который админ может принять */
             new_fingerprint?: string;
-            /** @description ╨Ъ╨╗╤О╤З ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░ ╨╖╨░╨║╤А╨╡╨┐╨╗╤С╨╜: ╨┐╨╛╨┤╨┐╨╕╤Б╤М ╤Б ╨┤╤А╤Г╨│╨╕╨╝ ╨║╨╗╤О╤З╨╛╨╝ ╨╕╨╗╨╕ ╨▒╨╡╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨╕ ╨┐╨░╨╜╨╡╨╗╤М ╨╜╨╡ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В */
+            /** @description Ключ источника закреплён: подпись с другим ключом или без подписи панель не принимает */
             signed: boolean;
             skipped: components["schemas"]["SourceSkipView"][];
             title: string;
             url: string;
         };
         SourcesView: {
-            /** @description catalog_unavailable тАФ ╨▒╨╡╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨╖╨░╨┐╨╕╤Б╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨╛╨▓ ╨╜╨╡ ╤Б╨▓╨╡╤А╨╕╤В╤М, ╨╕╤Е ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╨╝ */
+            /** @description catalog_unavailable — без подписанного каталога записи источников не сверить, их не показываем */
             catalog_error?: string;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨╛╨▓ ╨╝╨╛╨╢╨╜╨╛ ╨┤╨╛╨▒╨░╨▓╨╕╤В╤М
+             * @description Сколько источников можно добавить
              */
             limit: number;
             sources: components["schemas"]["SourceView"][];
@@ -5359,73 +5359,73 @@ export interface components {
             at: string;
             /**
              * Format: int64
-             * @description ╨Ч╨░╨│╤А╤Г╨╖╨║╨░, ╨▒╨╕╤В/╤Б
+             * @description Загрузка, бит/с
              */
             down_bps: number;
-            /** @description ╨У╨┤╨╡ ╤В╨╡╤Б╤В ╨╛╨▒╨╛╤А╨▓╨░╨╗╤Б╤П; ╨╕╨╖╨╝╨╡╤А╨╡╨╜╨╜╨╛╨╡ ╨┤╨╛ ╤В╨╛╨│╨╛ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╛ */
+            /** @description Где тест оборвался; измеренное до того сохранено */
             error?: string;
             /** Format: int64 */
             id: number;
             /**
              * Format: double
-             * @description ╨б╤А╨╡╨┤╨╜╨╕╨╣ ╤А╨░╨╖╨▒╤А╨╛╤Б ╨╖╨░╨┤╨╡╤А╨╢╨║╨╕, ╨╝╤Б
+             * @description Средний разброс задержки, мс
              */
             jitter_ms: number;
             /**
              * Format: double
-             * @description ╨Я╨╛╤В╨╡╤А╨╕, %
+             * @description Потери, %
              */
             loss_pct: number;
             /**
              * Format: double
-             * @description ╨Ь╨╡╨┤╨╕╨░╨╜╨░ ╨╖╨░╨┤╨╡╤А╨╢╨║╨╕, ╨╝╤Б; -1 ╨╡╤Б╨╗╨╕ ╨╛╤В╨▓╨╡╤В╨╛╨▓ ╨╜╨╡ ╨▒╤Л╨╗╨╛
+             * @description Медиана задержки, мс; -1 если ответов не было
              */
             ping_ms: number;
             /**
              * Format: int64
-             * @description ╨Ю╤В╨┤╨░╤З╨░, ╨▒╨╕╤В/╤Б
+             * @description Отдача, бит/с
              */
             up_bps: number;
         };
         Status: {
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╡ ╨┐╨╛╨┐╤Л╤В╨║╨╕ ╨┐╨╛╨╗╤Г╤З╨╕╤В╤М ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В, ╤Б╨▓╨╡╨╢╨╕╨╡ ╨┐╨╡╤А╨▓╤Л╨╝╨╕ */
+            /** @description Последние попытки получить сертификат, свежие первыми */
             attempts?: components["schemas"]["Attempt"][];
             /** @enum {string} */
             ca?: "letsencrypt" | "zerossl" | "google";
             /**
-             * @description ╨Ъ╤Г╨┤╨░ ╤Г╨╣╨┤╤С╤В ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╨╖╨░╨║╨░╨╖: ╨▓╤Л╨▒╤А╨░╨╜╨╜╤Л╨╣ ╤Ж╨╡╨╜╤В╤А, ╨┤╨╗╤П IP ╨▓╤Б╨╡╨│╨┤╨░ Let's Encrypt
+             * @description Куда уйдёт следующий заказ: выбранный центр, для IP всегда Let's Encrypt
              * @enum {string}
              */
             ca_wanted: "letsencrypt" | "zerossl" | "google";
             /** Format: date-time */
             checked_at: string;
             error?: string;
-            /** @description ╨Я╨╛╨┤╤А╨╛╨▒╨╜╨╛╤Б╤В╨╕ ╨╛╤И╨╕╨▒╨║╨╕ ╨║╨░╨║ ╨╡╤Б╤В╤М, ╨┤╨╗╤П ┬л╨┐╨╛╨┤╤А╨╛╨▒╨╜╨╡╨╡┬╗ */
+            /** @description Подробности ошибки как есть, для «подробнее» */
             error_detail?: string;
-            /** @description ╨Ъ╤В╨╛ ╨┤╨╡╤А╨╢╨╕╤В ╨┐╨╛╤А╤В 80 (port80_busy), ╨╡╤Б╨╗╨╕ ╤Н╤В╨╛ ╨▓╨╕╨┤╨╜╨╛ */
+            /** @description Кто держит порт 80 (port80_busy), если это видно */
             holder?: string;
             identifier: string;
             issuer?: string;
             /**
-             * @description acme тАФ ╨▓╤Л╨┤╨░╨╜ ╤Ж╨╡╨╜╤В╤А╨╛╨╝ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤Ж╨╕╨╕ ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕ (ca), custom тАФ ╤Б╨▓╨╛╨╣, self-signed тАФ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╣ ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣
+             * @description acme — выдан центром сертификации автоматически (ca), custom — свой, self-signed — временный самоподписанный
              * @enum {string}
              */
             kind: "self-signed" | "acme" | "custom";
             names?: string[];
             /** Format: date-time */
             not_after: string;
-            /** @description ╨Ч╨░╨║╨░╨╖ ╨╕╨┤╤С╤В ╨┐╤А╤П╨╝╨╛ ╤Б╨╡╨╣╤З╨░╤Б */
+            /** @description Заказ идёт прямо сейчас */
             ordering?: boolean;
             /**
              * Format: date-time
-             * @description rate_limited: ╨║╨╛╨│╨┤╨░ ╤Ж╨╡╨╜╤В╤А ╤Б╨╜╨╛╨▓╨░ ╨┐╤А╨╕╨╝╨╡╤В ╨╖╨░╨║╨░╨╖
+             * @description rate_limited: когда центр снова примет заказ
              */
             retry_at?: string;
-            /** @description ╨б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╨┐╤Г╨▒╨╗╨╕╤З╨╜╨╛ ╨┤╨╛╨▓╨╡╤А╨╡╨╜╨╜╤Л╨╣ ╨┤╨╗╤П ╨░╨┤╤А╨╡╤Б╨░ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Сертификат публично доверенный для адреса панели */
             trusted?: boolean;
         };
         SubDocBody: {
-            /** @description Markdown: ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╕ #, ╤Б╨┐╨╕╤Б╨║╨╕, **╨╢╨╕╤А╨╜╤Л╨╣**, *╨║╤Г╤А╤Б╨╕╨▓*, ╨║╨╛╨┤ ╨▓ ╨╛╨▒╤А╨░╤В╨╜╤Л╤Е ╨║╨░╨▓╤Л╤З╨║╨░╤Е, [╤Б╤Б╤Л╨╗╨║╨╕](https://тАж), ╨║╨░╤А╤В╨╕╨╜╨║╨╕ ![](https://тАж) */
+            /** @description Markdown: заголовки #, списки, **жирный**, *курсив*, код в обратных кавычках, [ссылки](https://…), картинки ![](https://…) */
             body: string;
             emoji: string;
             /** @enum {string} */
@@ -5439,9 +5439,9 @@ export interface components {
             emoji: string;
             /** Format: int64 */
             id: number;
-            /** @description ios, android, windows, macos, linux; ╨┐╤Г╤Б╤В╨╛ тАФ ╨┤╨╗╤П ╨▓╤Б╨╡╤Е */
+            /** @description ios, android, windows, macos, linux; пусто — для всех */
             platform: string;
-            /** @description ╨Т╨╕╨┤╨╜╨░ ╨╜╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨╕ ╨▓ Mini App */
+            /** @description Видна на странице подписки и в Mini App */
             published: boolean;
             title: string;
             /** Format: int64 */
@@ -5452,12 +5452,12 @@ export interface components {
         };
         SubPageView: {
             background?: components["schemas"]["PageAsset"];
-            /** @description ╨Э╨░╨╖╨▓╨░╨╜╨╕╨╡ ╨▒╤А╨╡╨╜╨┤╨░ (settings.brand) */
+            /** @description Название бренда (settings.brand) */
             brand: string;
-            /** @description ╨ж╨▓╨╡╤В ╨▒╤А╨╡╨╜╨┤╨░ (settings.brand_accent); ╨╡╨│╨╛ ╨╢╨╡ ╨┐╨╛╨╗╤Г╤З╨░╤О╤В ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П ╤Б ╨▒╤А╨╡╨╜╨┤╨╕╨╜╨│╨╛╨╝ */
+            /** @description Цвет бренда (settings.brand_accent); его же получают приложения с брендингом */
             brand_accent: string;
             config: components["schemas"]["Page"];
-            /** @description ╨б╤В╤А╨░╨╜╨╕╤Ж╨░ ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О тАФ ╨║ ╨╜╨╡╨╣ ╨▓╨╡╨┤╤С╤В ┬л╨б╨▒╤А╨╛╤Б╨╕╤В╤М┬╗ */
+            /** @description Страница по умолчанию — к ней ведёт «Сбросить» */
             defaults: components["schemas"]["Page"];
             logo?: components["schemas"]["PageAsset"];
         };
@@ -5480,34 +5480,34 @@ export interface components {
         TariffBody: {
             /**
              * Format: int64
-             * @description ╨б╤А╨╛╨║ ╨┤╨╛ ╤Н╤В╨╛╨│╨╛ ╤З╨╕╤Б╨╗╨░ ╨╝╨╡╤Б╤П╤Ж╨░: ╨╝╨╡╤Б╤П╤Ж = ╨╛╤В ╨┤╨╜╤П ╨╛╨┐╨╗╨░╤В╤Л ╨┤╨╛ ╨┤╨╜╤П ╨╛╨┐╨╗╨░╤В╤Л
+             * @description Срок до этого числа месяца: месяц = от дня оплаты до дня оплаты
              */
             billing_day?: number;
-            /** @description ╨в╨╡╨║╤Б╤В ╨┤╨╗╤П ╨┐╨╛╨║╤Г╨┐╨░╤В╨╡╨╗╨╡╨╣, ╨▓╨╕╨┤╨╡╨╜ ╨▓ ╨▒╨╛╤В╨╡ ╨╕ Mini App ╤А╤П╨┤╨╛╨╝ ╤Б╨╛ ╤Б╤В╤А╨╛╨║╨╛╨╣ ╨╕╨╖ ╨╗╨╕╨╝╨╕╤В╨╛╨▓: ╤З╨╡╨╝ ╤В╨░╤А╨╕╤Д ╨╛╤В╨╗╨╕╤З╨░╨╡╤В╤Б╤П, ╨║╨╛╨│╨┤╨░ ╨╗╨╕╨╝╨╕╤В╤Л ╤Н╤В╨╛╨│╨╛ ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В (┬л╤Б ╨▒╨╡╨╗╤Л╨╝╨╕ ╤Б╨┐╨╕╤Б╨║╨░╨╝╨╕┬╗). ╨Я╤А╨╛╤Б╤В╨╛╨╣ ╤В╨╡╨║╤Б╤В ╨┤╨╛ 300 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╨╕ ╨┤╨╛ 5 ╤Б╤В╤А╨╛╨║; ╨╜╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜ ╨╕╨╗╨╕ ╨┐╤Г╤Б╤В╨╛╨╣ тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б╤В╤А╨╛╨║╨░ ╨╕╨╖ ╨╗╨╕╨╝╨╕╤В╨╛╨▓ */
+            /** @description Текст для покупателей, виден в боте и Mini App рядом со строкой из лимитов: чем тариф отличается, когда лимиты этого не показывают («с белыми списками»). Простой текст до 300 символов и до 5 строк; не передан или пустой — только строка из лимитов */
             description?: string;
             /** Format: int64 */
             device_limit?: number;
             /**
-             * @description bound: ╨╗╨╕╨╝╨╕╤В ╤Н╤В╨╛ ╤З╨╕╤Б╨╗╨╛ ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╤Е ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓; online: ╨┐╤А╨╕╨▓╤П╨╖╤Л╨▓╨░╤В╤М ╨╝╨╛╨╢╨╜╨╛ ╨╗╤О╨▒╨╛╨╡ ╤З╨╕╤Б╨╗╨╛, ╤Б╤З╨╕╤В╨░╤О╤В╤Б╤П ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╤С╨╜╨╜╤Л╨╡ ╨║ ╤Б╨╡╤А╨▓╨╡╤А╨░╨╝. ╨Э╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜: ╤Г ╨╜╨╛╨▓╨╛╨│╨╛ ╤В╨░╤А╨╕╤Д╨░ bound, ╤Г ╤Б╤Г╤Й╨╡╤Б╤В╨▓╤Г╤О╤Й╨╡╨│╨╛ ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣
+             * @description bound: лимит это число привязанных устройств; online: привязывать можно любое число, считаются устройства, одновременно подключённые к серверам. Не передан: у нового тарифа bound, у существующего без изменений
              * @enum {string}
              */
             device_mode?: "bound" | "online";
             /** Format: int64 */
             duration_days: number;
             name: string;
-            /** @description ╨Я╤А╨╛╨┤╨░╨▓╨░╤В╤М ╨▓ ╨▒╨╛╤В╨╡ ╨╕ Mini App; ╨╜╤Г╨╢╨╜╨░ ╤Е╨╛╤В╤П ╨▒╤Л ╨╛╨┤╨╜╨░ ╤Ж╨╡╨╜╨░ */
+            /** @description Продавать в боте и Mini App; нужна хотя бы одна цена */
             on_sale?: boolean;
-            /** @description ╨Ы╨╕╨╝╨╕╤В╤Л ╨┐╤Г╨╗╨╛╨▓ ╤В╤А╨░╤Д╨╕╨║╨░; ╨╜╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜ тАФ ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ */
+            /** @description Лимиты пулов трафика; не передан — без изменений */
             pools?: components["schemas"]["PoolLimit"][];
             price_label?: string;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е: 19900 тАФ 199 тВ╜
+             * @description Цена в копейках: 19900 — 199 ₽
              */
             price_rub?: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ Telegram Stars
+             * @description Цена в Telegram Stars
              */
             price_stars?: number;
             /**
@@ -5519,10 +5519,10 @@ export interface components {
             sort?: number;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╤А╨╛╤Б╤В╤М, ╨Ь╨▒╨╕╤В/╤Б ╨▓ ╨║╨░╨╢╨┤╤Г╤О ╤Б╤В╨╛╤А╨╛╨╜╤Г; ╨╜╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜╨░ тАФ ╨▒╨╡╨╖ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╤П
+             * @description Скорость, Мбит/с в каждую сторону; не передана — без ограничения
              */
             speed_limit?: number;
-            /** @description ╨Т╤Б╨╡ ╤Б╤А╨╛╨║╨╕ ╨┐╨╛ ╨┐╨╛╤А╤П╨┤╨║╤Г, ╨║╨╛╨│╨┤╨░ ╤В╨░╤А╨╕╤Д ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨╜╨░ ╨╜╨╡╤Б╨║╨╛╨╗╤М╨║╨╛; ╤В╨╛╨│╨┤╨░ duration_days, price_stars ╨╕ price_rub ╨▒╨╡╤А╤Г╤В╤Б╤П ╨╕╨╖ ╨┐╨╡╤А╨▓╨╛╨│╨╛. ╨Э╨╡ ╨┐╨╡╤А╨╡╨┤╨░╨╜ тАФ ╨┐╨╡╤А╨▓╤Л╨╣ ╤Б╤А╨╛╨║ ╨╕╨╖ duration_days, price_stars ╨╕ price_rub, ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╨╡ ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ */
+            /** @description Все сроки по порядку, когда тариф продаётся на несколько; тогда duration_days, price_stars и price_rub берутся из первого. Не передан — первый срок из duration_days, price_stars и price_rub, остальные без изменений */
             terms?: components["schemas"]["TermBody"][];
             /** Format: int64 */
             traffic_limit?: number;
@@ -5530,39 +5530,39 @@ export interface components {
         TariffView: {
             /**
              * Format: int64
-             * @description ╨Ф╨╡╨╜╤М ╨╝╨╡╤Б╤П╤Ж╨░, ╨▓ ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨╖╨░╨║╨░╨╜╤З╨╕╨▓╨░╨╡╤В╤Б╤П ╤Б╤А╨╛╨║; null тАФ ╤Б╤А╨╛╨║ ╨▓ ╨┤╨╜╤П╤Е
+             * @description День месяца, в который заканчивается срок; null — срок в днях
              */
             billing_day: number | null;
-            /** @description ╨в╨╡╨║╤Б╤В ╨┤╨╗╤П ╨┐╨╛╨║╤Г╨┐╨░╤В╨╡╨╗╨╡╨╣: ╤З╨╡╨╝ ╤В╨░╤А╨╕╤Д ╨╛╤В╨╗╨╕╤З╨░╨╡╤В╤Б╤П, ╨║╨╛╨│╨┤╨░ ╨╗╨╕╨╝╨╕╤В╤Л ╤Н╤В╨╛╨│╨╛ ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В; ╨┤╨╛ 300 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓, ╨┤╨╛ 5 ╤Б╤В╤А╨╛╨║, ╨┐╤Г╤Б╤В╨╛╨╣ тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б╤В╤А╨╛╨║╨░ ╨╕╨╖ ╨╗╨╕╨╝╨╕╤В╨╛╨▓ */
+            /** @description Текст для покупателей: чем тариф отличается, когда лимиты этого не показывают; до 300 символов, до 5 строк, пустой — только строка из лимитов */
             description: string;
             /** Format: int64 */
             device_limit: number | null;
             /**
-             * @description ╨Ъ╨░╨║ ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П ╨╗╨╕╨╝╨╕╤В ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓: bound: ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ (╨╝╨╡╤Б╤В╨░), online: ╨╗╤О╨▒╨╛╨╡ ╤З╨╕╤Б╨╗╨╛ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓, ╤Б╤З╨╕╤В╨░╤О╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╛╨╜╨╗╨░╨╣╨╜
+             * @description Как считается лимит устройств: bound: привязанные устройства (места), online: любое число устройств, считаются только одновременно онлайн
              * @enum {string}
              */
             device_mode: "bound" | "online";
             /**
              * Format: int64
-             * @description 0 тАФ ╨▒╨╡╤Б╤Б╤А╨╛╤З╨╜╨╛
+             * @description 0 — бессрочно
              */
             duration_days: number;
             /** Format: int64 */
             id: number;
             name: string;
-            /** @description ╨Я╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨▓ ╨▒╨╛╤В╨╡ ╨╕ Mini App */
+            /** @description Продаётся в боте и Mini App */
             on_sale: boolean;
-            /** @description ╨Ы╨╕╨╝╨╕╤В╤Л ╨┐╤Г╨╗╨╛╨▓ ╤В╤А╨░╤Д╨╕╨║╨░ ╨╕ ╨╖╨░╨║╤А╤Л╤В╤Л╨╡ ╨┐╤Г╨╗╤Л; ╨┐╤Г╨╗ ╨╜╨╡ ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡ тАФ ╨▒╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░. ╨Ы╨╕╨╝╨╕╤В╤Л ╨┤╨╡╨╣╤Б╤В╨▓╤Г╤О╤В ╨╜╨░ ╨╜╨╛╨▓╤Л╤Е ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╨╕ ╨┐╤А╨╕ ╨┐╤А╨╛╨┤╨╗╨╡╨╜╨╕╨╕ ╨╕╨╗╨╕ ╤Б╨╝╨╡╨╜╨╡ ╤В╨░╤А╨╕╤Д╨░; ╨╖╨░╨║╤А╤Л╤В╨╕╨╡ ╨╕ ╨╛╤В╨║╤А╤Л╤В╨╕╨╡ ╨┐╤Г╨╗╨░ ╨┤╨╡╨╣╤Б╤В╨▓╤Г╤О╤В ╤Б╤А╨░╨╖╤Г ╨╜╨░ ╨▓╤Б╨╡╤Е ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣ ╤В╨░╤А╨╕╤Д╨░: ╨┐╤А╨╕ ╨╛╤В╨║╤А╤Л╤В╨╕╨╕ ╨╜╨░ ╨╜╨╕╤Е ╤Б╤В╨░╨▓╨╕╤В╤Б╤П ╨╗╨╕╨╝╨╕╤В ╤В╨░╤А╨╕╤Д╨░, ╤А╤Г╤З╨╜╨╛╨╣ ╨╗╨╕╨╝╨╕╤В ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П ╨╖╨░╤В╨╕╤А╨░╨╡╤В╤Б╤П */
+            /** @description Лимиты пулов трафика и закрытые пулы; пул не в списке — без лимита. Лимиты действуют на новых пользователей и при продлении или смене тарифа; закрытие и открытие пула действуют сразу на всех пользователей тарифа: при открытии на них ставится лимит тарифа, ручной лимит пользователя затирается */
             pools: components["schemas"]["PoolLimit"][];
             price_label: string;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е (╨оKassa, CryptoBot); null тАФ ╨╜╨╡ ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨╖╨░ ╤А╤Г╨▒╨╗╨╕
+             * @description Цена в копейках (ЮKassa, CryptoBot); null — не продаётся за рубли
              */
             price_rub: number | null;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ Telegram Stars; null тАФ ╨╜╨╡ ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨╖╨░ Stars
+             * @description Цена в Telegram Stars; null — не продаётся за Stars
              */
             price_stars: number | null;
             /** @enum {string} */
@@ -5571,14 +5571,14 @@ export interface components {
             sort: number;
             /**
              * Format: int64
-             * @description ╨Ь╨▒╨╕╤В/╤Б ╨▓ ╨║╨░╨╢╨┤╤Г╤О ╤Б╤В╨╛╤А╨╛╨╜╤Г; null тАФ ╨▒╨╡╨╖ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╤П
+             * @description Мбит/с в каждую сторону; null — без ограничения
              */
             speed_limit: number | null;
-            /** @description ╨б╤А╨╛╨║╨╕, ╨╜╨░ ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╤В╨░╤А╨╕╤Д, ╨┐╨╛ ╨┐╨╛╤А╤П╨┤╨║╤Г; ╨┐╨╡╤А╨▓╤Л╨╣ тАФ ╤В╨╛╤В ╨╢╨╡, ╤З╤В╨╛ duration_days, price_stars ╨╕ price_rub */
+            /** @description Сроки, на которые продаётся тариф, по порядку; первый — тот же, что duration_days, price_stars и price_rub */
             terms: components["schemas"]["TermView"][];
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л; null тАФ ╨▒╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░
+             * @description Байты; null — без лимита
              */
             traffic_limit: number | null;
         };
@@ -5617,18 +5617,18 @@ export interface components {
             username: string;
         };
         TelegramBroadcast: {
-            /** @description ╨Х╤Й╤С ╨╛╤В╨┐╤А╨░╨▓╨╗╤П╨╡╤В╤Б╤П */
+            /** @description Ещё отправляется */
             active: boolean;
             /**
              * Format: int64
-             * @description ╨Э╨╡ ╨┤╨╛╤И╨╗╨╛: ╨▒╨╛╤В ╨╖╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╜, ╤З╨░╤В ╤Г╨┤╨░╨╗╤С╨╜
+             * @description Не дошло: бот заблокирован, чат удалён
              */
             failed: number;
             /** Format: int64 */
             sent: number;
             /**
              * Format: int64
-             * @description Unix-╨▓╤А╨╡╨╝╤П ╨╜╨░╤З╨░╨╗╨░
+             * @description Unix-время начала
              */
             started: number;
             /** Format: int64 */
@@ -5650,15 +5650,15 @@ export interface components {
             username: string;
         };
         TelegramPreviewInputBody: {
-            /** @description ╨в╨╡╨║╤Б╤В ╨▒╨╛╤В╨░ ╤Б Markdown */
+            /** @description Текст бота с Markdown */
             text: string;
-            /** @description ╨Ч╨╜╨░╤З╨╡╨╜╨╕╤П ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Л╤Е {name}; ╨▒╨╡╨╖ ╨╜╨╕╤Е ╨┐╨╡╤А╨╡╨╝╨╡╨╜╨╜╤Л╨╡ ╨╛╤Б╤В╨░╤О╤В╤Б╤П ╨║╨░╨║ ╨╜╨░╨┐╨╕╤Б╨░╨╜╤Л */
+            /** @description Значения переменных {name}; без них переменные остаются как написаны */
             vars?: {
                 [key: string]: string;
             };
         };
         TelegramPreviewOutputBody: {
-            /** @description ╨б╨╛╨╛╨▒╤Й╨╡╨╜╨╕╨╡, ╨║╨░╨║ ╨╡╨│╨╛ ╨╛╤В╨┐╤А╨░╨▓╨╕╤В ╨▒╨╛╤В: HTML Telegram */
+            /** @description Сообщение, как его отправит бот: HTML Telegram */
             html: string;
         };
         TelegramProviderView: {
@@ -5667,16 +5667,16 @@ export interface components {
         };
         TelegramRoute: {
             /**
-             * @description ╨Э╨░╨┐╤А╤П╨╝╤Г╤О ╤Б ╤Б╨╡╤А╨▓╨╡╤А╨░ ╨┐╨░╨╜╨╡╨╗╨╕, ╤З╨╡╤А╨╡╨╖ ╨╡╤С ╨╜╨╛╨┤╤Г ╨╕╨╗╨╕ ╤З╨╡╤А╨╡╨╖ ╨┐╤А╨╛╨║╤Б╨╕ тАФ ╨║╨╛╨│╨┤╨░ Telegram ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨╖╨░╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╜
+             * @description Напрямую с сервера панели, через её ноду или через прокси — когда Telegram на сервере заблокирован
              * @enum {string}
              */
             mode: "direct" | "node" | "proxy";
             /**
              * Format: int64
-             * @description ╨Э╨╛╨┤╨░, ╤З╨╡╤А╨╡╨╖ ╨║╨╛╤В╨╛╤А╤Г╤О ╨╕╨┤╤Г╤В ╨╖╨░╨┐╤А╨╛╤Б╤Л
+             * @description Нода, через которую идут запросы
              */
             node_id?: number;
-            /** @description ╨Р╨┤╤А╨╡╤Б ╨┐╤А╨╛╨║╤Б╨╕; ╨┐╨░╤А╨╛╨╗╤М ╤Б╨║╤А╤Л╤В */
+            /** @description Адрес прокси; пароль скрыт */
             proxy?: string;
         };
         TelegramStruct: {
@@ -5686,35 +5686,35 @@ export interface components {
         TelegramView: {
             /**
              * Format: int64
-             * @description ╨Р╨║╨║╨░╤Г╨╜╤В╨╛╨▓ Telegram ╤Б ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░╨╝╨╕
+             * @description Аккаунтов Telegram с подписками
              */
             accounts: number;
             admin_chat_set: boolean;
             bot?: components["schemas"]["TelegramBot"];
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╤П╤П ╤А╨░╤Б╤Б╤Л╨╗╨║╨░ ╤Б ╨╖╨░╨┐╤Г╤Б╨║╨░ ╨┐╨░╨╜╨╡╨╗╨╕ */
+            /** @description Последняя рассылка с запуска панели */
             broadcast?: components["schemas"]["TelegramBroadcast"];
-            /** @description ╨Я╨╛╤З╨╡╨╝╤Г ╨▒╨╛╤В ╨╜╨╡ ╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╨┐╨╛╨┤╨┐╨╕╤Б╨║╤Г ╨╜╨░ ╨║╨░╨╜╨░╨╗: channel_not_admin (╨▒╨╛╤В ╨╜╨╡ ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А ╨║╨░╨╜╨░╨╗╨░), channel_not_found, unreachable ╨╕╨╗╨╕ ╨╛╤В╨▓╨╡╤В Telegram. ╨Я╨╛╨║╨░ ╨╛╤И╨╕╨▒╨║╨░ ╨╡╤Б╤В╤М, ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨░╤П ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░ ╨╜╨╕╨║╨╛╨│╨╛ ╨╜╨╡ ╨╛╤Б╤В╨░╨╜╨░╨▓╨╗╨╕╨▓╨░╨╡╤В */
+            /** @description Почему бот не может проверить подписку на канал: channel_not_admin (бот не администратор канала), channel_not_found, unreachable или ответ Telegram. Пока ошибка есть, обязательная подписка никого не останавливает */
             channel_error?: string;
             config: components["schemas"]["Config"];
-            /** @description ╨Т╤Б╤В╤А╨╛╨╡╨╜╨╜╤Л╨╡ ╤В╨╡╨║╤Б╤В╤Л ╨╜╨░ ╤П╨╖╤Л╨║╨╡ ╨▒╨╛╤В╨░: ╨┐╤Г╤Б╤В╨╛╨╡ ╨┐╨╛╨╗╨╡ ╨▒╨╡╤А╤С╤В ╨╕╤Е */
+            /** @description Встроенные тексты на языке бота: пустое поле берёт их */
             defaults: components["schemas"]["Texts"];
             enabled: boolean;
-            /** @description token_invalid, token_revoked, token_conflict (╤В╨╛╨║╨╡╨╜ ╨╛╨┐╤А╨░╤И╨╕╨▓╨░╨╡╤В ╨╡╤Й╤С ╨╛╨┤╨╜╨░ ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░), unreachable ╨╕╨╗╨╕ ╨╛╤В╨▓╨╡╤В Telegram */
+            /** @description token_invalid, token_revoked, token_conflict (токен опрашивает ещё одна программа), unreachable или ответ Telegram */
             error?: string;
             infrastructure: components["schemas"]["AlertsConfig"];
             /**
              * Format: int64
-             * @description ╨Я╨╛╨┤╨┐╨╕╤Б╨╛╨║, ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╤Е ╨║ Telegram
+             * @description Подписок, привязанных к Telegram
              */
             linked: number;
-            /** @description ╨Р╨┤╤А╨╡╤Б Mini App; ╨┐╤Г╤Б╤В╨╛ тАФ Telegram ╨╡╨│╨╛ ╨╜╨╡ ╨╛╤В╨║╤А╨╛╨╡╤В: ╨╜╨╡╤В ╨░╨┤╤А╨╡╤Б╨░ ╨╕╨╗╨╕ ╤Б╨╡╤А╤В╨╕╤Д╨╕╨║╨░╤В ╤Б╨░╨╝╨╛╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╤Л╨╣ */
+            /** @description Адрес Mini App; пусто — Telegram его не откроет: нет адреса или сертификат самоподписанный */
             mini_app_url: string;
-            /** @description ╨Ъ╨░╨║ ╨▒╨╛╤В ╤Е╨╛╨┤╨╕╤В ╨▓ Telegram */
+            /** @description Как бот ходит в Telegram */
             route: components["schemas"]["TelegramRoute"];
             running: boolean;
-            /** @description ID ╨▒╨╛╤В╨░ ╨╕╨╖ ╤В╨╛╨║╨╡╨╜╨░ */
+            /** @description ID бота из токена */
             token_hint?: string;
-            /** @description ╨в╨╛╨║╨╡╨╜ ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜ */
+            /** @description Токен сохранён */
             token_set: boolean;
         };
         TelegramWidgetInputBody: {
@@ -5731,55 +5731,55 @@ export interface components {
         TermBody: {
             /**
              * Format: int64
-             * @description 0 тАФ ╨▒╨╡╤Б╤Б╤А╨╛╤З╨╜╨╛; ╤Б ╨┤╨╜╤С╨╝ ╨╛╨┐╨╗╨░╤В╤Л тАФ ╨╝╨╡╤Б╤П╤Ж╤Л ╨┐╨╛ 30 ╨┤╨╜╨╡╨╣
+             * @description 0 — бессрочно; с днём оплаты — месяцы по 30 дней
              */
             days: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е: 19900 тАФ 199 тВ╜
+             * @description Цена в копейках: 19900 — 199 ₽
              */
             price_rub?: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ Telegram Stars
+             * @description Цена в Telegram Stars
              */
             price_stars?: number;
         };
         TermView: {
             /**
              * Format: int64
-             * @description 0 тАФ ╨▒╨╡╤Б╤Б╤А╨╛╤З╨╜╨╛; ╤Б ╨┤╨╜╤С╨╝ ╨╛╨┐╨╗╨░╤В╤Л тАФ ╨╝╨╡╤Б╤П╤Ж╤Л ╨┐╨╛ 30 ╨┤╨╜╨╡╨╣
+             * @description 0 — бессрочно; с днём оплаты — месяцы по 30 дней
              */
             days: number;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ ╨║╨╛╨┐╨╡╨╣╨║╨░╤Е; null тАФ ╨╜╨╡ ╨╖╨░ ╤А╤Г╨▒╨╗╨╕
+             * @description Цена в копейках; null — не за рубли
              */
             price_rub: number | null;
             /**
              * Format: int64
-             * @description ╨ж╨╡╨╜╨░ ╨▓ Telegram Stars; null тАФ ╨╜╨╡ ╨╖╨░ Stars
+             * @description Цена в Telegram Stars; null — не за Stars
              */
             price_stars: number | null;
         };
         Texts: {
-            /** @description ╨н╨║╤А╨░╨╜ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨╛╨╣ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨╜╨░ ╨║╨░╨╜╨░╨╗, ╨▓╨╝╨╡╤Б╤В╨╛ ╨╝╨╡╨╜╤О; {brand}: ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡ ╤Б╨╡╤А╨▓╨╕╤Б╨░ */
+            /** @description Экран обязательной подписки на канал, вместо меню; {brand}: название сервиса */
             channel: string;
-            /** @description ╨г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╡: ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░ ╨╖╨░╨║╨╛╨╜╤З╨╕╨╗╨░╤Б╤М */
+            /** @description Уведомление: подписка закончилась */
             expired: string;
-            /** @description ╨г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╡: ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░ ╤Б╨║╨╛╤А╨╛ ╨╖╨░╨║╨╛╨╜╤З╨╕╤В╤Б╤П */
+            /** @description Уведомление: подписка скоро закончится */
             expiring: string;
-            /** @description ╨Э╨░╨┤╨┐╨╕╤Б╤М ╨║╨╜╨╛╨┐╨║╨╕ ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╨╛╨│╨╛ ╤В╨░╤А╨╕╤Д╨░, ╨┤╨╛ 40 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ */
+            /** @description Надпись кнопки бесплатного тарифа, до 40 символов */
             free_button: string;
-            /** @description ╨и╨░╨┐╨║╨░ ╨│╨╗╨░╨▓╨╜╨╛╨│╨╛ ╨╝╨╡╨╜╤О */
+            /** @description Шапка главного меню */
             main: string;
-            /** @description ╨н╨║╤А╨░╨╜ ┬л╨Я╤А╨╛╨┤╨╗╨╕╤В╤М┬╗ */
+            /** @description Экран «Продлить» */
             renew: string;
-            /** @description ╨г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╡: ╨╕╨╖╤А╨░╤Б╤Е╨╛╨┤╨╛╨▓╨░╨╜╨╛ 90% ╤В╤А╨░╤Д╨╕╨║╨░ */
+            /** @description Уведомление: израсходовано 90% трафика */
             traffic_90: string;
-            /** @description ╨г╨▓╨╡╨┤╨╛╨╝╨╗╨╡╨╜╨╕╨╡: ╤В╤А╨░╤Д╨╕╨║ ╨╖╨░╨║╨╛╨╜╤З╨╕╨╗╤Б╤П */
+            /** @description Уведомление: трафик закончился */
             traffic_end: string;
-            /** @description ╨Ф╨╗╤П ╤В╨╡╤Е, ╤Г ╨║╨╛╨│╨╛ ╨╡╤Й╤С ╨╜╨╡╤В ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨▓ ╨▒╨╛╤В╨╡ */
+            /** @description Для тех, у кого ещё нет подписки в боте */
             welcome: string;
         };
         TopUser: {
@@ -5794,36 +5794,36 @@ export interface components {
             at: string;
             /**
              * Format: date-time
-             * @description ╨Ф╨╛ ╨║╨░╨║╨╛╨│╨╛ ╨▓╤А╨╡╨╝╨╡╨╜╨╕ ╨▒╨░╨╜; null тАФ ╨▒╨╡╨╖ ╨▒╨░╨╜╨░
+             * @description До какого времени бан; null — без бана
              */
             banned_until: string | null;
-            /** @description ╨Ъ╤Г╨┤╨░ ╤И╨╗╨╛ ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╡ */
+            /** @description Куда шло соединение */
             dest: string;
             /**
              * Format: int32
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨┐╨╛╨┐╤Л╤В╨╛╨║ ╨╖╨░ ╤А╨░╨╖: ╨╜╨╛╨┤╨░ ╤Б╨╛╨╛╨▒╤Й╨░╨╡╤В ╨╛ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡ ╨╜╨╡ ╤З╨░╤Й╨╡ ╤А╨░╨╖╨░ ╨▓ ╨╝╨╕╨╜╤Г╤В╤Г
+             * @description Сколько попыток за раз: нода сообщает о пользователе не чаще раза в минуту
              */
             hits: number;
             /** Format: int64 */
             id: number;
             inbound: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б, ╤Б ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨░╨╗╤Б╤П ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М */
+            /** @description Адрес, с которого подключался пользователь */
             ip: string;
             /**
-             * @description ╨з╤В╨╛ ╤А╨░╤Б╨┐╨╛╨╖╨╜╨░╨╜╨╛
+             * @description Что распознано
              * @enum {string}
              */
             kind: "handshake" | "tracker" | "dht" | "utp";
             /**
              * Format: date-time
-             * @description ╨Ъ╨╛╨│╨┤╨░ ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А ╤Б╨╜╤П╨╗ ╨▒╨░╨╜
+             * @description Когда администратор снял бан
              */
             lifted_at: string | null;
             /** @enum {string} */
             network: "tcp" | "udp";
             /**
              * Format: int64
-             * @description null тАФ ╨╜╨╛╨┤╨░ ╤Г╨┤╨░╨╗╨╡╨╜╨░
+             * @description null — нода удалена
              */
             node_id: number | null;
             node_name: string;
@@ -5839,12 +5839,12 @@ export interface components {
         TorrentView: {
             /**
              * Format: int64
-             * @description ╨Э╨░ ╤Б╨║╨╛╨╗╤М╨║╨╛ ╨╝╨╕╨╜╤Г╤В ╨┐╨╛╨╣╨╝╨░╨╜╨╜╤Л╨╣ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╤В╨╡╤А╤П╨╡╤В ╨┤╨╛╤Б╤В╤Г╨┐ ╨║╨╛ ╨▓╤Б╨╡╨╝ ╨╜╨╛╨┤╨░╨╝; 0 тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б╨▒╤А╨╛╤Б╨╕╤В╤М ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╡
+             * @description На сколько минут пойманный пользователь теряет доступ ко всем нодам; 0 — только сбросить соединение
              */
             ban_minutes: number;
-            /** @description ╨Э╨╛╨┤╤Л ╤А╨░╤Б╨┐╨╛╨╖╨╜╨░╤О╤В BitTorrent (╤А╤Г╨║╨╛╨┐╨╛╨╢╨░╤В╨╕╨╡, DHT, uTP, ╤В╤А╨╡╨║╨╡╤А╤Л) ╨╕ ╨╜╨╡ ╨┐╤А╨╛╨┐╤Г╤Б╨║╨░╤О╤В ╨╡╨│╨╛. ╨Ч╨░╤И╨╕╤Д╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ ╤В╨╛╤А╤А╨╡╨╜╤В ╨╜╨╡ ╤А╨░╤Б╨┐╨╛╨╖╨╜╨░╤С╤В╤Б╤П */
+            /** @description Ноды распознают BitTorrent (рукопожатие, DHT, uTP, трекеры) и не пропускают его. Зашифрованный торрент не распознаётся */
             enabled: boolean;
-            /** @description ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╕, ╨║╨╛╤В╨╛╤А╤Л╤Е ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╤Й╨╕╨║ ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╤В */
+            /** @description Пользователи, которых блокировщик не трогает */
             exempt: components["schemas"]["TorrentUser"][];
         };
         TotpCodeInputBody: {
@@ -5855,7 +5855,7 @@ export interface components {
             password: string;
         };
         TotpSetupInputBody: {
-            /** @description ╨Я╨░╤А╨╛╨╗╤М: ╨▒╨╡╨╖ ╨╜╨╡╨│╨╛ ╤Г╨║╤А╨░╨┤╨╡╨╜╨╜╨░╤П ╤Б╨╡╤Б╤Б╨╕╤П ╨▓╨║╨╗╤О╤З╨╕╨╗╨░ ╨▒╤Л 2FA ╨╜╨░ ╤Б╨╡╨▒╤П ╨╕ ╨╖╨░╨║╤А╤Л╨╗╨░ ╨▓╤Е╨╛╨┤ ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╤Г */
+            /** @description Пароль: без него украденная сессия включила бы 2FA на себя и закрыла вход владельцу */
             password: string;
         };
         TotpSetupOutputBody: {
@@ -5882,19 +5882,19 @@ export interface components {
         UnbindRules: {
             /**
              * Format: int64
-             * @description ╨Ч╨░ ╤Б╨║╨╛╨╗╤М╨║╨╛ ╨┤╨╜╨╡╨╣ ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П ╨╗╨╕╨╝╨╕╤В (╤Б╨║╨╛╨╗╤М╨╖╤П╤Й╨╡╨╡ ╨╛╨║╨╜╨╛)
+             * @description За сколько дней считается лимит (скользящее окно)
              */
             days: number;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╝╨╛╨╢╨╡╤В ╨╛╤В╨▓╤П╨╖╨░╤В╤М ╨╖╨░ days; 0 тАФ ╨▒╨╡╨╖ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╤П
+             * @description Сколько устройств подписчик может отвязать за days; 0 — без ограничения
              */
             limit: number;
-            /** @description ╨Я╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║ ╨╜╨╡ ╨╛╤В╨▓╤П╨╖╤Л╨▓╨░╨╡╤В ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░ ╤Б╨░╨╝, ╤В╨╛╨╗╤М╨║╨╛ ╨░╨┤╨╝╨╕╨╜ */
+            /** @description Подписчик не отвязывает устройства сам, только админ */
             off?: boolean;
             /**
              * Format: int64
-             * @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤З╨░╤Б╨╛╨▓ ╨╛╤В╨▓╤П╨╖╨░╨╜╨╜╨╛╨╡ ╨┐╨╛╨┤╨┐╨╕╤Б╤З╨╕╨║╨╛╨╝ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨╛ ╨╜╨╡ ╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╕╨▓╤П╨╖╨░╤В╤М╤Б╤П ╤Б╨╜╨╛╨▓╨░; 0 тАФ ╤Б╤А╨░╨╖╤Г, -1 тАФ ╨┐╨╛╨║╨░ ╨░╨┤╨╝╨╕╨╜ ╨╜╨╡ ╤А╨░╨╖╤А╨╡╤И╨╕╤В
+             * @description Сколько часов отвязанное подписчиком устройство не может привязаться снова; 0 — сразу, -1 — пока админ не разрешит
              */
             return_hours: number;
         };
@@ -5908,49 +5908,49 @@ export interface components {
             version: string;
         };
         UpdatesView: {
-            /** @description ╨б╨╡╤А╨▓╨╡╤А ╤Б╨░╨╝ ╤Б╤В╨░╨▓╨╕╤В ╨╜╨╛╨▓╤Л╨╡ ╤А╨╡╨╗╨╕╨╖╤Л ╤А╨░╨╖ ╨▓ ╤Б╤Г╤В╨║╨╕, ╨╜╨╛╤З╤М╤О */
+            /** @description Сервер сам ставит новые релизы раз в сутки, ночью */
             auto: boolean;
-            /** @description ╨Т╤Л╤И╨╗╨░ ╨▓╨╡╤А╤Б╨╕╤П ╨╜╨╛╨▓╨╡╨╡ ╤Н╤В╨╛╨╣ */
+            /** @description Вышла версия новее этой */
             available: boolean;
             /**
-             * @description ╨Ъ╨░╨║╨╕╨╡ ╤А╨╡╨╗╨╕╨╖╤Л ╤Б╤В╨░╨▓╨╕╤В╤М: stable тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤А╨╡╨╗╨╕╨╖╤Л, beta тАФ ╨╕ ╨┐╤А╨╡-╤А╨╡╨╗╨╕╨╖╤Л (vX-rc.N)
+             * @description Какие релизы ставить: stable — только релизы, beta — и пре-релизы (vX-rc.N)
              * @enum {string}
              */
             channel: "stable" | "beta";
             /**
              * Format: int64
-             * @description Unix-╨▓╤А╨╡╨╝╤П ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╣ ╨┐╤А╨╛╨▓╨╡╤А╨║╨╕; 0 тАФ ╨╡╤Й╤С ╨╜╨╡ ╨┐╤А╨╛╨▓╨╡╤А╤П╨╗╨╕
+             * @description Unix-время последней проверки; 0 — ещё не проверяли
              */
             checked_at: number;
             current: string;
-            /** @description ╨Ъ╤Г╨┤╨░ ╨┐╨╛╨┤╨┤╨╡╤А╨╢╨░╤В╤М ╨┐╤А╨╛╨╡╨║╤В ╨▒╨╡╨╖ ╤Ж╨╡╨╗╨╕ */
+            /** @description Куда поддержать проект без цели */
             donate: string;
-            /** @description ╨Я╨╛╤З╨╡╨╝╤Г ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╤П╤П ╨┐╤А╨╛╨▓╨╡╤А╨║╨░ ╨╜╨╡ ╤Г╨┤╨░╨╗╨░╤Б╤М; no_release тАФ ╤А╨╡╨╗╨╕╨╖╨╛╨▓ ╨╡╤Й╤С ╨╜╨╡╤В */
+            /** @description Почему последняя проверка не удалась; no_release — релизов ещё нет */
             error: string;
-            /** @description ╨Э╨░ ╤З╤В╨╛ ╨┐╤А╨╛╨╡╨║╤В ╤Б╨╛╨▒╨╕╤А╨░╨╡╤В ╨┤╨╡╨╜╤М╨│╨╕: ╨╕╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨░╨╜╨╜╨╛╨│╨╛ ╨╕╨╜╨┤╨╡╨║╤Б╨░ ╤А╨╡╨╗╨╕╨╖╨╛╨▓; ╨┐╤Г╤Б╤В╨╛, ╨┐╨╛╨║╨░ ╨┐╤А╨╛╨▓╨╡╤А╨║╨╕ ╨╜╨╡ ╨▒╤Л╨╗╨╛ */
+            /** @description На что проект собирает деньги: из подписанного индекса релизов; пусто, пока проверки не было */
             goals: components["schemas"]["Goal"][];
-            /** @description ╨Ъ╨░╨║ ╨┐╤А╨╛╤И╨╗╨╛ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ */
+            /** @description Как прошло последнее обновление на сервере */
             host?: components["schemas"]["HostStatus"];
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╣ ╤А╨╡╨╗╨╕╨╖; ╨┐╤Г╤Б╤В╨╛, ╨┐╨╛╨║╨░ ╨┐╤А╨╛╨▓╨╡╤А╨║╨╕ ╨╜╨╡ ╨▒╤Л╨╗╨╛ */
+            /** @description Последний релиз; пусто, пока проверки не было */
             latest: string;
-            /** @description ╨Э╨╛╨▓╨╡╨╣╤И╨╕╨╣ ╤А╨╡╨╗╨╕╨╖ ╨║╨░╨╜╨░╨╗╨░, ╨╡╤Б╨╗╨╕ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ ╨╕╨┤╤С╤В ╨║ ╨╜╨╡╨╝╤Г ╤З╨╡╤А╨╡╨╖ latest ╨╕╨╗╨╕ ╨┤╨╛ ╨╜╨╡╨│╨╛ ╨╛╤В╤Б╤О╨┤╨░ ╨╜╨╡ ╨┤╨╛╨▒╤А╨░╤В╤М╤Б╤П; ╨╕╨╜╨░╤З╨╡ ╨┐╤Г╤Б╤В╨╛ */
+            /** @description Новейший релиз канала, если обновление идёт к нему через latest или до него отсюда не добраться; иначе пусто */
             newest: string;
-            /** @description ╨г╨┤╨░╨╗╤С╨╜╨╜╤Л╨╡ ╨╜╨╛╨┤╤Л ╤Б╨╗╨╡╨┤╤Г╤О╤В ╨╖╨░ ╨┐╨░╨╜╨╡╨╗╤М╤О: ╨┐╨╛╤Б╨╗╨╡ ╨╡╤С ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П ╨┐╨░╨╜╨╡╨╗╤М ╨╛╨▒╨╜╨╛╨▓╨╗╤П╨╡╤В ╨╕╤Е ╨┤╨╛ ╤Б╨▓╨╛╨╡╨╣ ╨▓╨╡╤А╤Б╨╕╨╕, ╨┐╨╛ ╨╛╨┤╨╜╨╛╨╣ */
+            /** @description Удалённые ноды следуют за панелью: после её обновления панель обновляет их до своей версии, по одной */
             nodes_follow: boolean;
-            /** @description ╨з╤В╨╛ ╨╕╨╖╨╝╨╡╨╜╨╕╨╗╨╛╤Б╤М: markdown ╨┐╨╛ ╤П╨╖╤Л╨║╨░╨╝, en ╨╕ ru */
+            /** @description Что изменилось: markdown по языкам, en и ru */
             notes: {
                 [key: string]: string;
             };
-            /** @description ╨Ъ╨╛╨│╨┤╨░ ╨▓╤Л╤И╨╡╨╗ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╣ ╤А╨╡╨╗╨╕╨╖, RFC 3339 */
+            /** @description Когда вышел последний релиз, RFC 3339 */
             published: string;
             /**
              * Format: int64
-             * @description ╨Ъ╨╛╨│╨┤╨░ ╨╜╨░╨╢╨░╨╗╨╕ ┬л╨Ю╨▒╨╜╨╛╨▓╨╕╤В╤М┬╗; 0 тАФ ╨╖╨░╤П╨▓╨║╨╕ ╨╜╨╡╤В ╨╕╨╗╨╕ ╤Б╨╡╤А╨▓╨╡╤А ╨╡╤С ╤Г╨╢╨╡ ╨▓╨╖╤П╨╗
+             * @description Когда нажали «Обновить»; 0 — заявки нет или сервер её уже взял
              */
             requested_at: number;
-            /** @description ╨Я╨╛╨║╨░╨╖╤Л╨▓╨░╤В╤М ╤Ж╨╡╨╗╨╕ ╨▓ ╨║╨░╤А╤В╨╛╤З╨║╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╣ */
+            /** @description Показывать цели в карточке обновлений */
             show_goals: boolean;
-            /** @description ╨Т╤Л╤И╨╡╨╗ newest, ╨╜╨╛ ╤Б ╤Н╤В╨╛╨╣ ╨▓╨╡╤А╤Б╨╕╨╕ ╨║ ╨╜╨╡╨╝╤Г ╨╜╨╡ ╨▓╨╡╨┤╤С╤В ╨╜╨╕ ╨╛╨┤╨╜╨╛ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╨╡ */
+            /** @description Вышел newest, но с этой версии к нему не ведёт ни одно обновление */
             unreachable: boolean;
         };
         UserCounts: {
@@ -5968,13 +5968,13 @@ export interface components {
             limited: number;
         };
         UserPoolView: {
-            /** @description ╨Я╤Г╨╗ ╨╖╨░╨║╤А╤Л╤В ╨┤╨╗╤П ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П: ╨╡╨│╨╛ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ ╨╜╨╡╤В ╨▓ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╡, ╨╜╨╛╨┤╤Л ╨╕╤Е ╨╜╨╡ ╨┐╤Г╤Б╨║╨░╤О╤В */
+            /** @description Пул закрыт для пользователя: его подключений нет в подписке, ноды их не пускают */
             excluded: boolean;
-            /** @description ╨Ы╨╕╨╝╨╕╤В ╨┐╤Г╨╗╨░ ╨╕ ╨╡╨│╨╛ ╨┐╨░╨║╨╡╤В╤Л ╨╕╤Б╤З╨╡╤А╨┐╨░╨╜╤Л: ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨┐╤Г╨╗╨░ ╨╜╨╡ ╤А╨░╨▒╨╛╤В╨░╤О╤В ╨┤╨╛ ╤Б╨▒╤А╨╛╤Б╨░ */
+            /** @description Лимит пула и его пакеты исчерпаны: подключения пула не работают до сброса */
             exhausted: boolean;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л, ╨╛╤Б╤В╨░╨▓╤И╨╕╨╡╤Б╤П ╨▓ ╨┐╨░╨║╨╡╤В╨░╤Е ╤В╤А╨░╤Д╨╕╨║╨░ ╨┐╤Г╨╗╨░: ╤В╤А╨░╤В╤П╤В╤Б╤П ╨┐╨╛╤Б╨╗╨╡ ╨╗╨╕╨╝╨╕╤В╨░
+             * @description Байты, оставшиеся в пакетах трафика пула: тратятся после лимита
              */
             extra: number;
             name: string;
@@ -5982,7 +5982,7 @@ export interface components {
             pool_id: number;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л ╨╖╨░ ╨┐╨╡╤А╨╕╨╛╨┤; null тАФ ╨▒╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░
+             * @description Байты за период; null — без лимита
              */
             traffic_limit: number | null;
             /** Format: int64 */
@@ -5996,12 +5996,12 @@ export interface components {
         UserView: {
             /**
              * Format: int64
-             * @description ╨Ф╨╡╨╜╤М ╨╝╨╡╤Б╤П╤Ж╨░, ╨▓ ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨╖╨░╨║╨░╨╜╤З╨╕╨▓╨░╨╡╤В╤Б╤П ╤Б╤А╨╛╨║ (1тАУ31); null тАФ ╨┐╤А╨╛╨┤╨╗╨╡╨╜╨╕╨╡ ╨┤╨╜╤П╨╝╨╕
+             * @description День месяца, в который заканчивается срок (1–31); null — продление днями
              */
             billing_day: number | null;
             /**
              * Format: int64
-             * @description ╨Я╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░: ╤Б ╨┐╤А╨╕╨▓╤П╨╖╨║╨╛╨╣ ╤Н╤В╨╛ ╨╖╨░╨╜╤П╤В╤Л╨╡ ╨╝╨╡╤Б╤В╨░
+             * @description Привязанные устройства: с привязкой это занятые места
              */
             bound_devices: number;
             contact: string;
@@ -6010,7 +6010,7 @@ export interface components {
             /** Format: int64 */
             device_limit: number | null;
             /**
-             * @description ╨Ъ╨░╨║ ╤Б╤З╨╕╤В╨░╨╡╤В╤Б╤П ╨╗╨╕╨╝╨╕╤В ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓: bound: ╨┐╤А╨╕╨▓╤П╨╖╨░╨╜╨╜╤Л╨╡ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓╨░, online: ╨╗╤О╨▒╨╛╨╡ ╤З╨╕╤Б╨╗╨╛ ╤Г╤Б╤В╤А╨╛╨╣╤Б╤В╨▓, ╤Б╤З╨╕╤В╨░╤О╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╛╨╜╨╗╨░╨╣╨╜
+             * @description Как считается лимит устройств: bound: привязанные устройства, online: любое число устройств, считаются только одновременно онлайн
              * @enum {string}
              */
             device_mode: "bound" | "online";
@@ -6018,16 +6018,16 @@ export interface components {
             expires_at: string | null;
             /**
              * Format: int64
-             * @description ╨Я╨░╨┐╨║╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П; null тАФ ╨▓╨╜╨╡ ╨┐╨░╨┐╨╛╨║
+             * @description Папка пользователя; null — вне папок
              */
             folder_id: number | null;
-            /** @description ╨б╨║╤А╤Л╤В ╨╕╨╖ ╤Б╨┐╨╕╤Б╨║╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╨╡╨╣. ╨в╨╛╨╗╤М╨║╨╛ ╨┐╤А╤П╤З╨╡╤В ╤Б╤В╤А╨╛╨║╤Г: ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨░, ╨╛╨┐╨╗╨░╤В╨░ ╨╕ ╨╜╨╛╨┤╤Л ╤А╨░╨▒╨╛╤В╨░╤О╤В ╨║╨░╨║ ╤Г ╨▓╤Б╨╡╤Е, ╤Б╤З╤С╤В╤З╨╕╨║╨╕ ╨╛╨▒╨╖╨╛╤А╨░ ╨╜╨╡ ╨╝╨╡╨╜╤П╤О╤В╤Б╤П */
+            /** @description Скрыт из списка пользователей. Только прячет строку: подписка, оплата и ноды работают как у всех, счётчики обзора не меняются */
             hidden: boolean;
             /** Format: int64 */
             id: number;
-            /** @description ╨а╨░╨╖╤А╨╡╤И╤С╨╜╨╜╤Л╨╡ ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П; ╨┐╤Г╤Б╤В╨╛ тАФ ╨▓╤Б╨╡ */
+            /** @description Разрешённые подключения; пусто — все */
             inbounds: number[];
-            /** @description ╨б╤В╨░╤А╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨║╨╕ ╨╕╨╖ ╨┐╨░╨╜╨╡╨╗╨╕, ╨╛╤В╨║╤Г╨┤╨░ ╨╕╨╝╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╜ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М. ╨в╨╛╨╗╤М╨║╨╛ ╨▓ ╨║╨░╤А╤В╨╛╤З╨║╨╡ ╨╕ ╨╜╨╡ ╨┤╨╗╤П ╨║╨╗╤О╤З╨░ ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨░ ╤З╤В╨╡╨╜╨╕╨╡: ╤Н╤В╨╛ ╤В╨╛╨╢╨╡ ╤Б╤Б╤Л╨╗╨║╨░ */
+            /** @description Старые ссылки подписки из панели, откуда импортирован пользователь. Только в карточке и не для ключа только на чтение: это тоже ссылка */
             legacy?: components["schemas"]["LegacyLinks"];
             name: string;
             note: string;
@@ -6036,20 +6036,20 @@ export interface components {
             online_at: string | null;
             online_ips: string[];
             /**
-             * @description month_start тАФ ╤А╨░╨╖ ╨▓ ╨╝╨╡╤Б╤П╤Ж: ╨▓ ╨┤╨╡╨╜╤М ╨╛╨┐╨╗╨░╤В╤Л, ╨▒╨╡╨╖ ╨╜╨╡╨│╨╛ 1-╨│╨╛ ╤З╨╕╤Б╨╗╨░
+             * @description month_start — раз в месяц: в день оплаты, без него 1-го числа
              * @enum {string}
              */
             reset_strategy: "none" | "month_start" | "period";
             /** Format: date-time */
             resets_at: string | null;
             /**
-             * @description ╨Ю╤В╨║╤Г╨┤╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М: admin тАФ ╤Б╨╛╨╖╨┤╨░╨╜ ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╕╨╗╨╕ ╨┐╨╛ ╨║╨╗╤О╤З╤Г API, bot тАФ ╨║╤Г╨┐╨╗╨╡╨╜ ╨▓ ╨▒╨╛╤В╨╡, trial тАФ ╨┐╤А╨╛╨▒╨╜╤Л╨╣ ╨┐╨╡╤А╨╕╨╛╨┤ ╨▒╨╛╤В╨░, free тАФ ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╤Л╨╣ ╤В╨░╤А╨╕╤Д ╨╕╨╖ ╨▒╨╛╤В╨░ ╨╕╨╗╨╕ Mini App, import тАФ ╨┐╨╡╤А╨╡╨╜╨╡╤Б╤С╨╜ ╨╕╨╖ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╨░╨╜╨╡╨╗╨╕. ╨Ч╨░╨┐╨╛╨╗╨╜╤П╨╡╤В╤Б╤П ╨┐╤А╨╕ ╤Б╨╛╨╖╨┤╨░╨╜╨╕╨╕, ╨╜╨╡ ╨╝╨╡╨╜╤П╨╡╤В╤Б╤П
+             * @description Откуда пользователь: admin — создан в панели или по ключу API, bot — куплен в боте, trial — пробный период бота, free — бесплатный тариф из бота или Mini App, import — перенесён из другой панели. Заполняется при создании, не меняется
              * @enum {string}
              */
             source: "admin" | "bot" | "trial" | "free" | "import";
             /**
              * Format: int64
-             * @description ╨Ь╨▒╨╕╤В/╤Б ╨▓ ╨║╨░╨╢╨┤╤Г╤О ╤Б╤В╨╛╤А╨╛╨╜╤Г; null тАФ ╨▒╨╡╨╖ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╤П
+             * @description Мбит/с в каждую сторону; null — без ограничения
              */
             speed_limit: number | null;
             /** @enum {string} */
@@ -6058,11 +6058,11 @@ export interface components {
             tags: string[];
             /** Format: int64 */
             tariff_id: number | null;
-            /** @description ╨в╨╛╨╗╤М╨║╨╛ ╨▓ ╨║╨░╤А╤В╨╛╤З╨║╨╡ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+            /** @description Только в карточке пользователя */
             telegram?: components["schemas"]["TelegramLink"];
             /**
              * Format: date-time
-             * @description ╨Ф╨╛ ╨║╨░╨║╨╛╨│╨╛ ╨▓╤А╨╡╨╝╨╡╨╜╨╕ ╨┤╨╡╨╣╤Б╤В╨▓╤Г╨╡╤В ╨▒╨░╨╜ ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╤Й╨╕╨║╨░ ╤В╨╛╤А╤А╨╡╨╜╤В╨╛╨▓; null тАФ ╨▒╨░╨╜╨░ ╨╜╨╡╤В
+             * @description До какого времени действует бан блокировщика торрентов; null — бана нет
              */
             torrent_ban: string | null;
             /** Format: int64 */
@@ -6071,12 +6071,12 @@ export interface components {
             total_up: number;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л, ╨╛╤Б╤В╨░╨▓╤И╨╕╨╡╤Б╤П ╨▓ ╨┐╨░╨║╨╡╤В╨░╤Е ╤В╤А╨░╤Д╨╕╨║╨░ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨│╨╛ ╨╗╨╕╨╝╨╕╤В╨░: ╤В╤А╨░╤В╤П╤В╤Б╤П ╨┐╨╛╤Б╨╗╨╡ ╨╗╨╕╨╝╨╕╤В╨░ ╤В╨░╤А╨╕╤Д╨░
+             * @description Байты, оставшиеся в пакетах трафика основного лимита: тратятся после лимита тарифа
              */
             traffic_extra: number;
             /**
              * Format: int64
-             * @description ╨С╨░╨╣╤В╤Л ╨╖╨░ ╨┐╨╡╤А╨╕╨╛╨┤; null тАФ ╨▒╨╡╨╖ ╨╗╨╕╨╝╨╕╤В╨░
+             * @description Байты за период; null — без лимита
              */
             traffic_limit: number | null;
             /** Format: int64 */
@@ -6085,9 +6085,9 @@ export interface components {
             used_up: number;
         };
         UsernameInputBody: {
-            /** @description ╨в╨╡╨║╤Г╤Й╨╕╨╣ ╨┐╨░╤А╨╛╨╗╤М: ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨░╨╡╤В ╤Б╨╝╨╡╨╜╤Г ╨╗╨╛╨│╨╕╨╜╨░ */
+            /** @description Текущий пароль: подтверждает смену логина */
             password: string;
-            /** @description ╨Э╨╛╨▓╤Л╨╣ ╨╗╨╛╨│╨╕╨╜: 3тАУ32 ╤Б╨╕╨╝╨▓╨╛╨╗╨░ ╨╕╨╖ a-z, 0-9, ╤В╨╛╤З╨╡╨║, ╨┤╨╡╤Д╨╕╤Б╨╛╨▓ ╨╕ ╨┐╨╛╨┤╤З╤С╤А╨║╨╕╨▓╨░╨╜╨╕╨╣ */
+            /** @description Новый логин: 3–32 символа из a-z, 0-9, точек, дефисов и подчёркиваний */
             username: string;
         };
         ValidateInboundInputBody: {
@@ -6104,114 +6104,114 @@ export interface components {
             /** Format: date-time */
             checked_at: string;
             colo?: string;
-            /** @description ╨Я╤А╨╕╤З╨╕╨╜╨░ ╤Б╨╗╨╛╨▓╨░╨╝╨╕, ╨▒╨╡╨╖ ╤Б╨╡╨║╤А╨╡╤В╨╛╨▓; ╨╜╨░ ╨░╨╜╨│╨╗╨╕╨╣╤Б╨║╨╛╨╝ */
+            /** @description Причина словами, без секретов; на английском */
             detail?: string;
-            /** @description ╨Я╤А╨╕╤З╨╕╨╜╨░: timeout | dns | tls | refused | not_loaded | bad_answer | https_timeout | failed; node_unreachable тАФ ╨╜╨╛╨┤╨░ ╨╜╨╡ ╨╛╤В╨▓╨╡╤В╨╕╨╗╨░ ╨┐╨░╨╜╨╡╨╗╨╕; unreachable тАФ ╤Б╤В╨░╤А╨░╤П ╨╜╨╛╨┤╨░ */
+            /** @description Причина: timeout | dns | tls | refused | not_loaded | bad_answer | https_timeout | failed; node_unreachable — нода не ответила панели; unreachable — старая нода */
             error?: string;
-            /** @description ╨Р╨┤╤А╨╡╤Б, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨▓╨╕╨┤╤П╤В ╤Б╨░╨╣╤В╤Л */
+            /** @description Адрес, который видят сайты */
             ip?: string;
             ok: boolean;
-            /** @description on | plus | off тАФ ╨║╨░╨║ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В Cloudflare */
+            /** @description on | plus | off — как отвечает Cloudflare */
             warp?: string;
         };
         WarpImportInputBody: {
-            /** @description WireGuard-╨║╨╛╨╜╤Д╨╕╨│ WARP: wgcf, warp-plus ╨╕╨╗╨╕ ╤Н╨║╤Б╨┐╨╛╤А╤В ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╤П */
+            /** @description WireGuard-конфиг WARP: wgcf, warp-plus или экспорт приложения */
             config: string;
         };
         WarpPatchInputBody: {
             enabled?: boolean;
-            /** @description ╨Ъ╨╗╤О╤З WARP+ ╨┤╨╗╤П ╨╖╨░╤А╨╡╨│╨╕╤Б╤В╤А╨╕╤А╨╛╨▓╨░╨╜╨╜╨╛╨│╨╛ ╨░╨║╨║╨░╤Г╨╜╤В╨░ */
+            /** @description Ключ WARP+ для зарегистрированного аккаунта */
             license?: string;
-            /** @description ╨Ф╨╛╨╝╨╡╨╜╤Л (example.com тАФ ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б ╨┐╨╛╨┤╨┤╨╛╨╝╨╡╨╜╨░╨╝╨╕) ╨╕ ╤Б╨╡╤В╨╕ (104.16.0.0/13) */
+            /** @description Домены (example.com — вместе с поддоменами) и сети (104.16.0.0/13) */
             routes?: string[];
         };
         WarpRegisterInputBody: {
-            /** @description ╨Ъ╨╗╤О╤З WARP+ (╨╜╨╡╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╨╛) */
+            /** @description Ключ WARP+ (необязательно) */
             license?: string;
         };
         WarpView: {
             configured: boolean;
             enabled: boolean;
             endpoint?: string;
-            /** @description ╨Я╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╤П ╨╜╨╛╨┤╤Л, ╤Г ╨║╨╛╤В╨╛╤А╤Л╤Е ╨▓╨╡╤Б╤М ╤В╤А╨░╤Д╨╕╨║ ╨╕╨┤╤С╤В ╤З╨╡╤А╨╡╨╖ WARP */
+            /** @description Подключения ноды, у которых весь трафик идёт через WARP */
             inbounds: string[];
             ipv4?: string;
             ipv6?: string;
-            /** @description ╨б╨▓╨╛╨╣ ╨║╨╛╨╜╤Д╨╕╨│ ╨▒╨╡╨╖ Reserved: ╨╜╨░ ╤З╨░╤Б╤В╨╕ endpoint'╨╛╨▓ Cloudflare ╨╝╨╛╨╗╤З╨░ ╨╜╨╡ ╨╛╤В╨▓╨╡╤З╨░╨╡╤В ╨╜╨░ handshake */
+            /** @description Свой конфиг без Reserved: на части endpoint'ов Cloudflare молча не отвечает на handshake */
             no_reserved?: boolean;
-            /** @description ╨Р╨║╨║╨░╤Г╨╜╤В WARP+ */
+            /** @description Аккаунт WARP+ */
             plus: boolean;
-            /** @description ╨Ф╨╛╨╝╨╡╨╜╤Л ╨╕ ╤Б╨╡╤В╨╕, ╨║╨╛╤В╨╛╤А╤Л╨╡ ╨╕╨┤╤Г╤В ╤З╨╡╤А╨╡╨╖ WARP ╤Г ╨▓╤Б╨╡╤Е ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╕╨╣ ╨╜╨╛╨┤╤Л */
+            /** @description Домены и сети, которые идут через WARP у всех подключений ноды */
             routes: string[];
             /** @enum {string} */
             source?: "register" | "import" | "";
-            /** @description ╨Я╨╛╤Б╨╗╨╡╨┤╨╜╤П╤П ╨┐╤А╨╛╨▓╨╡╤А╨║╨░ ╨▓╤Л╤Е╨╛╨┤╨░ ╤З╨╡╤А╨╡╨╖ WARP ╤Б ╨╜╨╛╨┤╤Л; ╨╜╨╡╤В тАФ ╤Г ╨╜╨╛╨┤╤Л ╨╡╤Й╤С ╨╜╨╡╤В ╨╜╨░╤Б╤В╤А╨╛╨╡╨╜╨╜╨╛╨│╨╛ WARP */
+            /** @description Последняя проверка выхода через WARP с ноды; нет — у ноды ещё нет настроенного WARP */
             status?: components["schemas"]["WarpCheck"];
         };
         XHTTPTuning: {
             /**
-             * @description ╨а╨╡╨╢╨╕╨╝ XHTTP; ╨┐╤Г╤Б╤В╨╛ тАФ ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О
+             * @description Режим XHTTP; пусто — по умолчанию
              * @enum {string}
              */
             mode?: "" | "stream-one" | "stream-up" | "packet-up";
-            /** @description ╨Э╨╡ ╤Б╨╗╨░╤В╤М Content-Type: text/event-stream ╨▓ ╨╛╤В╨▓╨╡╤В╨░╤Е */
+            /** @description Не слать Content-Type: text/event-stream в ответах */
             no_sse_header?: boolean;
-            /** @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╨╖╨░╨┐╤А╨╛╤Б╨╛╨▓ ╨╛╤В╨┐╤А╨░╨▓╨║╨╕ ╤Б╨╡╤А╨▓╨╡╤А ╨┤╨╡╤А╨╢╨╕╤В ╨▓ ╨╛╤З╨╡╤А╨╡╨┤╨╕ (packet-up): ╤З╨╕╤Б╨╗╨╛ ╨╛╤В 1 */
+            /** @description Сколько запросов отправки сервер держит в очереди (packet-up): число от 1 */
             sc_max_buffered_posts?: string;
-            /** @description ╨Э╨░╨╕╨▒╨╛╨╗╤М╤И╨╕╨╣ ╨╖╨░╨┐╤А╨╛╤Б ╨╛╤В╨┐╤А╨░╨▓╨║╨╕ (packet-up), ╨▒╨░╨╣╤В: ╤З╨╕╤Б╨╗╨╛ ╨╕╨╗╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜ */
+            /** @description Наибольший запрос отправки (packet-up), байт: число или диапазон */
             sc_max_each_post_bytes?: string;
-            /** @description ╨Я╨░╤Г╨╖╨░ ╨╝╨╡╨╢╨┤╤Г ╨╖╨░╨┐╤А╨╛╤Б╨░╨╝╨╕ ╨╛╤В╨┐╤А╨░╨▓╨║╨╕ (packet-up), ╨╝╤Б */
+            /** @description Пауза между запросами отправки (packet-up), мс */
             sc_min_posts_interval_ms?: string;
-            /** @description ╨Ъ╨░╨║ ╤З╨░╤Б╤В╨╛ ╤Б╨╡╤А╨▓╨╡╤А ╤И╨╗╤С╤В ╨┐╨░╨┤╨┤╨╕╨╜╨│ ╨▓ stream-up, ╤Б╨╡╨║╤Г╨╜╨┤: ╤З╨╕╤Б╨╗╨╛ ╨╕╨╗╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜; 0 тАФ ╨╜╨╡ ╤Б╨╗╨░╤В╤М */
+            /** @description Как часто сервер шлёт паддинг в stream-up, секунд: число или диапазон; 0 — не слать */
             sc_stream_up_server_secs?: string;
-            /** @description ╨Ш╨╝╤П ╨┐╨░╤А╨░╨╝╨╡╤В╤А╨░ ╨╜╨╛╨╝╨╡╤А╨░ ╨╖╨░╨┐╤А╨╛╤Б╨░ (╨╜╨╡ ╨┤╨╗╤П path) */
+            /** @description Имя параметра номера запроса (не для path) */
             seq_key?: string;
             /**
-             * @description ╨У╨┤╨╡ ╨╡╨┤╨╡╤В ╨╜╨╛╨╝╨╡╤А ╨╖╨░╨┐╤А╨╛╤Б╨░ (packet-up); ╨┐╤Г╤Б╤В╨╛ тАФ path
+             * @description Где едет номер запроса (packet-up); пусто — path
              * @enum {string}
              */
             seq_placement?: "" | "path" | "query" | "header" | "cookie";
-            /** @description ╨Ш╨╝╤П ╨┐╨░╤А╨░╨╝╨╡╤В╤А╨░ ╤Б╨╡╤Б╤Б╨╕╨╕ (╨╜╨╡ ╨┤╨╗╤П path) */
+            /** @description Имя параметра сессии (не для path) */
             session_key?: string;
-            /** @description ╨Ф╨╗╨╕╨╜╨░ ╨╜╨╛╨╝╨╡╤А╨░ ╤Б╨╡╤Б╤Б╨╕╨╕: ╤З╨╕╤Б╨╗╨╛ ╨╕╨╗╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜; ╤Б ╨╜╨░╨▒╨╛╤А╨╛╨╝ ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О 16-32 */
+            /** @description Длина номера сессии: число или диапазон; с набором по умолчанию 16-32 */
             session_length?: string;
             /**
-             * @description ╨У╨┤╨╡ ╨╡╨┤╨╡╤В ╨╜╨╛╨╝╨╡╤А ╤Б╨╡╤Б╤Б╨╕╨╕; ╨┐╤Г╤Б╤В╨╛ тАФ path
+             * @description Где едет номер сессии; пусто — path
              * @enum {string}
              */
             session_placement?: "" | "path" | "query" | "header" | "cookie";
-            /** @description ╨Ш╨╖ ╨║╨░╨║╨╕╤Е ASCII-╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╡ ╤Б╨╛╤Б╤В╨░╨▓╨╗╤П╨╡╤В ╨╜╨╛╨╝╨╡╤А ╤Б╨╡╤Б╤Б╨╕╨╕: ╤Б╨▓╨╛╨╣ ╨╜╨░╨▒╨╛╤А ╨╕╨╗╨╕ ╨╕╨╝╤П hex, base36, Base62, number, alphabet, Alphabet */
+            /** @description Из каких ASCII-символов приложение составляет номер сессии: свой набор или имя hex, base36, Base62, number, alphabet, Alphabet */
             session_table?: string;
-            /** @description ╨а╨░╨╖╨╝╨╡╤А ╨║╤Г╤Б╨║╨░ ╨╛╤В╨┐╤А╨░╨▓╨║╨╕, ╨▒╨░╨╣╤В: ╤З╨╕╤Б╨╗╨╛ ╨╕╨╗╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜ */
+            /** @description Размер куска отправки, байт: число или диапазон */
             uplink_chunk_size?: string;
-            /** @description ╨Ш╨╝╤П ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨░ ╨╕╨╗╨╕ cookie ╤Б ╨┤╨░╨╜╨╜╤Л╨╝╨╕: ╨╜╤Г╨╢╨╜╨╛ ╨┤╨╗╤П header ╨╕ cookie */
+            /** @description Имя заголовка или cookie с данными: нужно для header и cookie */
             uplink_data_key?: string;
             /**
-             * @description ╨У╨┤╨╡ ╨╡╨┤╤Г╤В ╨┤╨░╨╜╨╜╤Л╨╡ ╨╛╤В╨┐╤А╨░╨▓╨║╨╕ (packet-up); header ╨╕ cookie ╤В╨╛╨╗╤М╨║╨╛ ╨▓ ╤А╨╡╨╢╨╕╨╝╨╡ packet-up
+             * @description Где едут данные отправки (packet-up); header и cookie только в режиме packet-up
              * @enum {string}
              */
             uplink_data_placement?: "" | "body" | "header" | "cookie" | "auto";
             /** @enum {string} */
             uplink_http_method?: "" | "POST" | "PUT" | "PATCH";
-            /** @description ╨а╨░╨╖╨╝╨╡╤А ╨┐╨░╨┤╨┤╨╕╨╜╨│╨░, ╨▒╨░╨╣╤В: ╤З╨╕╤Б╨╗╨╛ ╨╕╨╗╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜ ┬л100-1000┬╗ */
+            /** @description Размер паддинга, байт: число или диапазон «100-1000» */
             x_padding_bytes?: string;
             x_padding_header?: string;
             x_padding_key?: string;
             /** @enum {string} */
             x_padding_method?: "" | "repeat-x" | "tokenish";
-            /** @description ╨Я╨░╨┤╨┤╨╕╨╜╨│ ╨▓ ╤Б╨▓╨╛╤С╨╝ ╨╝╨╡╤Б╤В╨╡ ╨▓╨╝╨╡╤Б╤В╨╛ Referer: ╨╜╤Г╨╢╨╡╨╜ ╤Б╨▓╨╡╨╢╨╕╨╣ Xray ╨╕╨╗╨╕ mihomo 1.19.31+ ╤Г ╨║╨╗╨╕╨╡╨╜╤В╨╛╨▓ */
+            /** @description Паддинг в своём месте вместо Referer: нужен свежий Xray или mihomo 1.19.31+ у клиентов */
             x_padding_obfs_mode?: boolean;
             /** @enum {string} */
             x_padding_placement?: "" | "queryInHeader" | "header" | "cookie" | "query";
-            /** @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤А╨░╨╖ ╨┐╨╡╤А╨╡╨╕╤Б╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╤М ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╡ */
+            /** @description Сколько раз переиспользовать соединение */
             xmux_c_max_reuse_times?: string;
-            /** @description ╨Ч╨░╨┐╤А╨╛╤Б╨╛╨▓ ╨╜╨░ ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╡ HTTP/2 */
+            /** @description Запросов на соединение HTTP/2 */
             xmux_h_max_request_times?: string;
-            /** @description ╨б╨║╨╛╨╗╤М╨║╨╛ ╤Б╨╡╨║╤Г╨╜╨┤ ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╡ ╨╢╨╕╨▓╤С╤В */
+            /** @description Сколько секунд соединение живёт */
             xmux_h_max_reusable_secs?: string;
-            /** @description ╨Я╨╛╤В╨╛╨║╨╛╨▓ ╨╜╨░ ╤Б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╡: ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜ ┬л16-32┬╗ */
+            /** @description Потоков на соединение: диапазон «16-32» */
             xmux_max_concurrency?: string;
-            /** @description ╨б╨╛╨╡╨┤╨╕╨╜╨╡╨╜╨╕╨╣ ╤Б╤А╨░╨╖╤Г; ╨▓╨╖╨░╨╕╨╝╨╛╨╕╤Б╨║╨╗╤О╤З╨░╨╡╤В╤Б╤П ╤Б ╨┐╨╛╤В╨╛╨║╨░╨╝╨╕ */
+            /** @description Соединений сразу; взаимоисключается с потоками */
             xmux_max_connections?: string;
         };
     };
@@ -6319,7 +6319,7 @@ export interface operations {
     "refresh-addon-source": {
         parameters: {
             query?: {
-                /** @description ╨Ю╤В╨┐╨╡╤З╨░╤В╨╛╨║ ╨╜╨╛╨▓╨╛╨│╨╛ ╨║╨╗╤О╤З╨░, ╨║╨╛╤В╨╛╤А╤Л╨╣ ╨░╨┤╨╝╨╕╨╜ ╤Б╨▓╨╡╤А╨╕╨╗ ╤Б ╨░╨▓╤В╨╛╤А╨╛╨╝ (╨┐╨╛╤Б╨╗╨╡ source_key_changed) */
+                /** @description Отпечаток нового ключа, который админ сверил с автором (после source_key_changed) */
                 accept?: string;
             };
             header?: never;
@@ -6698,7 +6698,7 @@ export interface operations {
     "list-audit": {
         parameters: {
             query?: {
-                /** @description ╨Ч╨░╨┐╨╕╤Б╨╕ ╨┤╨╛ ╤Н╤В╨╛╨│╨╛ ╨╜╨╛╨╝╨╡╤А╨░; 0 тАФ ╤Б╨░╨╝╤Л╨╡ ╨╜╨╛╨▓╤Л╨╡ */
+                /** @description Записи до этого номера; 0 — самые новые */
                 before?: number;
                 limit?: number;
             };
@@ -6731,7 +6731,9 @@ export interface operations {
     "get-external-auth-settings": {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                Host?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -6796,9 +6798,12 @@ export interface operations {
                 code?: string;
                 state?: string;
                 error?: string;
+                /** @description RFC 9207 authorization server issuer */
+                iss?: string;
             };
             header?: {
                 Cookie?: string;
+                Host?: string;
             };
             path?: never;
             cookie?: never;
@@ -6833,6 +6838,7 @@ export interface operations {
             };
             header?: {
                 Cookie?: string;
+                Host?: string;
             };
             path?: never;
             cookie?: never;
@@ -8173,7 +8179,7 @@ export interface operations {
     "scan-targets": {
         parameters: {
             query?: {
-                /** @description ╨Э╨╛╨┤╨░, ╤А╤П╨┤╨╛╨╝ ╤Б ╨║╨╛╤В╨╛╤А╨╛╨╣ ╨╕╤Б╨║╨░╤В╤М */
+                /** @description Нода, рядом с которой искать */
                 node_id?: number;
             };
             header?: never;
@@ -8460,7 +8466,7 @@ export interface operations {
     "node-health": {
         parameters: {
             query?: {
-                /** @description ╨Э╨╛╨┤╨░; 1 тАФ ╤Б╨▓╨╛╤П ╨╜╨╛╨┤╨░ ╨┐╨░╨╜╨╡╨╗╨╕ */
+                /** @description Нода; 1 — своя нода панели */
                 id?: number;
             };
             header?: never;
@@ -9260,7 +9266,7 @@ export interface operations {
     "get-node-warp": {
         parameters: {
             query?: {
-                /** @description ╨Я╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╨╖╨░╨╜╨╛╨▓╨╛, ╨╜╨╡ ╨▒╨╡╤А╤П ╨╛╤В╨▓╨╡╤В ╨╜╨╛╨┤╤Л ╨╕╨╖ ╨║╨╡╤И╨░ (╨╜╨╡ ╤З╨░╤Й╨╡ ╤А╨░╨╖╨░ ╨▓ 5 ╤Б╨╡╨║╤Г╨╜╨┤) */
+                /** @description Проверить заново, не беря ответ ноды из кеша (не чаще раза в 5 секунд) */
                 force?: boolean;
             };
             header?: never;
@@ -9557,7 +9563,7 @@ export interface operations {
                 status?: "pending" | "paid" | "applied" | "expired" | "failed" | "refunded" | "";
                 provider?: string;
                 user_id?: number;
-                /** @description id ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╡╨│╨╛ ╨┐╨╗╨░╤В╨╡╨╢╨░ ╨┐╤А╨╡╨┤╤Л╨┤╤Г╤Й╨╡╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л */
+                /** @description id последнего платежа предыдущей страницы */
                 before?: number;
                 limit?: number;
             };
@@ -10863,7 +10869,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description PNG, JPEG ╨╕╨╗╨╕ WebP */
+            /** @description PNG, JPEG или WebP */
             200: {
                 headers: {
                     "Cache-Control"?: string;
@@ -11573,9 +11579,9 @@ export interface operations {
     "list-torrent-hits": {
         parameters: {
             query?: {
-                /** @description ╨в╨╛╨╗╤М╨║╨╛ ╤Н╤В╨╛╨│╨╛ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+                /** @description Только этого пользователя */
                 user_id?: number;
-                /** @description ╨б╤В╤А╨░╨╜╨╕╤Ж╨░: ╨╖╨░╨┐╨╕╤Б╨╕ ╤Б id ╨╝╨╡╨╜╤М╤И╨╡ ╤Н╤В╨╛╨│╨╛ */
+                /** @description Страница: записи с id меньше этого */
                 before?: number;
                 limit?: number;
             };
@@ -11728,14 +11734,14 @@ export interface operations {
     "list-users": {
         parameters: {
             query?: {
-                /** @description attention тАФ ╨╕╤Б╤З╨╡╤А╨┐╨░╨╜ ╨╗╨╕╨╝╨╕╤В, ╨╕╤Б╤В╨╡╨║╨░╤О╤В ╨╕ ╨╕╤Б╤В╨╡╨║╨╗╨╕, ╨▓ ╤Н╤В╨╛╨╝ ╨┐╨╛╤А╤П╨┤╨║╨╡: ╨╛╨┤╨╜╨╕╨╝ ╨╖╨░╨┐╤А╨╛╤Б╨╛╨╝ ╨┤╨╗╤П ╨╛╨▒╨╖╨╛╤А╨░ */
+                /** @description attention — исчерпан лимит, истекают и истекли, в этом порядке: одним запросом для обзора */
                 state?: "all" | "active" | "expiring" | "limited" | "expired" | "disabled" | "attention";
                 q?: string;
-                /** @description all тАФ ╨╗╤О╨▒╨░╤П; none тАФ ╨▓╨╜╨╡ ╨┐╨░╨┐╨╛╨║; ╤З╨╕╤Б╨╗╨╛ тАФ id ╨┐╨░╨┐╨║╨╕ */
+                /** @description all — любая; none — вне папок; число — id папки */
                 folder?: string;
-                /** @description ╨Ю╤В╨║╤Г╨┤╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М, ╤Б╨╝. source ╤Г ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П */
+                /** @description Откуда пользователь, см. source у пользователя */
                 source?: "all" | "admin" | "bot" | "trial" | "free" | "import";
-                /** @description show тАФ ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б╨╛ ╤Б╨║╤А╤Л╤В╤Л╨╝╨╕ (╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О: ╤Б╨║╤А╤Л╤В╨╕╨╡ ╨║╨░╤Б╨░╨╡╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╤Б╨┐╨╕╤Б╨║╨░ ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕); hide тАФ ╨▒╨╡╨╖ ╤Б╨║╤А╤Л╤В╤Л╤Е; only тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б╨║╤А╤Л╤В╤Л╨╡ */
+                /** @description show — вместе со скрытыми (по умолчанию: скрытие касается только списка в панели); hide — без скрытых; only — только скрытые */
                 hidden?: "hide" | "show" | "only";
                 limit?: number;
                 offset?: number;

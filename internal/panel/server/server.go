@@ -142,6 +142,8 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request, admin bool) {
 		r2.URL.Path = p[len(paths.Legacy)+1:]
 		r2.URL.RawPath = ""
 		s.legacy.ServeHTTP(w, r2)
+	case admin && (p == "/api/v1/auth/github/callback" || p == "/api/v1/auth/github/start"):
+		s.admin.ServeHTTP(w, r)
 	case s.hello != nil && s.hello(w, r):
 	default:
 		s.other(w, r)

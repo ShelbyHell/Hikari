@@ -68,4 +68,17 @@ func TestSubDomainRoutes(t *testing.T) {
 	if code, body := get("panel.example.com", "/admin-path/"); code != http.StatusOK || body != "admin" {
 		t.Fatalf("admin on panel domain when sni_domain matches panel: %d %q", code, body)
 	}
+
+	// 7. GitHub OAuth routes bypass secret admin path on panel domain
+	if code, body := get("panel.example.com", "/api/v1/auth/github/callback?code=abc&state=123"); code != http.StatusOK || body != "admin" {
+		t.Fatalf("github callback on panel domain: want 200, got %d %q", code, body)
+	}
+	if code, body := get("panel.example.com", "/api/v1/auth/github/start"); code != http.StatusOK || body != "admin" {
+		t.Fatalf("github start on panel domain: want 200, got %d %q", code, body)
+	}
+
+	// 8. GitHub OAuth routes blocked on sub_domain
+	if code, _ := get("sub.example.com", "/api/v1/auth/github/callback"); code != http.StatusNotFound {
+		t.Fatalf("github callback on sub_domain: want 404, got %d", code)
+	}
 }

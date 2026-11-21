@@ -87,3 +87,14 @@ func TestGitHubAuthorizeURLFormat(t *testing.T) {
 		t.Errorf("wrong redirect_uri: %s", q.Get("redirect_uri"))
 	}
 }
+
+func TestGitHubBindStatePrefix(t *testing.T) {
+	state := "random_token"
+	bindState := "bind:" + state
+	if !strings.HasPrefix(bindState, "bind:") {
+		t.Fatalf("expected bindState to have prefix 'bind:'")
+	}
+	if strings.TrimPrefix(bindState, "bind:") != state {
+		t.Fatalf("expected trimmed state to be %s", state)
+	}
+}

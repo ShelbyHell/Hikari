@@ -23,9 +23,10 @@ import (
 )
 
 type ghOAuthState struct {
-	ExpiresAt time.Time
-	IsBind    bool
-	AdminID   int64
+	ExpiresAt   time.Time
+	IsBind      bool
+	AdminID     int64
+	RedirectURI string
 }
 
 type AuthProvidersView struct {
@@ -150,10 +151,15 @@ type telegramBindCheckOutput struct {
 	Body TelegramBindCheckBody
 }
 
+type externalAuthSettingsInput struct {
+	Host string `header:"Host"`
+}
+
 type githubStartInput struct {
 	Next   string `query:"next" maxLength:"256"`
 	Bind   bool   `query:"bind"`
 	Cookie string `header:"Cookie"`
+	Host   string `header:"Host"`
 }
 
 type githubStartOutput struct {
@@ -165,7 +171,9 @@ type githubCallbackInput struct {
 	Code   string `query:"code"`
 	State  string `query:"state"`
 	Error  string `query:"error"`
+	Iss    string `query:"iss" doc:"RFC 9207 authorization server issuer"`
 	Cookie string `header:"Cookie"`
+	Host   string `header:"Host"`
 }
 
 type githubCallbackOutput struct {
@@ -313,7 +321,7 @@ func (h *handlers) authProviders(ctx context.Context, _ *struct{}) (*authProvide
 	}, nil
 }
 
-func (h *handlers) getExternalAuthSettings(ctx context.Context, _ *struct{}) (*externalAuthSettingsOutput, error) {
+func (h *handlers) getExternalAuthSettings(ctx context.Context, in *externalAuthSettingsInput) (*externalAuthSettingsOutput, error) {
 	tgEnabled, _, _ := settings.Get[bool](ctx, h.d.Settings, settings.KeyAuthTelegramEnabled)
 	tgAllowedIDs, _ := h.d.Settings.String(ctx, settings.KeyAuthTelegramIDs)
 
@@ -339,6 +347,8 @@ func (h *handlers) getExternalAuthSettings(ctx context.Context, _ *struct{}) (*e
 	ep, err := h.d.Settings.Endpoint(ctx)
 	if err == nil && ep.URL() != "" {
 		callbackURL = ep.URL() + "/api/v1/auth/github/callback"
+	} else if in != nil && in.Host != "" {
+		callbackURL = "https://" + in.Host + "/api/v1/auth/github/callback"
 	}
 
 	return &externalAuthSettingsOutput{
@@ -686,7 +696,18 @@ func (h *handlers) githubAuthStart(ctx context.Context, in *githubStartInput) (*
 		adminID = sess.AdminID
 	}
 
+	callbackURL := ""
+	ep, err := h.d.Settings.Endpoint(ctx)
+	if err == nil && ep.URL() != "" {
+		callbackURL = ep.URL() + "/api/v1/auth/github/callback"
+	} else if in.Host != "" {
+		callbackURL = "https://" + in.Host + "/api/v1/auth/github/callback"
+	}
+
 	state := secure.Token(32)
+	if in.Bind {
+		state = "bind:" + state
+	}
 
 	h.ghStateMu.Lock()
 	for k, st := range h.ghStates {
@@ -695,17 +716,12 @@ func (h *handlers) githubAuthStart(ctx context.Context, in *githubStartInput) (*
 		}
 	}
 	h.ghStates[state] = ghOAuthState{
-		ExpiresAt: now.Add(10 * time.Minute),
-		IsBind:    in.Bind,
-		AdminID:   adminID,
+		ExpiresAt:   now.Add(10 * time.Minute),
+		IsBind:      in.Bind,
+		AdminID:     adminID,
+		RedirectURI: callbackURL,
 	}
 	h.ghStateMu.Unlock()
-
-	callbackURL := ""
-	ep, err := h.d.Settings.Endpoint(ctx)
-	if err == nil && ep.URL() != "" {
-		callbackURL = ep.URL() + "/api/v1/auth/github/callback"
-	}
 
 	authURL := fmt.Sprintf(
 		"https://github.com/login/oauth/authorize?client_id=%s&scope=read:user,read:org&state=%s",
@@ -885,8 +901,10 @@ func (h *handlers) githubAuthCallback(ctx context.Context, in *githubCallbackInp
 	}
 	h.ghStateMu.Unlock()
 
+	isBind := stateInfo.IsBind || strings.HasPrefix(in.State, "bind:")
+
 	errorDestURL := loginURL
-	if stateInfo.IsBind {
+	if isBind {
 		errorDestURL = securitySettingsURL
 	}
 
@@ -915,9 +933,15 @@ func (h *handlers) githubAuthCallback(ctx context.Context, in *githubCallbackInp
 	}
 
 	callbackURL := ""
-	ep, err := h.d.Settings.Endpoint(ctx)
-	if err == nil && ep.URL() != "" {
-		callbackURL = ep.URL() + "/api/v1/auth/github/callback"
+	if stateInfo.RedirectURI != "" {
+		callbackURL = stateInfo.RedirectURI
+	} else {
+		ep, err := h.d.Settings.Endpoint(ctx)
+		if err == nil && ep.URL() != "" {
+			callbackURL = ep.URL() + "/api/v1/auth/github/callback"
+		} else if in.Host != "" {
+			callbackURL = "https://" + in.Host + "/api/v1/auth/github/callback"
+		}
 	}
 
 	accessToken, err := exchangeGitHubCode(ctx, clientID, clientSecret, in.Code, callbackURL)
@@ -939,7 +963,7 @@ func (h *handlers) githubAuthCallback(ctx context.Context, in *githubCallbackInp
 	}
 
 	// If this is a bind flow, automatically append to allowed users
-	if stateInfo.IsBind {
+	if isBind {
 		currentUsers, _ := h.d.Settings.String(ctx, settings.KeyAuthGitHubUsers)
 		parts := strings.Split(currentUsers, ",")
 		seen := false
@@ -960,7 +984,13 @@ func (h *handlers) githubAuthCallback(ctx context.Context, in *githubCallbackInp
 			newParts = append(newParts, "@"+ghUser.Login)
 			_ = settings.Set(ctx, h.d.Settings, settings.KeyAuthGitHubUsers, strings.Join(newParts, ", "))
 		}
-		h.audit(ctx, stateInfo.AdminID, "auth.github_bind", "admin", ghUser.Login, map[string]any{
+		bindAdminID := stateInfo.AdminID
+		if bindAdminID == 0 {
+			if admins, err := h.d.Store.Q.ListAdmins(ctx); err == nil && len(admins) > 0 {
+				bindAdminID = admins[0].ID
+			}
+		}
+		h.audit(ctx, bindAdminID, "auth.github_bind", "admin", ghUser.Login, map[string]any{
 			"github_login": ghUser.Login,
 			"github_id":    ghUser.ID,
 		})
