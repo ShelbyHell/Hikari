@@ -1,10 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
+import { ExternalLink } from "lucide-react";
 import { lazy, Suspense, useState, type FormEvent } from "react";
-import { ApiError, errorText, type Schemas } from "../../../api/client";
-import { useNodes } from "../../../api/hooks";
+import { api, ApiError, errorText, unwrap, type Schemas } from "../../../api/client";
+import { useNodes, useReadySubTemplates } from "../../../api/hooks";
 import { FormActions } from "../../../components/layout";
+import { Confirm, Drawer } from "../../../components/overlay";
+import { useToast } from "../../../components/toast";
 import { Button, Pill, Skeleton } from "../../../components/ui";
-import { t } from "../../../i18n";
+import { t, tMaybe } from "../../../i18n";
 import { useSaveSettings } from "./shared";
 
 const ConfigEditor = lazy(() => import("../../../components/config-editor"));
@@ -78,10 +81,43 @@ const SNIFFER = `sniffer:
 
 /** The admin's own Clash profile: a mihomo config the panel puts the user's servers into. */
 export function TemplateCard({ s, text, setText, starter }: { s: Schemas["SettingsView"]; text: string; setText: (f: (v: string) => string) => void; starter: () => Promise<string> }) {
+  const toast = useToast();
   const save = useSaveSettings();
   const nodes = useNodes();
+  const readyList = useReadySubTemplates();
   const [sure, setSure] = useState(false);
-  const fromSimple = useMutation({ mutationFn: starter, onSuccess: (yaml) => setText(() => yaml) });
+  const [catalog, setCatalog] = useState(false);
+  const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
+
+  const fromSimple = useMutation({
+    mutationFn: starter,
+    onSuccess: (yaml) => {
+      setText(() => yaml);
+      toast.ok(t("settings.templateLoaded"));
+    },
+  });
+
+  const loadReady = useMutation({
+    mutationFn: (id: string) => unwrap(api.GET("/api/v1/sub-templates/ready/{id}", { params: { path: { id } } })),
+    onSuccess: (r) => {
+      setText(() => r.body);
+      setCatalog(false);
+      toast.ok(t("settings.templateLoaded"));
+    },
+    onError: (e) => toast.error(errorText(e)),
+  });
+
+  const pickTemplate = (id: string) => {
+    if (text.trim() && text !== s.sub_template) {
+      setReplaceTarget(id);
+    } else if (id === "mikan-clash") {
+      fromSimple.mutate();
+      setCatalog(false);
+    } else {
+      loadReady.mutate(id);
+    }
+  };
+
   const apiErr = save.error instanceof ApiError ? save.error : null;
   const error = apiErr?.fields.sub_template;
   const live = s.sub_template.trim() !== "";
@@ -119,6 +155,9 @@ export function TemplateCard({ s, text, setText, starter }: { s: Schemas["Settin
         <div className="mb-3 flex flex-wrap gap-2">
           <Button variant="ghost" loading={fromSimple.isPending} onClick={() => fromSimple.mutate()}>
             {t("settings.templateFromSimple")}
+          </Button>
+          <Button variant="ghost" onClick={() => setCatalog(true)}>
+            {t("settings.templateReady.open")}
           </Button>
         </div>
         {fromSimple.error ? (
@@ -180,6 +219,59 @@ export function TemplateCard({ s, text, setText, starter }: { s: Schemas["Settin
           ) : null}
         </FormActions>
       </form>
+      <Drawer open={catalog} onOpenChange={setCatalog} title={t("settings.templateReady.title")}>
+        <p className="text-sm text-[var(--ink-500)] mb-4">{t("settings.templateReady.lead")}</p>
+        <ul className="flex flex-col gap-3">
+          {(readyList.data?.templates ?? []).map((r) => {
+            const name = tMaybe(`settings.templateReadyNames.${r.id}`) ?? r.name;
+            const summary = tMaybe(`settings.templateReadyItems.${r.id}`) ?? r.summary;
+            return (
+              <li key={r.id} className="panel-soft flex flex-col gap-2 p-3 rounded-xl border border-[var(--ink-100)]">
+                <div className="flex min-w-0 items-center justify-between gap-2">
+                  <span className="truncate text-[14px] font-semibold text-[var(--ink-900)]">{name}</span>
+                  {r.builtin ? <Pill tone="ok">{t("settings.templateReady.builtin")}</Pill> : null}
+                </div>
+                <p className="text-xs text-[var(--ink-600)] leading-relaxed">{summary}</p>
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[var(--ink-100)]">
+                  <span className="text-xs text-[var(--ink-500)] flex items-center gap-1">
+                    {t("settings.templateReady.meta", { author: r.author, license: r.license })}
+                    {r.source ? (
+                      <a className="link-btn inline-flex items-center gap-1 ml-1" href={r.source} target="_blank" rel="noreferrer noopener">
+                        {t("settings.templateReady.source")} <ExternalLink size={12} aria-hidden />
+                      </a>
+                    ) : null}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    loading={loadReady.isPending && loadReady.variables === r.id}
+                    onClick={() => pickTemplate(r.id)}
+                  >
+                    {t("settings.templateReady.load")}
+                  </Button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </Drawer>
+      <Confirm
+        open={replaceTarget !== null}
+        onOpenChange={(o) => !o && setReplaceTarget(null)}
+        title={t("settings.templateReplaceTitle")}
+        text={t("settings.templateReplaceText")}
+        confirm={t("settings.templateReplaceConfirm")}
+        onConfirm={() => {
+          const target = replaceTarget;
+          setReplaceTarget(null);
+          if (target === "mikan-clash") {
+            fromSimple.mutate();
+            setCatalog(false);
+          } else if (target) {
+            loadReady.mutate(target);
+          }
+        }}
+      />
     </section>
   );
 }

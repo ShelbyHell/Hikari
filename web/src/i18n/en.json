@@ -1428,6 +1428,29 @@
     "templateOff": "Off",
     "templateNotLive": "Apps get the simple profile for now. Save the YAML and it takes its place in Koala Clash, FlClash, Clash Verge and other apps on mihomo.",
     "templateFromSimple": "Start from the simple one",
+    "templateReplaceTitle": "Replace current template text?",
+    "templateReplaceText": "The current text in the editor will be replaced with the chosen template. Unsaved changes will be lost.",
+    "templateReplaceConfirm": "Replace",
+    "templateLoaded": "Template loaded into editor",
+    "templateReady": {
+      "open": "Load ready template",
+      "title": "Ready routing templates",
+      "lead": "Loading puts the text into the editor; it only applies when you save. The lists linked by the template stay with their authors, pinned to stable versions.",
+      "builtin": "from panel settings",
+      "meta": "Author: {author} · {license} ·",
+      "source": "Source",
+      "load": "Load into editor"
+    },
+    "templateReadyItems": {
+      "mikan-clash": "The panel's built-in profile with the current routing settings; groups ask for servers themselves.",
+      "privwl-blocked": "What is blocked or slowed down in Russia, Telegram and the address ranges that are slowed down (Cloudflare, AWS and others) go through the VPN; the rest goes direct. Lists: Nemu-x/privWL-clash.",
+      "davoyan-ru-direct": "Russian sites and addresses go direct, the rest through the VPN, Telegram too: Russian domains from several lists and the networks of Russia and Belarus from the IPinfo and MaxMind databases, with no geo files."
+    },
+    "templateReadyNames": {
+      "mikan-clash": "Panel base profile",
+      "privwl-blocked": "privWL · only what is blocked",
+      "davoyan-ru-direct": "Davoyan · Russia direct"
+    },
     "templateSnippets": "Ready pieces",
     "templateSnippet": {
       "dns": "DNS fake-ip",

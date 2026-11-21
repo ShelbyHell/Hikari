@@ -278,6 +278,7 @@ func New(d Deps) (http.Handler, huma.API, error) {
 	h.registerSettings()
 	h.registerSubPage()
 	h.registerRoutes()
+	h.registerReadySubTemplates()
 	h.registerCerts()
 	h.registerTelegram()
 	h.registerUpdates()

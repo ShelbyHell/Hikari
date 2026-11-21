@@ -54,6 +54,7 @@ export const qk = {
   folders: ["folders"] as const,
   nodeTraffic: (node: number, range: string) => ["node-traffic", node, range] as const,
   nodeShares: (range: string) => ["node-shares", range] as const,
+  readySubTemplates: ["sub-templates", "ready"] as const,
 };
 
 export const meQuery = {
@@ -331,6 +332,13 @@ export const folderActions = {
   remove: (id: number) => unwrap(api.DELETE("/api/v1/folders/{id}", { params: { path: { id } } })),
   order: (ids: number[]) => unwrap(api.PUT("/api/v1/folders/order", { body: { ids } })),
 };
+
+export function useReadySubTemplates() {
+  return useQuery({
+    queryKey: qk.readySubTemplates,
+    queryFn: () => unwrap(api.GET("/api/v1/sub-templates/ready")),
+  });
+}
 
 /** One node's traffic by the hour (24 h, 7 days) or by the day (30 days). */
 export function useNodeTraffic(id: number | undefined, range: "24h" | "7d" | "30d") {
