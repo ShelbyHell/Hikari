@@ -3,12 +3,8 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
-## 0.5.1.4-rc.14
+## 0.5.1.4-rc.15
 ### en
-- **Telegram & GitHub OAuth panel sign-in**: The admin panel now supports signing in using Telegram and GitHub OAuth alongside passwords and TOTP.
-  - **Telegram**: Supports interactive confirmation via the official panel Telegram bot (scanning a QR code or opening the bot link with `/start auth_<token>`, with inline approval buttons displaying the requesting IP, device, and timestamp), as well as Telegram Login Widget verification.
-  - **GitHub OAuth**: Supports standard OAuth 2.0 redirect flow with CSRF state protection, code-to-token exchange, and validation against a list of allowed usernames.
-  - **Security Settings**: Added configuration cards for Telegram and GitHub sign-in to `Settings → Security`, allowing administrators to toggle each method, set allowed Telegram IDs / usernames, configure GitHub OAuth credentials, and copy the required authorization callback URL.
 - **Security Login Alerts**:
   - The Telegram bot sends instant notifications to infrastructure and admin chats upon every successful sign-in (Password+2FA, Telegram, GitHub) with the authentication method, identity, client IP, device User-Agent, and timestamp.
   - Alerts include an interactive inline button «🚨 Terminate this session» (`tgkill:<session_id_hash>`) allowing instant one-click revocation of compromised sessions directly from Telegram.
@@ -21,10 +17,6 @@ the signed manifest, and the panel shows the one in its language.
 - **GitHub Organizations & Teams Support**:
   - Added `allowed_orgs` setting allowing members of specified GitHub organizations or teams to authenticate to the panel without having to manually list every individual GitHub username.
 ### ru
-- **Вход в панель через Telegram и GitHub OAuth**: В панели управления добавлена поддержка авторизации администратора через Telegram и GitHub OAuth наряду со стандартным паролем и 2FA.
-  - **Telegram**: Поддерживается подтверждение входа через официального Telegram-бота панели (сканирование QR-кода или переход по ссылке `/start auth_<token>` с интерактивными кнопками подтверждения и отображением IP, устройства и времени запроса), а также проверка данных Telegram Login Widget.
-  - **GitHub OAuth**: Реализована авторизация через GitHub OAuth 2.0 с защитой CSRF-состояния, обменом кода на токен и проверкой логина пользователя по списку разрешённых аккаунтов.
-  - **Настройки безопасности**: В раздел «Настройки → Безопасность» добавлены карточки управления входом через Telegram и GitHub для включения каждого способа, настройки разрешённых ID и юзернеймов, параметров OAuth-приложения GitHub и быстрого копирования callback URL.
 - **Уведомления о входе в панель в Telegram (Security Login Alerts)**:
   - При каждом успешном входе администратора в панель (по паролю, через Telegram или GitHub) бот отправляет мгновенное уведомление в чат администратора инфраструктуры и администраторам панели с указанием метода входа, логина, IP-адреса, устройства (User-Agent) и времени.
   - Сообщение содержит интерактивную inline-кнопку «🚨 Завершить эту сессию», позволяющую в один клик сбросить скомпрометированную сессию прямо из Telegram.
@@ -36,6 +28,18 @@ the signed manifest, and the panel shows the one in its language.
   - Добавлена миграция базы данных для сохранения метода и идентификатора авторизации для каждой сессии.
 - **Поддержка организаций GitHub (GitHub Organizations / Teams)**:
   - Добавлена настройка `allowed_orgs`: позволяет указать организации GitHub через запятую. Все участники указанных организаций получают доступ к панели без необходимости вручную прописывать логин каждого администратора.
+
+## 0.5.1.4-rc.14
+### en
+- **Telegram & GitHub OAuth panel sign-in**: The admin panel now supports signing in using Telegram and GitHub OAuth alongside passwords and TOTP.
+  - **Telegram**: Supports interactive confirmation via the official panel Telegram bot (scanning a QR code or opening the bot link with `/start auth_<token>`, with inline approval buttons displaying the requesting IP, device, and timestamp), as well as Telegram Login Widget verification.
+  - **GitHub OAuth**: Supports standard OAuth 2.0 redirect flow with CSRF state protection, code-to-token exchange, and validation against a list of allowed usernames.
+  - **Security Settings**: Added configuration cards for Telegram and GitHub sign-in to `Settings → Security`, allowing administrators to toggle each method, set allowed Telegram IDs / usernames, configure GitHub OAuth credentials, and copy the required authorization callback URL.
+### ru
+- **Вход в панель через Telegram и GitHub OAuth**: В панели управления добавлена поддержка авторизации администратора через Telegram и GitHub OAuth наряду со стандартным паролем и 2FA.
+  - **Telegram**: Поддерживается подтверждение входа через официального Telegram-бота панели (сканирование QR-кода или переход по ссылке `/start auth_<token>` с интерактивными кнопками подтверждения и отображением IP, устройства и времени запроса), а также проверка данных Telegram Login Widget.
+  - **GitHub OAuth**: Реализована авторизация через GitHub OAuth 2.0 с защитой CSRF-состояния, обменом кода на токен и проверкой логина пользователя по списку разрешённых аккаунтов.
+  - **Настройки безопасности**: В раздел «Настройки → Безопасность» добавлены карточки управления входом через Telegram и GitHub для включения каждого способа, настройки разрешённых ID и юзернеймов, параметров OAuth-приложения GitHub и быстрого копирования callback URL.
 
 ## 0.5.1.4-rc.13
 ### en
