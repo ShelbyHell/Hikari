@@ -58,6 +58,8 @@ type Tune struct {
 	// RealIP resolves names for real instead of fake-ip: for apps that break on fake
 	// addresses, at the cost of a DNS round trip before each connection.
 	RealIP bool `json:"real_ip,omitempty"`
+	// IPv6 enables IPv6 routing and DNS in client profiles.
+	IPv6 bool `json:"ipv6,omitempty"`
 }
 
 // Targets of a service. "node:<id>" is one server: a group of its own with the node's

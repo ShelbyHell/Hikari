@@ -30,6 +30,7 @@ func twoNodes(t *testing.T) Profile {
 }
 
 type routedProfile struct {
+	IPv6   bool `json:"ipv6"`
 	Groups []struct {
 		Name    string   `json:"name"`
 		Proxies []string `json:"proxies"`

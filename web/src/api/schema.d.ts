@@ -5631,6 +5631,7 @@ export interface components {
         };
         Tune: {
             block_quic?: boolean;
+            ipv6?: boolean;
             real_ip?: boolean;
             sniffer?: boolean;
         };

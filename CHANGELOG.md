@@ -3,6 +3,14 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.13
+### en
+- **IPv6 in client subscription profiles**: Added an IPv6 toggle to subscription routing settings (`Settings → Routing → Fine-tuning`). By default, client profiles keep IPv6 disabled to avoid connection stalls and timeouts on networks or VPS lacking working IPv6 routes. When enabled, Clash and sing-box client configurations receive IPv6 routing and DNS resolution (`ipv6: true`, sing-box `strategy: "prefer_ipv4"` and ULA IPv6 address `fd00::1/126` for TUN inbounds).
+- **Security vulnerabilities resolved**: Resolved security vulnerabilities in frontend dependencies reported by `pnpm audit` (patched `seroval` transitive dependency).
+### ru
+- **IPv6 в профилях клиентских подписок**: В настройки маршрутизации подписок («Настройки → Маршрутизация → Тонкая настройка») добавлен переключатель IPv6. По умолчанию в профилях клиентов IPv6 отключён для исключения задержек и таймаутов на хостах или у провайдеров без рабочего IPv6. При включении опции конфигурации Clash и sing-box получают поддержку маршрутизации и разрешения DNS по IPv6 (`ipv6: true`, в sing-box `strategy: "prefer_ipv4"` и IPv6 ULA-адрес `fd00::1/126` в интерфейсе TUN).
+- **Устранение уязвимостей зависимостей**: Обновлены зависимости фронтенда для устранения уязвимостей безопасности из отчёта `pnpm audit` (пропатчена транзитивная уязвимость `seroval`).
+
 ## 0.5.1.4-rc.12
 ### en
 - **IPv6 diagnostics and recommendations**: The node diagnostics and server check (`hikari node check` and Diagnostics drawer) now test IPv6 connectivity using fixed targets without DNS. If a node has IPv6 enabled but the server host lacks working IPv6 connectivity or routes, the check displays a warning and provides a direct quick-action button to open node settings and disable IPv6, preventing client timeout issues. When IPv6 is disabled for a node, the check line is cleanly marked as skipped (`Disabled in node settings`).

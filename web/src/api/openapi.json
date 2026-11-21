@@ -8689,6 +8689,9 @@
           "block_quic": {
             "type": "boolean"
           },
+          "ipv6": {
+            "type": "boolean"
+          },
           "real_ip": {
             "type": "boolean"
           },

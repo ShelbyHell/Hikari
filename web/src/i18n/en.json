@@ -1391,6 +1391,8 @@
     "routesSnifferSub": "Rules by domain work for apps that connect by IP too.",
     "routesRealIP": "Real addresses instead of fake-ip",
     "routesRealIPSub": "For apps that break on fake addresses; every connection waits for DNS.",
+    "routesIPv6": "Enable IPv6 in subscriptions",
+    "routesIPv6Sub": "Enables IPv6 routing and DNS in client profiles. Enable only if your nodes and client networks have working IPv6.",
     "routesView": "How to set it up",
     "routesPreviewAgain": "Refresh",
     "routesViewSimple": "Simple",

@@ -104,10 +104,14 @@ func singboxConfig(ctx context.Context, cfg map[string]any, main string) map[str
 		}
 		route["rule_set"] = list
 	}
+	tunAddresses := []string{"172.19.0.1/30"}
+	if cfg["ipv6"] == true {
+		tunAddresses = append(tunAddresses, "fd00::1/126")
+	}
 	return map[string]any{
 		"log": map[string]any{"level": "warn"},
 		"dns": dns,
-		"inbounds": []map[string]any{{"type": "tun", "tag": "tun-in", "address": []string{"172.19.0.1/30"},
+		"inbounds": []map[string]any{{"type": "tun", "tag": "tun-in", "address": tunAddresses,
 			"auto_route": true, "strict_route": true}},
 		"outbounds":    all,
 		"route":        route,
@@ -672,7 +676,9 @@ func singboxDNS(d map[string]any, tags map[string]bool, sets *singboxSets) (map[
 	if len(rules) > 0 {
 		dns["rules"] = rules
 	}
-	if d["ipv6"] == false {
+	if d["ipv6"] == true {
+		dns["strategy"] = "prefer_ipv4"
+	} else if d["ipv6"] == false {
 		dns["strategy"] = "ipv4_only"
 	}
 	return dns, local

@@ -47,11 +47,11 @@ func TestServerChoice(t *testing.T) {
 	}
 }
 
-// QUIC blocked ahead of the admin's rules, the sniffer, and DNS without fake addresses.
+// QUIC blocked ahead of the admin's rules, the sniffer, IPv6, and DNS without fake addresses.
 func TestTune(t *testing.T) {
 	prof := profile(t, "")
 	prof.Rules = []string{"DOMAIN-SUFFIX,sber.ru,DIRECT"}
-	prof.Routes.Tune = Tune{BlockQUIC: true, Sniffer: true, RealIP: true}
+	prof.Routes.Tune = Tune{BlockQUIC: true, Sniffer: true, RealIP: true, IPv6: true}
 	cfg, raw := renderRouted(t, prof, RoutingRUDirect)
 	quic, own := slices.Index(cfg.Rules, "AND,((NETWORK,UDP),(DST-PORT,443)),REJECT"), slices.Index(cfg.Rules, "DOMAIN-SUFFIX,sber.ru,DIRECT")
 	if quic < 0 || own < quic {
@@ -60,7 +60,13 @@ func TestTune(t *testing.T) {
 	if cfg.DNS["enhanced-mode"] != "redir-host" || cfg.DNS["fake-ip-range"] != nil || !strings.Contains(string(raw), "sniffer:") {
 		t.Fatalf("dns %v\n%s", cfg.DNS, raw)
 	}
-	if _, raw := renderRouted(t, profile(t, ""), RoutingRUDirect); strings.Contains(string(raw), "sniffer") || strings.Contains(string(raw), "DST-PORT") {
+	if !cfg.IPv6 || cfg.DNS["ipv6"] != true {
+		t.Fatalf("ipv6 tune: cfg=%v dns=%v", cfg.IPv6, cfg.DNS["ipv6"])
+	}
+	if !strings.Contains(string(raw), "ipv6: true") {
+		t.Fatalf("raw lacks ipv6: true:\n%s", raw)
+	}
+	if cfgDefault, raw := renderRouted(t, profile(t, ""), RoutingRUDirect); strings.Contains(string(raw), "sniffer") || strings.Contains(string(raw), "DST-PORT") || cfgDefault.IPv6 {
 		t.Fatal("left alone, the profile is as it was")
 	}
 }

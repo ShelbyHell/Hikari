@@ -59,7 +59,7 @@ function tidy(r: Routes): Routes {
   if (!out.direct?.length) delete out.direct;
   if (!out.lists?.length) delete out.lists;
   if (!out.servers?.auto && !out.servers?.interval && !out.servers?.no_countries) delete out.servers;
-  if (!out.tune?.block_quic && !out.tune?.sniffer && !out.tune?.real_ip) delete out.tune;
+  if (!out.tune?.block_quic && !out.tune?.sniffer && !out.tune?.real_ip && !out.tune?.ipv6) delete out.tune;
   if (!out.dns?.nameserver?.length && !out.dns?.proxy_server_nameserver?.length && !out.dns?.policy?.length) delete out.dns;
   return out;
 }
@@ -313,6 +313,7 @@ function SimpleRoutingView({ s }: { s: Schemas["SettingsView"] }) {
             <SwitchRow label={t("settings.routesQuic")} sub={t("settings.routesQuicSub")} checked={!!tune.block_quic} onChange={(v) => setTune({ block_quic: v || undefined })} />
             <SwitchRow label={t("settings.routesSniffer")} sub={t("settings.routesSnifferSub")} checked={!!tune.sniffer} onChange={(v) => setTune({ sniffer: v || undefined })} />
             <SwitchRow label={t("settings.routesRealIP")} sub={t("settings.routesRealIPSub")} checked={!!tune.real_ip} onChange={(v) => setTune({ real_ip: v || undefined })} />
+            <SwitchRow label={t("settings.routesIPv6")} sub={t("settings.routesIPv6Sub")} checked={!!tune.ipv6} onChange={(v) => setTune({ ipv6: v || undefined })} />
           </Disclosure>
 
           <Disclosure title={t("settings.routesDns")} sub={t("common.forExperts")}>

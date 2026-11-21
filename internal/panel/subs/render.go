@@ -387,14 +387,14 @@ func mihomoConfigOf(p Profile, g Groups, r Routing, ps []proxy) map[string]any {
 	if g.Main != AliasGroup {
 		groups = append(groups, map[string]any{"name": AliasGroup, "type": "select", "proxies": []string{g.Main}, "hidden": true})
 	}
+	tune := p.Routes.Tune
 	dns := map[string]any{
-		"enable": true, "ipv6": false, "enhanced-mode": "fake-ip", "fake-ip-range": "198.18.0.1/16",
+		"enable": true, "ipv6": tune.IPv6, "enhanced-mode": "fake-ip", "fake-ip-range": "198.18.0.1/16",
 		"default-nameserver": []string{"1.1.1.1", "8.8.8.8"},
 		"nameserver":         slices.Clone(defaultNameservers),
 	}
 	// The panel and the nodes stay out of the tunnel whatever the admin's rules say.
 	rules := append(directRules(p.Direct), "GEOIP,LAN,DIRECT,no-resolve")
-	tune := p.Routes.Tune
 	if tune.BlockQUIC {
 		rules = append(rules, "AND,((NETWORK,UDP),(DST-PORT,443)),REJECT")
 	}
@@ -404,7 +404,7 @@ func mihomoConfigOf(p Profile, g Groups, r Routing, ps []proxy) map[string]any {
 		"mixed-port": 7890, "allow-lan": false, "mode": "rule", "log-level": "warning",
 		// The node has no IPv6 on most VPS: with it on, apps first try IPv6 through the
 		// tunnel and wait for the node's "network unreachable" before falling back.
-		"ipv6": false, "unified-delay": true, "tcp-concurrent": true,
+		"ipv6": tune.IPv6, "unified-delay": true, "tcp-concurrent": true,
 		"dns":          dns,
 		"proxies":      proxies,
 		"proxy-groups": groups,

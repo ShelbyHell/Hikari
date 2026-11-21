@@ -10,9 +10,10 @@ import (
 
 type sbConfig struct {
 	DNS struct {
-		Servers []map[string]any `json:"servers"`
-		Rules   []map[string]any `json:"rules"`
-		Final   string           `json:"final"`
+		Servers  []map[string]any `json:"servers"`
+		Rules    []map[string]any `json:"rules"`
+		Final    string           `json:"final"`
+		Strategy string           `json:"strategy"`
 	} `json:"dns"`
 	Inbounds  []map[string]any `json:"inbounds"`
 	Outbounds []map[string]any `json:"outbounds"`
@@ -160,5 +161,34 @@ func TestSingBoxModes(t *testing.T) {
 	}
 	if net := outbound(own, "🌍 Сеть"); slices.Contains(net["outbounds"].([]any), any("🇯🇵 Япония")) {
 		t.Fatalf("a closed group stays a member: %v", net)
+	}
+}
+
+// When IPv6 is enabled in Tune, sing-box uses prefer_ipv4 and adds a ULA address to the TUN interface.
+func TestSingBoxIPv6(t *testing.T) {
+	lists(t)
+	prof := twoNodes(t)
+	// Default: IPv6 disabled
+	def := renderSingBox(t, prof, RoutingAll, "")
+	if def.DNS.Strategy != "ipv4_only" {
+		t.Fatalf("default strategy: %q", def.DNS.Strategy)
+	}
+	if len(def.Inbounds) == 0 {
+		t.Fatal("no inbounds")
+	}
+	defAddrs, _ := def.Inbounds[0]["address"].([]any)
+	if slices.Contains(defAddrs, any("fd00::1/126")) {
+		t.Fatalf("default tun should not have ipv6 address: %v", defAddrs)
+	}
+
+	// Enabled: IPv6 enabled in Tune
+	prof.Routes.Tune = Tune{IPv6: true}
+	v6 := renderSingBox(t, prof, RoutingAll, "")
+	if v6.DNS.Strategy != "prefer_ipv4" {
+		t.Fatalf("v6 strategy: %q", v6.DNS.Strategy)
+	}
+	v6Addrs, _ := v6.Inbounds[0]["address"].([]any)
+	if !slices.Contains(v6Addrs, any("fd00::1/126")) {
+		t.Fatalf("v6 tun missing fd00::1/126: %v", v6Addrs)
 	}
 }
