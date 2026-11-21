@@ -10,6 +10,7 @@ export const qk = {
   devices: (id: number) => ["users", "devices", id] as const,
   boundDevices: (id: number) => ["users", "bound", id] as const,
   deviceBans: (id: number) => ["users", "bans", id] as const,
+  userOnline: (id: number) => ["users", "online", id] as const,
   tariffs: ["tariffs"] as const,
   inbounds: ["inbounds"] as const,
   presets: ["presets"] as const,
@@ -270,7 +271,7 @@ type UserScope = "all" | "devices";
 
 /** The user views a devices mutation changes: the user (its device count), the list (the
  * same count) and the device lists. */
-const DEVICE_VIEWS = new Set(["one", "list", "devices", "bound", "bans"]);
+const DEVICE_VIEWS = new Set(["one", "list", "devices", "bound", "bans", "online"]);
 
 /** Mutations that change a user refresh the user-related views they change. */
 export function useUserMutation<TArgs, TResult>(fn: (args: TArgs) => Promise<TResult>, scope: UserScope = "all") {
@@ -305,7 +306,17 @@ export const userActions = {
     unwrap(api.PATCH("/api/v1/users/{id}/bound-devices/{device}", { params: { path: { id, device } }, body: { name } })),
   banDevice: ({ id, device }: { id: number; device: number }) => unwrap(api.POST("/api/v1/users/{id}/bound-devices/{device}/ban", { params: { path: { id, device } } })),
   unbanDevice: ({ id, ban }: { id: number; ban: number }) => unwrap(api.DELETE("/api/v1/users/{id}/device-bans/{ban}", { params: { path: { id, ban } } })),
+  resetConnections: ({ id, ...body }: { id: number; node_id?: number; device_id?: number }) =>
+    unwrap(api.POST("/api/v1/users/{id}/reset-connections", { params: { path: { id } }, body })),
 };
+
+export function useUserOnline(id: number) {
+  return useQuery({
+    queryKey: qk.userOnline(id),
+    queryFn: () => unwrap(api.GET("/api/v1/users/{id}/online", { params: { path: { id } } })),
+    refetchInterval: 5_000,
+  });
+}
 
 /** One paid period: a month up to the billing day, or 30 days without one. */
 export const onePeriod = (u: Pick<User, "billing_day">): Schemas["ExtendInputBody"] => (u.billing_day != null ? { months: 1 } : { days: 30 });

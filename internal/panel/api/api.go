@@ -61,6 +61,8 @@ type Deps struct {
 	Pool      *domain.Pool
 	Changes   domain.Changes
 	Online    func() map[string]nodeapi.Online
+	NodeOnline func() map[int64]map[string]nodeapi.Online
+	ResetSlots func(ctx context.Context, nodeID int64, slots []string) []nodesync.ConnReset
 	Cert      func() acme.Status
 	RenewCert func()
 	// RenewCertNow tries the panel's certificate now and waits up to wait for the outcome;

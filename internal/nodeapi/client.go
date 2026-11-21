@@ -195,6 +195,13 @@ func (c *Client) SpeedTest(ctx context.Context) (SpeedTest, error) {
 	return r, err
 }
 
+// ResetSlots closes the open connections of the named slots on the node.
+func (c *Client) ResetSlots(ctx context.Context, slots []string) (ResetResult, error) {
+	var r ResetResult
+	err := c.do(ctx, http.MethodPost, "/v1/slots/reset", ResetSlotsRequest{Slots: slots}, &r, 15*time.Second)
+	return r, err
+}
+
 func (c *Client) Activity(ctx context.Context) (Activity, error) {
 	var r Activity
 	err := c.do(ctx, http.MethodGet, "/v1/activity", nil, &r, 10*time.Second)

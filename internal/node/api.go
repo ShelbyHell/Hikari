@@ -69,6 +69,13 @@ func Handler(e *Engine, log *slog.Logger) http.Handler {
 		}
 		w.WriteHeader(http.StatusNoContent)
 	})
+	mux.HandleFunc("POST /v1/slots/reset", func(w http.ResponseWriter, r *http.Request) {
+		var req nodeapi.ResetSlotsRequest
+		if !decode(w, r, &req) {
+			return
+		}
+		writeJSON(w, http.StatusOK, nodeapi.ResetResult{Closed: e.Reg.ResetSlots(req.Slots)})
+	})
 	mux.HandleFunc("GET /v1/health", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, e.Health())
 	})

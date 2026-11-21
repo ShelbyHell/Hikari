@@ -288,6 +288,26 @@ func (r *Registry) reshape() {
 	closeAll(toClose)
 }
 
+// ResetSlots closes the open connections of the named slots and says how many it closed.
+// Access stays as it is (policy, bans, quotas, devices): the node lets the clients in
+// again at once, so they connect anew. A name the node does not know closes nothing.
+func (r *Registry) ResetSlots(names []string) int {
+	var toClose []*countingConn
+	r.mu.RLock()
+	for _, n := range names {
+		s := r.byName[n]
+		if s == nil {
+			continue
+		}
+		s.mu.Lock()
+		toClose = append(toClose, s.connsLocked()...)
+		s.mu.Unlock()
+	}
+	r.mu.RUnlock()
+	closeAll(toClose)
+	return len(toClose)
+}
+
 func (r *Registry) lookup(key string) *slot {
 	if key == "" {
 		return nil

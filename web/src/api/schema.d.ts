@@ -2515,6 +2515,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{id}/online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Где пользователь онлайн сейчас: ноды, устройства, адреса */
+        get: operations["user-online"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/{id}/pools": {
         parameters: {
             query?: never;
@@ -2544,6 +2561,23 @@ export interface paths {
         put?: never;
         /** Перевыпустить ссылку */
         post: operations["reissue-user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/reset-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Сбросить соединения: ноды закрывают открытые соединения, доступ остаётся, приложения подключаются заново */
+        post: operations["reset-user-connections"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3212,6 +3246,21 @@ export interface components {
             /** @description Уведомления с 22:00 до 9:00 МСК приходят без звука */
             quiet_night: boolean;
             texts: components["schemas"]["Texts"];
+        };
+        ConnResetView: {
+            /**
+             * Format: int64
+             * @description Сколько соединений закрыла нода
+             */
+            closed: number;
+            /** Format: int64 */
+            node_id: number;
+            node_name: string;
+            /**
+             * @description ok — соединения закрыты; node_too_old — нода старее 0.5.2.1 и сбрасывать не умеет, её пропустили; node_unavailable — нода не ответила
+             * @enum {string}
+             */
+            status: "ok" | "node_too_old" | "node_unavailable";
         };
         CreateAPIKeyInputBody: {
             /**
@@ -5171,6 +5220,27 @@ export interface components {
             /** @description Имена, которые уже есть в Hikari: эти пользователи не перенесены */
             skipped: components["schemas"]["List"];
         };
+        ResetConnectionsInputBody: {
+            /**
+             * Format: int64
+             * @description Чьи ключи: не передано — все ключи пользователя; 0 — общие ключи пользователя; иначе привязанное устройство (device_id из списка онлайн)
+             */
+            device_id?: number;
+            /**
+             * Format: int64
+             * @description Нода; 0 или не передано — все ноды
+             */
+            node_id?: number;
+        };
+        ResetConnectionsOutputBody: {
+            /**
+             * Format: int64
+             * @description Сколько соединений закрыто на всех нодах
+             */
+            closed: number;
+            /** @description Как прошло на каждой ноде; нода, которая сбрасывать не умеет или не ответила, не делает ошибкой весь запрос */
+            nodes: components["schemas"]["ConnResetView"][];
+        };
         ResetPathOutputBody: {
             admin_url: string;
         };
@@ -6066,6 +6136,23 @@ export interface components {
             expiring: number;
             /** Format: int64 */
             limited: number;
+        };
+        UserOnlineView: {
+            /**
+             * Format: int64
+             * @description Открытые соединения на этой ноде
+             */
+            conns: number;
+            /**
+             * Format: int64
+             * @description Привязанное устройство, чьими ключами подключены; null — общие ключи пользователя (приложения без ID или без привязки)
+             */
+            device_id: number | null;
+            /** Format: int64 */
+            node_id: number;
+            node_name: string;
+            /** @description Адреса с открытыми соединениями на этой ноде; оператор поддержки без доступа к подписчикам получает пустой список */
+            online_ips: string[];
         };
         UserPoolView: {
             /** @description Пул закрыт для пользователя: его подключений нет в подписке, ноды их не пускают */
@@ -12446,6 +12533,37 @@ export interface operations {
             };
         };
     };
+    "user-online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserOnlineView"][];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
     "user-pools": {
         parameters: {
             query?: never;
@@ -12530,6 +12648,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "reset-user-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetConnectionsInputBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResetConnectionsOutputBody"];
                 };
             };
             /** @description Error */

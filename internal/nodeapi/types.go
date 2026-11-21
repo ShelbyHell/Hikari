@@ -180,6 +180,14 @@ type Online struct {
 	Conns int      `json:"conns"`
 }
 
+type ResetSlotsRequest struct {
+	Slots []string `json:"slots"`
+}
+
+type ResetResult struct {
+	Closed int `json:"closed"`
+}
+
 type Health struct {
 	Version   string           `json:"version"`
 	Core      string           `json:"core"`

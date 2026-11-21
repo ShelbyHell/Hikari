@@ -203,6 +203,16 @@ func (m *Manager) Online() map[string]nodeapi.Online {
 	return out
 }
 
+// OnlineByNode is the live view of each node apart, by node id: where a device is online,
+// which Online merges away.
+func (m *Manager) OnlineByNode() map[int64]map[string]nodeapi.Online {
+	out := map[int64]map[string]nodeapi.Online{}
+	for _, s := range m.Syncers() {
+		out[s.id] = s.Online()
+	}
+	return out
+}
+
 // otherIPs returns, per slot of node id, the user's devices online anywhere else: on the
 // other nodes, and under the user's other slots (bound devices) on any node. owner maps
 // every slot to its user.
@@ -393,6 +403,48 @@ func (m *Manager) SpeedTest(ctx context.Context, id int64) (nodeapi.SpeedTest, e
 		return nodeapi.SpeedTest{}, err
 	}
 	return c.SpeedTest(ctx)
+}
+
+// ConnReset is how closing connections went on one node: how many it closed, or why it
+// did not (a *nodeapi.StatusError 404 from a node that predates the call).
+type ConnReset struct {
+	Node   int64
+	Closed int
+	Err    error
+}
+
+// ResetSlots has node id, or every node (0), close the open connections of the slots and
+// keep their access, so the clients connect again at once. The nodes are asked at once;
+// one that cannot is in the answer with its error, the others are not held up by it.
+func (m *Manager) ResetSlots(ctx context.Context, id int64, slots []string) []ConnReset {
+	var ids []int64
+	if id != 0 {
+		ids = []int64{id}
+	} else {
+		for _, s := range m.Syncers() {
+			ids = append(ids, s.id)
+		}
+	}
+	out := make([]ConnReset, len(ids))
+	var wg sync.WaitGroup
+	for i, nodeID := range ids {
+		wg.Add(1)
+		go func(i int, nodeID int64) {
+			defer wg.Done()
+			out[i].Node = nodeID
+			c, err := clientOf[interface {
+				ResetSlots(context.Context, []string) (nodeapi.ResetResult, error)
+			}](m, nodeID)
+			if err != nil {
+				out[i].Err = err
+				return
+			}
+			r, err := c.ResetSlots(ctx, slots)
+			out[i].Closed, out[i].Err = r.Closed, err
+		}(i, nodeID)
+	}
+	wg.Wait()
+	return out
 }
 
 // clientOf returns a node's client as T: methods beyond Node are optional, and tests

@@ -161,6 +161,8 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 		p.Nodes.SetEvents(hub)
 		changes = p.Nodes
 		deps.Online = p.Nodes.Online
+		deps.NodeOnline = p.Nodes.OnlineByNode
+		deps.ResetSlots = p.Nodes.ResetSlots
 		deps.Nodes = p.Nodes
 		p.NodeUpdates = nodeupdate.New(st, set, p.Nodes, o.Version, o.Log, o.Now)
 		deps.NodeUpdates = p.NodeUpdates
