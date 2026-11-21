@@ -111,6 +111,7 @@ type Deps struct {
 	Billing *billing.Service
 	// Warp registers WARP accounts with Cloudflare.
 	Warp    warp.Client
+	Discord DiscordChecker
 	SubBase func(ctx context.Context) string
 	// SubPort opens subscriptions on a port of their own (0: closes it); SubPortError says
 	// why the saved one is not served. nil: the panel runs no server (tests).

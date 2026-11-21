@@ -313,6 +313,32 @@ function InfrastructureCard({ v, draft, setDraft, error }: { v: View; draft: Sch
             </a>
           </div>
         ) : null}
+        <div className="grid gap-x-3 pt-4 sm:grid-cols-[1fr_160px]">
+          <Field label={t("telegram.infra.group")} htmlFor="infra-group" hint={t("telegram.infra.groupHint")}>
+            <input
+              id="infra-group"
+              className="input mono"
+              value={draft.group_chat ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, group_chat: e.target.value, ...(e.target.value.trim() ? {} : { group_thread: 0 }) }))}
+              placeholder="-1001234567890"
+              maxLength={40}
+              autoComplete="off"
+            />
+          </Field>
+          <Field label={t("telegram.infra.groupThread")} htmlFor="infra-thread" hint={t("telegram.infra.groupThreadHint")}>
+            <input
+              id="infra-thread"
+              className="input mono"
+              inputMode="numeric"
+              value={draft.group_thread ? String(draft.group_thread) : ""}
+              onChange={(e) => setDraft((d) => ({ ...d, group_thread: Number(e.target.value.replace(/\D/g, "").slice(0, 15)) }))}
+              disabled={!draft.group_chat?.trim()}
+              placeholder="42"
+              autoComplete="off"
+            />
+          </Field>
+        </div>
+        <DiscordRow v={v} />
         <SwitchRow label={t("telegram.infra.public")} sub={t("telegram.infra.publicHint")} checked={draft.public_enabled} onChange={(on) => change("public_enabled", on)} />
         <div className="pt-4">
           <Field label={t("telegram.infra.channel")} htmlFor="infra-channel" hint={t("telegram.infra.channelHint")} error={error}>
@@ -345,6 +371,68 @@ function InfrastructureCard({ v, draft, setDraft, error }: { v: View; draft: Sch
         ))}
       </div>
     </section>
+  );
+}
+
+// The Discord webhook the admin's alerts go to as well.
+function DiscordRow({ v }: { v: View }) {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const [hook, setHook] = useState("");
+  const [error, setError] = useState("");
+  const patch = useMutation({
+    mutationFn: (discord_webhook: string) => unwrap(api.PATCH("/api/v1/telegram", { body: { infrastructure: { discord_webhook } } })),
+    onSuccess: (_, discord_webhook) => {
+      setHook("");
+      setError("");
+      void qc.invalidateQueries({ queryKey: qk.telegram });
+      toast.ok(discord_webhook ? t("telegram.infra.discordSaved") : t("telegram.infra.discordRemoved"));
+    },
+    onError: (e) => {
+      if (e instanceof ApiError && Object.keys(e.fields).length) {
+        setError(Object.values(e.fields)[0] ?? "");
+      } else {
+        toast.error(errorText(e));
+      }
+    },
+  });
+
+  return (
+    <div className="py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="switch-row-title">{t("telegram.infra.discord")}</div>
+          <div className="switch-row-sub">
+            {v.discord_set ? (v.discord_name ? t("telegram.infra.discordSet", { name: v.discord_name }) : t("telegram.infra.discordSetNoName")) : t("telegram.infra.discordNotSet")}
+          </div>
+        </div>
+        {v.discord_set ? (
+          <Button size="sm" variant="ghost" loading={patch.isPending && !hook} onClick={() => patch.mutate("")}>
+            {t("telegram.infra.discordRemove")}
+          </Button>
+        ) : null}
+      </div>
+      <div className="pt-3">
+        <Field label={t("telegram.infra.discordURL")} htmlFor="infra-discord" hint={v.discord_set ? t("telegram.infra.discordReplace") : t("telegram.infra.discordHint")} error={error}>
+          <div className="flex gap-2">
+            <input
+              id="infra-discord"
+              className="input mono"
+              type="password"
+              value={hook}
+              onChange={(e) => setHook(e.target.value)}
+              placeholder="https://discord.com/api/webhooks/…"
+              maxLength={300}
+              autoComplete="off"
+              aria-invalid={!!error}
+            />
+            <Button type="button" loading={patch.isPending && !!hook} disabled={!hook.trim()} onClick={() => patch.mutate(hook.trim())}>
+              {t("common.save")}
+            </Button>
+          </div>
+        </Field>
+      </div>
+    </div>
   );
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"mikan/internal/nodeapi"
@@ -65,6 +66,7 @@ type Monitor struct {
 	updates     UpdateSource
 	nodeUpdates NodeUpdateSource
 	bot         Telegram
+	discord     discordPoster
 	log         *slog.Logger
 	now         func() time.Time
 	roundMu     sync.Mutex
@@ -76,11 +78,15 @@ type Monitor struct {
 	delivering sync.WaitGroup
 	// stored is the state's text as last read or written (under roundMu).
 	stored storedState
+	// notices counts the notices queued without a key of their own (Notify).
+	notices atomic.Int64
+	refusedMu sync.Mutex
+	refusedAt map[string]time.Time
 }
 
 func New(st *store.Store, set *settings.Settings, runtime Runtime, tuner Tuner, cert CertificateSource, updates UpdateSource,
 	bot Telegram, log *slog.Logger, now func() time.Time) *Monitor {
-	return &Monitor{store: st, settings: set, runtime: runtime, tuner: tuner, cert: cert, updates: updates, bot: bot, log: log, now: now}
+	return &Monitor{store: st, settings: set, runtime: runtime, tuner: tuner, cert: cert, updates: updates, bot: bot, discord: NewDiscordClient(), log: log, now: now}
 }
 
 // WatchNodeUpdates makes the monitor tell the admin about the updates of nodes that failed
