@@ -9,6 +9,7 @@ import { Confirm } from "../../../components/overlay";
 import { QueryBoundary } from "../../../components/query";
 import { useToast } from "../../../components/toast";
 import { Button, Field, Pill, QR, Segmented, Skeleton } from "../../../components/ui";
+import { SwitchRow } from "../../../components/switch";
 import { AcmeAttempts, AcmeProblem, caName, CertCheckDrawer } from "../../../components/acme";
 import { getLocale, t, tMaybe } from "../../../i18n";
 import { useCopy } from "../../../lib/copy";
@@ -536,6 +537,227 @@ export function AdminUsernameCard() {
           <input id="u-pw" type="password" className="input" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Field>
         <FormActions saving={change.isPending} disabled={!username || !password} label={t("settings.changeUsername")} />
+      </form>
+    </section>
+  );
+}
+
+export function TelegramAuthCard() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const query = useQuery({
+    queryKey: qk.externalAuthSettings,
+    queryFn: () => unwrap(api.GET("/api/v1/auth/external/settings")),
+  });
+
+  const tg = query.data?.telegram;
+  const [enabled, setEnabled] = useState(false);
+  const [allowedIDs, setAllowedIDs] = useState("");
+
+  useEffect(() => {
+    if (tg) {
+      setEnabled(tg.enabled);
+      setAllowedIDs(tg.allowed_ids ?? "");
+    }
+  }, [tg]);
+
+  const save = useMutation({
+    mutationFn: () =>
+      unwrap(
+        api.PATCH("/api/v1/auth/external/settings", {
+          body: {
+            telegram: {
+              enabled,
+              allowed_ids: allowedIDs,
+            },
+          },
+        })
+      ),
+    onSuccess: (res) => {
+      qc.setQueryData(qk.externalAuthSettings, res);
+      qc.invalidateQueries({ queryKey: qk.authProviders });
+      toast.ok(t("settings.authSaved"));
+    },
+    onError: (e) => toast.error(errorText(e)),
+  });
+
+  const dirty = !tg || enabled !== tg.enabled || allowedIDs !== (tg.allowed_ids ?? "");
+
+  return (
+    <section className="card glass reveal" style={{ "--i": 4 } as React.CSSProperties}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate();
+        }}
+        noValidate
+      >
+        <div className="card-head">
+          <div>
+            <h2 className="card-title">{t("settings.authTelegram")}</h2>
+            <div className="card-sub">{t("settings.authTelegramSub")}</div>
+          </div>
+          {tg?.bot_configured && tg.bot_username ? (
+            <Pill tone="ok">{t("settings.authTelegramBotReady", { username: tg.bot_username })}</Pill>
+          ) : (
+            <Pill tone="warn">{t("settings.authTelegramBotOff")}</Pill>
+          )}
+        </div>
+
+        <SwitchRow
+          label={t("settings.authTelegramEnabled")}
+          checked={enabled}
+          disabled={save.isPending}
+          onChange={setEnabled}
+          className="mb-4"
+        />
+
+        <Field label={t("settings.authTelegramAllowed")} htmlFor="tg-allowed" hint={t("settings.authTelegramAllowedHint")}>
+          <input
+            id="tg-allowed"
+            className="input"
+            placeholder="123456789, @admin"
+            value={allowedIDs}
+            onChange={(e) => setAllowedIDs(e.target.value)}
+          />
+        </Field>
+
+        <FormActions saving={save.isPending} disabled={!dirty} label={t("common.save")} />
+      </form>
+    </section>
+  );
+}
+
+export function GitHubAuthCard() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const copyText = useCopy();
+  const query = useQuery({
+    queryKey: qk.externalAuthSettings,
+    queryFn: () => unwrap(api.GET("/api/v1/auth/external/settings")),
+  });
+
+  const gh = query.data?.github;
+  const [enabled, setEnabled] = useState(false);
+  const [clientId, setClientId] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
+  const [allowedUsers, setAllowedUsers] = useState("");
+
+  useEffect(() => {
+    if (gh) {
+      setEnabled(gh.enabled);
+      setClientId(gh.client_id ?? "");
+      setAllowedUsers(gh.allowed_users ?? "");
+      setClientSecret("");
+    }
+  }, [gh]);
+
+  const save = useMutation({
+    mutationFn: () =>
+      unwrap(
+        api.PATCH("/api/v1/auth/external/settings", {
+          body: {
+            github: {
+              enabled,
+              client_id: clientId,
+              client_secret: clientSecret || undefined,
+              allowed_users: allowedUsers,
+            },
+          },
+        })
+      ),
+    onSuccess: (res) => {
+      qc.setQueryData(qk.externalAuthSettings, res);
+      qc.invalidateQueries({ queryKey: qk.authProviders });
+      setClientSecret("");
+      toast.ok(t("settings.authSaved"));
+    },
+    onError: (e) => toast.error(errorText(e)),
+  });
+
+  const dirty =
+    !gh ||
+    enabled !== gh.enabled ||
+    clientId !== (gh.client_id ?? "") ||
+    allowedUsers !== (gh.allowed_users ?? "") ||
+    clientSecret.length > 0;
+
+  return (
+    <section className="card glass reveal" style={{ "--i": 4 } as React.CSSProperties}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate();
+        }}
+        noValidate
+      >
+        <div className="card-head">
+          <div>
+            <h2 className="card-title">{t("settings.authGitHub")}</h2>
+            <div className="card-sub">{t("settings.authGitHubSub")}</div>
+          </div>
+        </div>
+
+        <SwitchRow
+          label={t("settings.authGitHubEnabled")}
+          checked={enabled}
+          disabled={save.isPending}
+          onChange={setEnabled}
+          className="mb-4"
+        />
+
+        <Field label={t("settings.authGitHubClientID")} htmlFor="gh-cid">
+          <input
+            id="gh-cid"
+            className="input mono"
+            placeholder="Ov23..."
+            value={clientId}
+            onChange={(e) => setClientId(e.target.value)}
+          />
+        </Field>
+
+        <Field
+          label={t("settings.authGitHubClientSecret")}
+          htmlFor="gh-secret"
+          hint={gh?.client_secret_set ? t("settings.authGitHubSecretSaved") : t("settings.authGitHubSecretHint")}
+        >
+          <input
+            id="gh-secret"
+            type="password"
+            className="input"
+            autoComplete="off"
+            placeholder={gh?.client_secret_set ? "••••••••••••••••" : ""}
+            value={clientSecret}
+            onChange={(e) => setClientSecret(e.target.value)}
+          />
+        </Field>
+
+        <Field label={t("settings.authGitHubAllowed")} htmlFor="gh-users" hint={t("settings.authGitHubAllowedHint")}>
+          <input
+            id="gh-users"
+            className="input"
+            placeholder="octocat, torvalds"
+            value={allowedUsers}
+            onChange={(e) => setAllowedUsers(e.target.value)}
+          />
+        </Field>
+
+        {gh?.callback_url ? (
+          <Field label={t("settings.authGitHubCallback")} hint={t("settings.authGitHubCallbackHint")}>
+            <div className="flex gap-2">
+              <input readOnly className="input mono text-xs select-all" value={gh.callback_url} />
+              <Button
+                type="button"
+                variant="glass"
+                onClick={() => void copyText(gh.callback_url, t("settings.authGitHubCallbackCopied"))}
+              >
+                <Copy size={15} aria-hidden />
+              </Button>
+            </div>
+          </Field>
+        ) : null}
+
+        <FormActions saving={save.isPending} disabled={!dirty} label={t("common.save")} />
       </form>
     </section>
   );

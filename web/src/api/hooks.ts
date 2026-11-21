@@ -19,6 +19,8 @@ export const qk = {
   nodes: ["nodes"] as const,
   settings: ["settings"] as const,
   sessions: ["sessions"] as const,
+  authProviders: ["auth-providers"] as const,
+  externalAuthSettings: ["external-auth-settings"] as const,
   telegram: ["telegram"] as const,
   updates: ["updates"] as const,
   apiKeys: ["api-keys"] as const,

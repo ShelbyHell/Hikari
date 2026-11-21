@@ -107,3 +107,57 @@ func CheckInitData(token, initData string, now time.Time) (User, error) {
 	}
 	return u, nil
 }
+
+// TelegramWidgetUser represents the user payload from the Telegram Login Widget.
+type TelegramWidgetUser struct {
+	ID        int64  `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name,omitempty"`
+	Username  string `json:"username,omitempty"`
+	PhotoURL  string `json:"photo_url,omitempty"`
+	AuthDate  int64  `json:"auth_date"`
+	Hash      string `json:"hash"`
+}
+
+// CheckTelegramWidget verifies the HMAC signature of data returned by the Telegram Login Widget.
+func CheckTelegramWidget(token string, params map[string]string, now time.Time) (TelegramWidgetUser, error) {
+	hash := params["hash"]
+	if hash == "" || token == "" {
+		return TelegramWidgetUser{}, ErrInitData
+	}
+	keys := make([]string, 0, len(params))
+	for k := range params {
+		if k != "hash" && params[k] != "" {
+			keys = append(keys, k)
+		}
+	}
+	sort.Strings(keys)
+	lines := make([]string, len(keys))
+	for i, k := range keys {
+		lines[i] = k + "=" + params[k]
+	}
+	secret := sha256.Sum256([]byte(token))
+	m := hmac.New(sha256.New, secret[:])
+	m.Write([]byte(strings.Join(lines, "\n")))
+	want, err := hex.DecodeString(hash)
+	if err != nil || !hmac.Equal(m.Sum(nil), want) {
+		return TelegramWidgetUser{}, ErrInitData
+	}
+	at, err := strconv.ParseInt(params["auth_date"], 10, 64)
+	if err != nil || now.Sub(time.Unix(at, 0)) > 24*time.Hour || time.Unix(at, 0).Sub(now) > time.Minute {
+		return TelegramWidgetUser{}, ErrInitData
+	}
+	id, err := strconv.ParseInt(params["id"], 10, 64)
+	if err != nil || id == 0 {
+		return TelegramWidgetUser{}, ErrInitData
+	}
+	return TelegramWidgetUser{
+		ID:        id,
+		FirstName: params["first_name"],
+		LastName:  params["last_name"],
+		Username:  params["username"],
+		PhotoURL:  params["photo_url"],
+		AuthDate:  at,
+		Hash:      hash,
+	}, nil
+}

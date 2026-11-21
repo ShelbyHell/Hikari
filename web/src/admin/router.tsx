@@ -29,7 +29,10 @@ export function createAppRouter(queryClient: QueryClient) {
     getParentRoute: () => root,
     path: "/login",
     component: page(() => import("./pages/login"), "LoginPage"),
-    validateSearch: (s: Record<string, unknown>): { next?: string } => ({ next: typeof s.next === "string" ? s.next : undefined }),
+    validateSearch: (s: Record<string, unknown>): { next?: string; error?: string } => ({
+      next: typeof s.next === "string" ? s.next : undefined,
+      error: typeof s.error === "string" ? s.error : undefined,
+    }),
   });
 
   const app = createRoute({

@@ -16,7 +16,7 @@ import { ImportCard, LegacyLinksCard } from "./import";
 import { ExitDnsCard } from "./exit-dns";
 import { ExternalSubsCard } from "../external-subs";
 import { RoutingSection } from "./routing";
-import { AccessCard, AdminUsernameCard, ApiCard, CertificateCard, PasswordCard, SessionsCard, TwoFactorCard } from "./security";
+import { AccessCard, AdminUsernameCard, ApiCard, CertificateCard, GitHubAuthCard, PasswordCard, SessionsCard, TelegramAuthCard, TwoFactorCard } from "./security";
 import { AppsCard, DevicesCard, SubDomainCard, SubPortCard, SubscriptionCard } from "./subscription";
 import { HappCard } from "./happ";
 import { SubPageSettings, type SubPagePart } from "./sub-page";
@@ -97,6 +97,8 @@ export function SettingsPage() {
                 <>
                   <PasswordCard />
                   <TwoFactorCard />
+                  <TelegramAuthCard />
+                  <GitHubAuthCard />
                   <SessionsCard />
                   <AccessCard s={s} />
                   <CertificateCard s={s} />

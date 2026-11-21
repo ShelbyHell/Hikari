@@ -3,6 +3,18 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.14
+### en
+- **Telegram & GitHub OAuth panel sign-in**: The admin panel now supports signing in using Telegram and GitHub OAuth alongside passwords and TOTP.
+  - **Telegram**: Supports interactive confirmation via the official panel Telegram bot (scanning a QR code or opening the bot link with `/start auth_<token>`, with inline approval buttons displaying the requesting IP, device, and timestamp), as well as Telegram Login Widget verification.
+  - **GitHub OAuth**: Supports standard OAuth 2.0 redirect flow with CSRF state protection, code-to-token exchange, and validation against a list of allowed usernames.
+  - **Security Settings**: Added configuration cards for Telegram and GitHub sign-in to `Settings → Security`, allowing administrators to toggle each method, set allowed Telegram IDs / usernames, configure GitHub OAuth credentials, and copy the required authorization callback URL.
+### ru
+- **Вход в панель через Telegram и GitHub OAuth**: В панели управления добавлена поддержка авторизации администратора через Telegram и GitHub OAuth наряду со стандартным паролем и 2FA.
+  - **Telegram**: Поддерживается подтверждение входа через официального Telegram-бота панели (сканирование QR-кода или переход по ссылке `/start auth_<token>` с интерактивными кнопками подтверждения и отображением IP, устройства и времени запроса), а также проверка данных Telegram Login Widget.
+  - **GitHub OAuth**: Реализована авторизация через GitHub OAuth 2.0 с защитой CSRF-состояния, обменом кода на токен и проверкой логина пользователя по списку разрешённых аккаунтов.
+  - **Настройки безопасности**: В раздел «Настройки → Безопасность» добавлены карточки управления входом через Telegram и GitHub для включения каждого способа, настройки разрешённых ID и юзернеймов, параметров OAuth-приложения GitHub и быстрого копирования callback URL.
+
 ## 0.5.1.4-rc.13
 ### en
 - **IPv6 in client subscription profiles**: Added an IPv6 toggle to subscription routing settings (`Settings → Routing → Fine-tuning`). By default, client profiles keep IPv6 disabled to avoid connection stalls and timeouts on networks or VPS lacking working IPv6 routes. When enabled, Clash and sing-box client configurations receive IPv6 routing and DNS resolution (`ipv6: true`, sing-box `strategy: "prefer_ipv4"` and ULA IPv6 address `fd00::1/126` for TUN inbounds).

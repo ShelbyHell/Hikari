@@ -117,6 +117,15 @@ const (
 	// KeySubPage is the subscription page as the admin built it (subpage.Config): its look,
 	// blocks, apps and own CSS; unset: the page as it always was.
 	KeySubPage = "sub_page"
+
+	// External authentication
+	KeyAuthTelegramEnabled = "auth_telegram_enabled"
+	KeyAuthTelegramIDs     = "auth_telegram_ids"
+
+	KeyAuthGitHubEnabled      = "auth_github_enabled"
+	KeyAuthGitHubClientID     = "auth_github_client_id"
+	KeyAuthGitHubClientSecret = "auth_github_client_secret"
+	KeyAuthGitHubUsers        = "auth_github_users"
 )
 
 // Switch is an on/off setting with its default: read it with On, so the default lives
@@ -137,8 +146,10 @@ var (
 	AutoUpdate    = Switch{KeyAutoUpdate, false}
 	NodesFollow   = Switch{KeyNodesFollow, true}
 	ShowGoals     = Switch{KeyShowGoals, true}
-	AppBranding   = Switch{KeyAppBranding, false}
-	HappHide      = Switch{KeyHappHide, false}
+	AppBranding         = Switch{KeyAppBranding, false}
+	HappHide            = Switch{KeyHappHide, false}
+	AuthTelegramEnabled = Switch{KeyAuthTelegramEnabled, false}
+	AuthGitHubEnabled   = Switch{KeyAuthGitHubEnabled, false}
 )
 
 // ValidLang says whether s is a language of the panel.

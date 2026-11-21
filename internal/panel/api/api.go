@@ -193,6 +193,9 @@ type handlers struct {
 	pendingMu sync.Mutex
 	pending   map[int64]pendingTOTP
 
+	ghStateMu sync.Mutex
+	ghStates  map[string]time.Time
+
 	metricsCache metricsCache
 
 	// speedCooldown spaces the speed tests of a node.
@@ -257,9 +260,10 @@ func New(d Deps) (http.Handler, huma.API, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	h := &handlers{d: d, api: api, dummyHash: dummy, hashSem: make(chan struct{}, 4), pending: map[int64]pendingTOTP{}}
+	h := &handlers{d: d, api: api, dummyHash: dummy, hashSem: make(chan struct{}, 4), pending: map[int64]pendingTOTP{}, ghStates: map[string]time.Time{}}
 	api.UseMiddleware(h.middleware)
 	h.registerAuth()
+	h.registerAuthExternal()
 	h.registerUsers()
 	h.registerFolders()
 	h.registerHapp()

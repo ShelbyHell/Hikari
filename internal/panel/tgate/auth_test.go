@@ -89,3 +89,48 @@ func TestCheckInitData(t *testing.T) {
 		t.Fatalf("no hash: %v", err)
 	}
 }
+
+func TestCheckTelegramWidget(t *testing.T) {
+	const token = "123456:ABC-test-token"
+	now := time.Unix(1_800_000_000, 0)
+	authDate := strconv.FormatInt(now.Add(-time.Minute).Unix(), 10)
+
+	params := map[string]string{
+		"id":         "777",
+		"first_name": "Анна",
+		"username":   "anna",
+		"auth_date":  authDate,
+	}
+
+	// Sign according to Telegram widget rules
+	keys := []string{"auth_date", "first_name", "id", "username"}
+	sort.Strings(keys)
+	lines := make([]string, len(keys))
+	for i, k := range keys {
+		lines[i] = k + "=" + params[k]
+	}
+	secret := sha256.Sum256([]byte(token))
+	m := hmac.New(sha256.New, secret[:])
+	m.Write([]byte(strings.Join(lines, "\n")))
+	params["hash"] = hex.EncodeToString(m.Sum(nil))
+
+	u, err := CheckTelegramWidget(token, params, now)
+	if err != nil || u.ID != 777 || u.Username != "anna" {
+		t.Fatalf("valid widget auth: %+v, err: %v", u, err)
+	}
+
+	// Tampered params
+	tampered := make(map[string]string)
+	for k, v := range params {
+		tampered[k] = v
+	}
+	tampered["username"] = "eve"
+	if _, err := CheckTelegramWidget(token, tampered, now); !errors.Is(err, ErrInitData) {
+		t.Fatalf("tampered widget auth should fail: %v", err)
+	}
+
+	// Wrong token
+	if _, err := CheckTelegramWidget("wrong:token", params, now); !errors.Is(err, ErrInitData) {
+		t.Fatalf("wrong token should fail: %v", err)
+	}
+}
