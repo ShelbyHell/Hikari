@@ -3,6 +3,20 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.16
+### en
+- **GitHub OAuth Direct Callback Routing**:
+  - Fixed 404 Not Found error during GitHub OAuth redirect authorization. Requests to `/api/v1/auth/github/callback` and `/api/v1/auth/github/start` are now routed directly to the admin handler on the panel domain without requiring the secret admin path prefix, allowing standard OAuth redirect URLs to work without exposing the panel's secret path.
+  - Preserved domain isolation: direct GitHub OAuth routes are blocked on `sub_domain` and `sni_domain`.
+  - Persisted the exact `redirect_uri` in OAuth state so the GitHub code-to-token exchange strictly matches the callback URL passed during authorization.
+  - Added `Host` header fallback for automatic callback URL resolution and supported RFC 9207 `iss` parameter.
+### ru
+- **Прямая маршрутизация колбэка GitHub OAuth**:
+  - Исправлена ошибка 404 Not Found при возврате после авторизации в GitHub. Запросы к `/api/v1/auth/github/callback` и `/api/v1/auth/github/start` теперь маршрутизируются напрямую к панели без необходимости указывать секретный префикс пути админки, что позволяет настраивать стандартный Redirect URL в приложении GitHub без раскрытия секретного адреса панели.
+  - Сохранена изоляция доменов: прямые маршруты GitHub OAuth заблокированы на `sub_domain` и `sni_domain`.
+  - Точный `redirect_uri` сохраняется в OAuth-состоянии для гарантированного совпадения callback URL при обмене авторизационного кода на токен в GitHub API.
+  - Добавлен fallback на заголовок `Host` при автоматическом определении callback URL и поддержка параметра `iss` по стандарту RFC 9207.
+
 ## 0.5.1.4-rc.15
 ### en
 - **Security Login Alerts**:
