@@ -680,11 +680,11 @@ function KeyDrawer({ joined, onClose, actions }: { joined: Joined | null; onClos
 function EditNodeDrawer({ node, onClose }: { node: Node | null; onClose: () => void }) {
   const qc = useQueryClient();
   const toast = useToast();
-  const [form, setForm] = useState({ name: "", public_name: "", host: "", domain: "", enabled: true, ipv6: true, fair_share: false, channel: "" });
+  const [form, setForm] = useState({ name: "", public_name: "", host: "", domain: "", enabled: true, ipv6: true, sni_router: false, sni_by_key: false, fair_share: false, channel: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   useEffect(() => {
     if (node) {
-      setForm({ name: node.name, public_name: node.public_name, host: node.host, domain: node.domain, enabled: node.enabled, ipv6: node.ipv6, fair_share: node.fair_share, channel: node.channel_mbps != null ? String(node.channel_mbps) : "" });
+      setForm({ name: node.name, public_name: node.public_name, host: node.host, domain: node.domain, enabled: node.enabled, ipv6: node.ipv6, sni_router: node.sni_router ?? false, sni_by_key: node.sni_by_key ?? false, fair_share: node.fair_share, channel: node.channel_mbps != null ? String(node.channel_mbps) : "" });
       setErrors({});
     }
   }, [node]);
@@ -708,7 +708,7 @@ function EditNodeDrawer({ node, onClose }: { node: Node | null; onClose: () => v
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (!node) return;
-    const body: Schemas["PatchNodeInputBody"] = { name: form.name.trim(), public_name: form.public_name.trim(), enabled: form.enabled, ipv6: form.ipv6, fair_share: form.fair_share };
+    const body: Schemas["PatchNodeInputBody"] = { name: form.name.trim(), public_name: form.public_name.trim(), enabled: form.enabled, ipv6: form.ipv6, fair_share: form.fair_share, sni_router: form.sni_router, sni_by_key: form.sni_by_key };
     const channel = Number(form.channel);
     if (form.channel.trim() || form.fair_share) {
       if (!Number.isInteger(channel) || channel < 1 || channel > 100000) {
@@ -764,6 +764,16 @@ function EditNodeDrawer({ node, onClose }: { node: Node | null; onClose: () => v
         <Field label={t("nodes.ipv6")} hint={t("nodes.ipv6Hint")}>
           <Switch checked={form.ipv6} onChange={(v) => setForm((f) => ({ ...f, ipv6: v }))} label={t("nodes.ipv6")} />
         </Field>
+        <div className="dr-sec">
+          <div className="switch-row pt-0">
+            <div><div className="switch-row-title">{t("nodes.sniRouter")}</div><div className="switch-row-sub">{t("nodes.sniRouterHint")}</div></div>
+            <Switch checked={form.sni_router} onChange={(v) => setForm((f) => ({ ...f, sni_router: v, sni_by_key: v && f.sni_by_key }))} label={t("nodes.sniRouter")} />
+          </div>
+          {form.sni_router ? <div className="switch-row">
+            <div><div className="switch-row-title">{t("nodes.sniByKey")}</div><div className="switch-row-sub">{t("nodes.sniByKeyHint")}</div></div>
+            <Switch checked={form.sni_by_key} onChange={(v) => setForm((f) => ({ ...f, sni_by_key: v }))} label={t("nodes.sniByKey")} />
+          </div> : null}
+        </div>
         <div className="dr-sec">
           <div className="switch-row pt-0">
             <div>

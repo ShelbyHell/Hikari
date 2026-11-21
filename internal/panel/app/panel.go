@@ -426,9 +426,10 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 			if sniDomain != "" {
 				sni = sniDomain
 			}
-			sn := subs.Node{ID: n.ID, Name: n.Name, Endpoint: subs.Endpoint{Host: host, SNI: sni}}
+			sn := subs.Node{ID: n.ID, Name: n.Name, Endpoint: subs.Endpoint{Host: host, SNI: sni}, SNIRouter: n.SniRouter != 0}
 			if n.Address != "" {
 				sn.Endpoint = subs.Endpoint{Host: domain.NodeHost(n), SNI: n.Domain}
+				sn.SNIRouter = n.SniRouter != 0
 				cfg.Direct = append(cfg.Direct, n.PublicHost, n.Domain)
 			}
 			if o.TLS != nil {

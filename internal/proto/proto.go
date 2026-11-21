@@ -23,6 +23,7 @@ const extKey = "mikan"
 type Ext struct {
 	Flow   string          `json:"flow,omitempty" yaml:"flow,omitempty"` // vless: xtls-rprx-vision
 	TLS    string          `json:"tls,omitempty" yaml:"tls,omitempty"`   // "node": use the node certificate
+	SNI443 bool            `json:"sni443,omitempty" yaml:"sni443,omitempty"`
 	Client ClientOverrides `json:"client,omitzero" yaml:"client,omitempty"`
 }
 

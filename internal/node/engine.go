@@ -23,8 +23,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/component/resolver"
+	C "github.com/metacubex/mihomo/constant"
 	"github.com/metacubex/mihomo/hub/executor"
 	"github.com/metacubex/mihomo/listener"
 	mlog "github.com/metacubex/mihomo/log"
@@ -98,6 +98,11 @@ type Engine struct {
 	warpState string
 	warpCheck func(ctx context.Context, proxy, endpoint string) nodeapi.WarpStatus // probe, unless a test swaps it
 	probes    map[string]nodeapi.ProbeResult                                       // the same for the exits to other nodes
+
+	routerMu     sync.Mutex
+	router       *sniRouter
+	routerAddr   string
+	routerStatus atomic.Pointer[nodeapi.PortStatus]
 }
 
 // routesKey covers what the outbound side of the config depends on.
@@ -353,6 +358,8 @@ func (e *Engine) Apply(st nodeapi.DesiredState) (nodeapi.ApplyResult, error) {
 	}
 	sort.Slice(statuses, func(i, j int) bool { return statuses[i].Name < statuses[j].Name })
 
+	e.setRouter(st.Router, st.Inbounds)
+
 	e.applied = st
 	e.listeners = map[string]nodeapi.ListenerStatus{}
 	for _, s := range statuses {
@@ -448,10 +455,14 @@ func (e *Engine) Health() nodeapi.Health {
 	if sh := e.shown.Load(); sh != nil {
 		ls, rev = append(ls, sh.listeners...), sh.revision
 	}
-	return nodeapi.Health{
+	h := nodeapi.Health{
 		Version: e.version, Core: "mihomo " + mihomoVersion(), Revision: rev, StartedAt: e.started,
 		Listeners: ls, Conns: e.Reg.ConnCount(), System: e.sys.last(), Update: e.UpdateStatus(), Host: e.host.get(), Time: time.Now(),
 	}
+	if r := e.routerStatus.Load(); r != nil {
+		h.Router = r
+	}
+	return h
 }
 
 // shownState is the last Apply as Health reports it: the listeners sorted by name.

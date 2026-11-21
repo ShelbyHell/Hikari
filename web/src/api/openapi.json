@@ -56,7 +56,7 @@
             "type": "string"
           },
           "url": {
-            "description": "https://…/mikan-addon.json, https://…/index.json или github.com/\u003cвладелец\u003e/\u003cрепозиторий\u003e (последний релиз)",
+            "description": "https://…/mikan-addon.json, https://…/index.json или github.com/<владелец>/<репозиторий> (последний релиз)",
             "maxLength": 512,
             "minLength": 1,
             "type": "string"
@@ -229,7 +229,7 @@
             "type": "object"
           },
           "url": {
-            "description": "Адрес страницы относительно адреса админки (addons-ui/\u003cid\u003e/\u003cподпись\u003e/…); подпись действует 10 минут",
+            "description": "Адрес страницы относительно адреса админки (addons-ui/<id>/<подпись>/…); подпись действует 10 минут",
             "type": "string"
           }
         },
@@ -1262,7 +1262,7 @@
         "additionalProperties": false,
         "properties": {
           "code": {
-            "description": "Что именно, текст — certCheck.\u003ccode\u003e в языке панели",
+            "description": "Что именно, текст — certCheck.<code> в языке панели",
             "type": "string"
           },
           "detail": {
@@ -1389,7 +1389,7 @@
             "type": "boolean"
           },
           "url": {
-            "description": "Ссылка, по которой вступают (https://t.me/…); пусто: t.me/\u003cusername\u003e. Для канала по числовому ID обязательна",
+            "description": "Ссылка, по которой вступают (https://t.me/…); пусто: t.me/<username>. Для канала по числовому ID обязательна",
             "maxLength": 256,
             "type": "string"
           }
@@ -3036,6 +3036,14 @@
           "xhttp": {
             "$ref": "#/components/schemas/XHTTPTuning",
             "description": "Тонкая настройка XHTTP; у других транспортов поля нет"
+          },
+          "sni443": {
+            "description": "Runs behind the node SNI router on shared port 443",
+            "type": "boolean"
+          },
+          "sni443_possible": {
+            "description": "Whether this inbound can use the SNI router",
+            "type": "boolean"
           }
         },
         "required": [
@@ -3554,7 +3562,7 @@
             "type": "array"
           },
           "url": {
-            "description": "http://127.0.0.1:\u003cпорт\u003e; клиенту панели (mode client) можно не указывать",
+            "description": "http://127.0.0.1:<порт>; клиенту панели (mode client) можно не указывать",
             "maxLength": 64,
             "type": "string"
           }
@@ -4060,6 +4068,14 @@
           },
           "version": {
             "type": "string"
+          },
+          "sni_router": {
+            "description": "The node shares TCP 443 among supported inbounds",
+            "type": "boolean"
+          },
+          "sni_by_key": {
+            "description": "REALITY inbounds may share a TLS name and be routed by key",
+            "type": "boolean"
           }
         },
         "required": [
@@ -4662,7 +4678,7 @@
             "$ref": "#/components/schemas/PageBrand"
           },
           "css": {
-            "description": "Свой CSS страницы подписки (не админки), до 20 КБ; @import и \u003c убираются",
+            "description": "Свой CSS страницы подписки (не админки), до 20 КБ; @import и < убираются",
             "maxLength": 20480,
             "type": "string"
           },
@@ -5304,6 +5320,10 @@
           "xhttp": {
             "$ref": "#/components/schemas/XHTTPTuning",
             "description": "Тонкая настройка XHTTP целиком: пустое поле — значение ядра по умолчанию"
+          },
+          "sni443": {
+            "description": "Route this inbound through the node SNI router on port 443",
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -5369,6 +5389,14 @@
             "description": "Публичное имя ноды; пустое — не публиковать её в канале",
             "maxLength": 80,
             "type": "string"
+          },
+          "sni_router": {
+            "description": "Enable or disable the shared TCP 443 SNI router",
+            "type": "boolean"
+          },
+          "sni_by_key": {
+            "description": "Route REALITY inbounds sharing a name by key",
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -5987,7 +6015,7 @@
             "type": "string"
           },
           "provider": {
-            "description": "stars или addon:\u003cid\u003e — адаптер маркетплейса",
+            "description": "stars или addon:<id> — адаптер маркетплейса",
             "type": "string"
           },
           "refunded_at": {
@@ -7697,7 +7725,7 @@
           },
           "sub_routes": {
             "$ref": "#/components/schemas/Routes",
-            "description": "Куда идут сервисы (services: id → vpn, direct, block или node:\u003cid\u003e), какие приложения и сайты идут мимо VPN (direct) и свои DNS (dns). Каталог — GET /api/v1/settings/routes/catalog"
+            "description": "Куда идут сервисы (services: id → vpn, direct, block или node:<id>), какие приложения и сайты идут мимо VPN (direct) и свои DNS (dns). Каталог — GET /api/v1/settings/routes/catalog"
           },
           "sub_routing": {
             "description": "Маршруты в Clash-приложениях: ru_direct — российские сайты и IP напрямую по геобазам mihomo, all — всё через VPN, blocked — через VPN только заблокированное (списки privWL-clash), остальное напрямую",
@@ -10209,7 +10237,7 @@
     }
   },
   "info": {
-    "description": "REST API панели Hikari. Все пути — под секретным адресом админки: https://\u003cпанель\u003e/\u003cсекретный путь\u003e/api/v1/…\n\nСкрипты и интеграции авторизуются ключом API (Настройки → API): заголовок `Authorization: Bearer mk_…`. Ключ «чтение» выполняет только GET и не получает ссылок подписок и секретных адресов; «полный» меняет данные, кроме входа, сессий, самих ключей и операций, где уходят деньги, ключи и адреса клиентов (они помечены «только сессия»).\n\nАдминка в браузере ходит с cookie сессии; изменяющие запросы тогда требуют заголовок `X-CSRF-Token` из `GET /auth/me`.\n\nОшибки — RFC 9457 (application/problem+json): `detail` — код ошибки, `errors[].message` — код по полю.\n\n## Подписка в приложениях\n\nСсылка подписки (`sub_url` пользователя) отдаёт конфиг и заголовки, которые читают приложения: `profile-title` — название профиля (настройка `sub_title`, пусто — бренд), `announce` — строка над профилем или под его названием (`sub_announce`), `subscription-userinfo` — трафик и срок, `support-url`, `profile-web-page-url`. Настраиваются в `PATCH /api/v1/settings`.\n\nВ `sub_title` и `sub_announce` подставляются переменные каждого пользователя: `{brand}` — бренд, `{name}` — имя, `{date}` — дата окончания (ДД.ММ.ГГГГ, МСК), `{days}` — дней осталось, `{used}` — израсходовано, `{left}` — осталось трафика, `{total}` — лимит с пакетами, `{devices}` — привязанные устройства (`2/3`; без лимита `2`; `∞`, когда привязки нет и лимита тоже). Без срока или лимита — `∞`. Неизвестное слово в фигурных скобках остаётся текстом. Если название после подстановки пустое, берётся бренд. Пример: `{brand} · до {date}`.",
+    "description": "REST API панели Hikari. Все пути — под секретным адресом админки: https://<панель>/<секретный путь>/api/v1/…\n\nСкрипты и интеграции авторизуются ключом API (Настройки → API): заголовок `Authorization: Bearer mk_…`. Ключ «чтение» выполняет только GET и не получает ссылок подписок и секретных адресов; «полный» меняет данные, кроме входа, сессий, самих ключей и операций, где уходят деньги, ключи и адреса клиентов (они помечены «только сессия»).\n\nАдминка в браузере ходит с cookie сессии; изменяющие запросы тогда требуют заголовок `X-CSRF-Token` из `GET /auth/me`.\n\nОшибки — RFC 9457 (application/problem+json): `detail` — код ошибки, `errors[].message` — код по полю.\n\n## Подписка в приложениях\n\nСсылка подписки (`sub_url` пользователя) отдаёт конфиг и заголовки, которые читают приложения: `profile-title` — название профиля (настройка `sub_title`, пусто — бренд), `announce` — строка над профилем или под его названием (`sub_announce`), `subscription-userinfo` — трафик и срок, `support-url`, `profile-web-page-url`. Настраиваются в `PATCH /api/v1/settings`.\n\nВ `sub_title` и `sub_announce` подставляются переменные каждого пользователя: `{brand}` — бренд, `{name}` — имя, `{date}` — дата окончания (ДД.ММ.ГГГГ, МСК), `{days}` — дней осталось, `{used}` — израсходовано, `{left}` — осталось трафика, `{total}` — лимит с пакетами, `{devices}` — привязанные устройства (`2/3`; без лимита `2`; `∞`, когда привязки нет и лимита тоже). Без срока или лимита — `∞`. Неизвестное слово в фигурных скобках остаётся текстом. Если название после подстановки пустое, берётся бренд. Пример: `{brand} · до {date}`.",
     "title": "Hikari",
     "version": "dev"
   },

@@ -25,5 +25,11 @@ UPDATE nodes SET fair_share = $1, channel_mbps = $2, updated_at = $3 WHERE id = 
 -- name: SetNodeCert :exec
 UPDATE nodes SET cert_sha256 = $1, updated_at = $2 WHERE id = $3;
 
+-- name: SetNodeSNIRouter :exec
+UPDATE nodes SET sni_router = $1, updated_at = $2 WHERE id = $3;
+
+-- name: SetNodeSNIByKey :exec
+UPDATE nodes SET sni_by_key = $1, updated_at = $2 WHERE id = $3;
+
 -- name: DeleteNode :exec
 DELETE FROM nodes WHERE id = $1 AND id != 1;

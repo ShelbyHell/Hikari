@@ -267,6 +267,12 @@ func (s *Syncer) desiredPin(ctx context.Context) (st nodeapi.DesiredState, pin s
 	st.DNS = snap.exitDNS.State()
 	v6 := n.Ipv6 != 0
 	st.IPv6 = &v6
+	if n.SniRouter != 0 {
+		st.Router = sniRouter(st.Inbounds, n.Domain)
+		if st.Router != nil && n.SniByKey != 0 {
+			st.Router.ByKey = true
+		}
+	}
 	if n.FairShare != 0 && n.ChannelMbps.Valid {
 		st.Shaping = &nodeapi.Shaping{ChannelMbps: int(n.ChannelMbps.Int64)}
 	}
@@ -813,10 +819,10 @@ func (s *Syncer) refreshHealth(ctx context.Context) {
 
 func stateKey(st nodeapi.DesiredState) string {
 	raw, _ := json.Marshal(struct {
-		I []nodeapi.Inbound
-		S []nodeapi.Slot
-		T *nodeapi.TLSFiles
-		P int
+		I  []nodeapi.Inbound
+		S  []nodeapi.Slot
+		T  *nodeapi.TLSFiles
+		P  int
 		W  *nodeapi.Warp
 		R  *nodeapi.Relay
 		E  []nodeapi.Exit
@@ -1055,6 +1061,41 @@ func unreachableExit(id int64) json.RawMessage {
 	raw, _ := json.Marshal(map[string]any{"name": nodeapi.ExitName(id), "type": "vless", "server": "192.0.2.1", "port": 9,
 		"uuid": "00000000-0000-4000-8000-000000000000", "udp": true})
 	return raw
+}
+
+func sniRouter(inbounds []nodeapi.Inbound, nodeDomain string) *nodeapi.SNIRouter {
+	r := &nodeapi.SNIRouter{}
+	taken := map[string]bool{}
+	busy := false
+	origin := ""
+	for _, in := range inbounds {
+		t, err := proto.Parse(string(in.Config))
+		if err != nil {
+			continue
+		}
+		if !proto.SNI443(t) || !proto.CanSNI443(t) {
+			busy = busy || in.Port == "443" && t.Network() != "udp"
+			continue
+		}
+		names := proto.SNINames(t, nodeDomain)
+		for _, n := range names {
+			taken[strings.ToLower(strings.TrimSuffix(n, "."))] = true
+		}
+		r.Routes = append(r.Routes, nodeapi.SNIRoute{Inbound: in.Name, Names: names})
+		if r.Default == "" && proto.Reality(t) {
+			r.Default = in.Name
+		}
+		if origin == "" && !proto.Reality(t) && t.Ext().Client.Server != "" {
+			origin = in.Name
+		}
+	}
+	if origin != "" {
+		r.Default = origin
+	}
+	if len(r.Routes) == 0 && busy {
+		return nil
+	}
+	return r
 }
 
 // Probe asks the node how it reaches the internet through one of its outbounds.

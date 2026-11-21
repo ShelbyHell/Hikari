@@ -31,8 +31,9 @@ type Node struct {
 	ID int64
 	// Name is the node's country group, e.g. "🇳🇱 Нидерланды"; with several nodes its
 	// leading flag (or the whole name) prefixes proxy names.
-	Name     string
-	Endpoint Endpoint
+	Name      string
+	Endpoint  Endpoint
+	SNIRouter bool
 }
 
 // ExternalServer is one server of an external subscription the admin attached to a tariff:
@@ -201,6 +202,9 @@ func build(p Profile) ([]proxy, error) {
 				// Saved configs are validated; one broken inbound must not empty the subscription.
 				p.skip(in, err)
 				continue
+			}
+			if n.SNIRouter && proto.SNI443(t) && proto.CanSNI443(t) {
+				port = 443
 			}
 			base := domain.ProxyName(in)
 			// A name the admin typed is used as is; preset names get the node's flag.

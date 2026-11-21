@@ -40,6 +40,7 @@ export function EditDrawer({ inbound, onClose }: { inbound: Inbound | null; onCl
   const [config, setConfig] = useState("");
   const [autoPort, setAutoPort] = useState(true);
   const [autoSni, setAutoSni] = useState(true);
+  const [sni443, setSni443] = useState(false);
   const [listenMode, setListenMode] = useState<ListenAt>("all");
   const [listenIP, setListenIP] = useState(""); // the address of its own for "custom"
   const [clientServer, setClientServer] = useState(""); // what clients get: "" = as now
@@ -64,6 +65,7 @@ export function EditDrawer({ inbound, onClose }: { inbound: Inbound | null; onCl
     setConfig(inbound.config);
     setAutoPort(inbound.auto_port);
     setAutoSni(inbound.auto_sni);
+    setSni443(inbound.sni443 ?? false);
     setListenMode(listenAt(inbound.listen));
     setListenIP(listenAt(inbound.listen) === "custom" ? inbound.listen : "");
     setClientServer(inbound.client.server);
@@ -118,6 +120,7 @@ export function EditDrawer({ inbound, onClose }: { inbound: Inbound | null; onCl
     const body: Schemas["PatchInboundInputBody"] = {};
     if (port !== inbound?.port) body.port = port.trim();
     if (name.trim() !== inbound?.display_name) body.display_name = name.trim();
+    if (sni443 !== (inbound?.sni443 ?? false)) body.sni443 = sni443;
     // The config tab rewrites the whole template; the dest field is a shortcut into it.
     if (configChanged) body.config = config;
     else if (inbound?.dest !== undefined) {
@@ -485,6 +488,18 @@ export function EditDrawer({ inbound, onClose }: { inbound: Inbound | null; onCl
                   />
                 ) : null}
               </Disclosure>
+              {inbound?.sni443_possible ? (
+                <Disclosure title={t("inbounds.sni443.title")} sub={t("inbounds.sni443.sub")}>
+                  <SwitchRow
+                    label={t("inbounds.sni443.title")}
+                    sub={inbound.sni443 ? t("inbounds.sni443.sub") : t("inbounds.sni443.routerOff")}
+                    warn={!inbound.sni443 && !allNodes.data?.find((n) => n.id === inbound.node_id)?.sni_router}
+                    checked={sni443}
+                    onChange={setSni443}
+                    disabled={!allNodes.data?.find((n) => n.id === inbound.node_id)?.sni_router}
+                  />
+                </Disclosure>
+              ) : null}
             </>
           ) : tab === "xhttp" ? (
             <XhttpTuning value={xhttp} onChange={(x) => {

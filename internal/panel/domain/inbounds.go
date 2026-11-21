@@ -101,6 +101,7 @@ type InboundPatch struct {
 	XHTTP       *proto.XHTTPTuning // the whole XHTTP tuning, as the form shows it
 	Client      *ClientEndpoint    // replaces all three
 	DisplayName *string
+	SNI443      *bool // behind the node's SNI router on 443
 	// What only the node uses.
 	Listen     *string
 	AutoPort   *bool
@@ -117,7 +118,7 @@ type InboundPatch struct {
 
 // EditsTemplate: the patch changes the listener's template.
 func (p InboundPatch) EditsTemplate() bool {
-	return p.Config != nil || p.Dest != nil || p.Fingerprint != nil || p.Obfs != nil || p.XHTTP != nil || p.Client != nil
+	return p.Config != nil || p.Dest != nil || p.Fingerprint != nil || p.Obfs != nil || p.XHTTP != nil || p.Client != nil || p.SNI443 != nil
 }
 
 // ForClients: the patch changes what clients get.
@@ -424,6 +425,9 @@ func editTemplate(config string, p InboundPatch) (string, error) {
 		edits = append(edits, templateEdit{"client", func(t proto.Template) error {
 			return proto.SetClientEndpoint(t, strings.TrimSpace(c.Server), c.Port, strings.TrimSpace(c.SNI))
 		}})
+	}
+	if p.SNI443 != nil {
+		edits = append(edits, templateEdit{"sni443", func(t proto.Template) error { return proto.SetSNI443(t, *p.SNI443) }})
 	}
 	for _, e := range edits {
 		t, err := proto.Parse(config)

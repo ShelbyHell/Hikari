@@ -71,6 +71,9 @@ type NodeInfo struct {
 	ChannelMbps *int64 `json:"channel_mbps" doc:"Ширина канала ноды, Мбит/с в каждую сторону; null — не задана"`
 	// IPv6 enables IPv6 egress and resolution on the node.
 	IPv6 bool `json:"ipv6" doc:"Включен ли IPv6 на ноде"`
+	// SNIRouter: the node shares its TCP 443 between the inbounds marked for it;
+	SNIRouter bool `json:"sni_router" doc:"Нода делит порт 443 между протоколами с TLS и REALITY (SNI-роутер ноды)"`
+	SNIByKey  bool `json:"sni_by_key" doc:"Протоколы REALITY за общим 443 могут маскироваться под одно имя: нода узнаёт клиента каждого по его ключу"`
 }
 
 type nodesOutput struct{ Body []NodeInfo }
@@ -105,6 +108,8 @@ type patchNodeInput struct {
 		FairShare  *bool   `json:"fair_share,omitempty" doc:"Делить канал ноды поровну между теми, кто сейчас качает; нужен channel_mbps"`
 		// The node's channel each way, which the fair share splits.
 		ChannelMbps *int64 `json:"channel_mbps,omitempty" minimum:"1" maximum:"100000" doc:"Ширина канала ноды, Мбит/с в каждую сторону"`
+		SNIRouter   *bool  `json:"sni_router,omitempty" doc:"Включить или выключить общий порт 443 на ноде"`
+		SNIByKey    *bool  `json:"sni_by_key,omitempty" doc:"Протоколы REALITY за общим 443 могут делить одно имя: нода узнаёт клиента каждого по его ключу"`
 	}
 }
 
@@ -168,7 +173,7 @@ func (h *handlers) orderNodes(ctx context.Context, in *orderNodesInput) (*struct
 
 func (h *handlers) viewNode(ctx context.Context, n db.Node, inbounds []db.Inbound) NodeInfo {
 	v := NodeInfo{ID: n.ID, Name: n.Name, PublicName: n.PublicName, Local: n.Address == "", Address: n.Address, Host: domain.NodeHost(n), Domain: n.Domain,
-		Enabled: n.Enabled != 0, IPv6: n.Ipv6 != 0, Inbounds: len(domain.NodeInbounds(inbounds, n.ID)), Status: "unknown",
+		Enabled: n.Enabled != 0, IPv6: n.Ipv6 != 0, SNIRouter: n.SniRouter != 0, SNIByKey: n.SniByKey != 0, Inbounds: len(domain.NodeInbounds(inbounds, n.ID)), Status: "unknown",
 		FairShare: n.FairShare != 0, ChannelMbps: store.Int64Ptr(n.ChannelMbps)}
 	if v.Local {
 		// The panel's own node is reached at the panel's address.
@@ -297,14 +302,14 @@ func (h *handlers) updateNode(ctx context.Context, in *patchNodeInput) (*nodeInf
 		return nil, err
 	}
 	n, err := domain.UpdateNode(ctx, h.d.Store, in.ID, domain.NodePatch{Name: b.Name, PublicName: b.PublicName, Host: b.Host, Domain: b.Domain,
-		Enabled: b.Enabled, IPv6: b.IPv6, FairShare: b.FairShare, ChannelMbps: b.ChannelMbps, Rules: rules}, h.d.Now())
+		Enabled: b.Enabled, IPv6: b.IPv6, FairShare: b.FairShare, ChannelMbps: b.ChannelMbps, SNIRouter: b.SNIRouter, SNIByKey: b.SNIByKey, Rules: rules}, h.d.Now())
 	if err != nil {
 		return nil, h.nodeErr(err)
 	}
 	h.nodesChanged()
 	h.d.Changes.SlotsChanged()
 	h.audit(ctx, sessionOf(ctx).AdminID, "node.update", "node", strconv.FormatInt(n.ID, 10), map[string]any{"name": n.Name, "public_name": n.PublicName, "enabled": n.Enabled != 0,
-		"ipv6": n.Ipv6 != 0, "fair_share": n.FairShare != 0, "channel_mbps": n.ChannelMbps.Int64})
+		"ipv6": n.Ipv6 != 0, "fair_share": n.FairShare != 0, "channel_mbps": n.ChannelMbps.Int64, "sni_router": n.SniRouter != 0, "sni_by_key": n.SniByKey != 0})
 	return h.nodeInfo(ctx, n.ID)
 }
 

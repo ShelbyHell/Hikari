@@ -3,6 +3,18 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## Unreleased
+### en
+- **Shared port 443 for REALITY and TLS protocols**:
+  - Nodes can route supported TCP protocols by TLS SNI through a shared port 443.
+  - Multiple REALITY protocols can share one name and be distinguished by their keys.
+  - Added panel controls for the node router and per-protocol “Through shared 443” mode.
+### ru
+- **Общий порт 443 для REALITY и TLS-протоколов**:
+  - Ноды могут направлять поддерживаемые TCP-протоколы по SNI через общий порт 443.
+  - Несколько протоколов REALITY могут использовать одно имя и различаться по ключам.
+  - В панель добавлены настройки роутера ноды и режима «Через общий 443» для протоколов.
+
 ## 0.5.1.4-rc.16
 ### en
 - **GitHub OAuth Direct Callback Routing**:

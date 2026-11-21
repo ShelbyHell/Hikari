@@ -3765,6 +3765,10 @@ export interface components {
             updated_at: string;
             /** @description Тонкая настройка XHTTP; у других транспортов поля нет */
             xhttp?: components["schemas"]["XHTTPTuning"];
+            /** @description Runs behind the node SNI router on shared port 443 */
+            sni443?: boolean;
+            /** @description Whether this inbound can use the SNI router */
+            sni443_possible?: boolean;
         };
         Info: {
             apps?: string;
@@ -4145,6 +4149,10 @@ export interface components {
             /** @description Как идёт или прошло обновление ноды */
             update?: components["schemas"]["UpdateStatus"];
             version?: string;
+            /** @description The node shares TCP 443 among supported inbounds */
+            sni_router?: boolean;
+            /** @description REALITY inbounds may share a TLS name and be routed by key */
+            sni_by_key?: boolean;
         };
         NodeKeyOutputBody: {
             /** @description Команда установки на сервере ноды */
@@ -4575,6 +4583,8 @@ export interface components {
             server_name?: string;
             /** @description Тонкая настройка XHTTP целиком: пустое поле — значение ядра по умолчанию */
             xhttp?: components["schemas"]["XHTTPTuning"];
+            /** @description Route this inbound through the node SNI router on port 443 */
+            sni443?: boolean;
         };
         PatchLegacyInputBody: {
             /** @enum {string} */
@@ -4599,6 +4609,10 @@ export interface components {
             name?: string;
             /** @description Публичное имя ноды; пустое — не публиковать её в канале */
             public_name?: string;
+            /** @description Enable or disable the shared TCP 443 SNI router */
+            sni_router?: boolean;
+            /** @description Route REALITY inbounds sharing a name by key */
+            sni_by_key?: boolean;
         };
         PatchPaymentSettingsInputBody: {
             allow_new?: boolean;

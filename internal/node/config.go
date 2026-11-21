@@ -89,6 +89,10 @@ func buildConfig(st nodeapi.DesiredState, cert proto.Cert, allowPrivate bool) (r
 	}
 	for _, in := range st.Inbounds {
 		l, err := listenerFor(in, st.Slots, cert, proto.Options{SelfStealPort: st.SelfStealPort})
+		// Routed listeners accept only the loopback SNI router and trust its PROXY header.
+		if err == nil && st.Router != nil && st.Router.Routed(in.Name) {
+			l["listen"], l["proxy-protocol"], l["proxy-protocol-trusted"] = "127.0.0.1", true, []string{"loopback"}
+		}
 		keep(in.Name, l, err)
 	}
 	if st.Relay != nil {

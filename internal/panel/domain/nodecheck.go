@@ -140,6 +140,8 @@ type NodePatch struct {
 	IPv6        *bool
 	FairShare   *bool
 	ChannelMbps *int64
+	SNIRouter   *bool
+	SNIByKey    *bool
 	Rules       NodeRules
 }
 
@@ -238,6 +240,18 @@ func UpdateNode(ctx context.Context, st *store.Store, id int64, p NodePatch, now
 				return ErrChannelRequired
 			}
 			if err := q.SetNodeShaping(ctx, db.SetNodeShapingParams{FairShare: cur.FairShare, ChannelMbps: cur.ChannelMbps, UpdatedAt: now.Unix(), ID: cur.ID}); err != nil {
+				return err
+			}
+		}
+		if p.SNIRouter != nil {
+			cur.SniRouter = Flag(*p.SNIRouter)
+			if err := q.SetNodeSNIRouter(ctx, db.SetNodeSNIRouterParams{SniRouter: cur.SniRouter, UpdatedAt: now.Unix(), ID: cur.ID}); err != nil {
+				return err
+			}
+		}
+		if p.SNIByKey != nil {
+			cur.SniByKey = Flag(*p.SNIByKey)
+			if err := q.SetNodeSNIByKey(ctx, db.SetNodeSNIByKeyParams{SniByKey: cur.SniByKey, UpdatedAt: now.Unix(), ID: cur.ID}); err != nil {
 				return err
 			}
 		}

@@ -51,6 +51,9 @@ type DesiredState struct {
 	// IPv6 turns IPv6 connectivity and resolution on the node on; nil: on (as before it).
 	// When false, mihomo disables IPv6 resolution and outbound IPv6 traffic.
 	IPv6 *bool `json:"ipv6,omitempty"`
+	// Router shares the node's TCP 443 between inbounds by the TLS name the client asks for
+	// (SNIRouter); nil: none.
+	Router *SNIRouter `json:"sni_router,omitempty"`
 }
 
 // Shaping is the fair share of a node: ChannelMbps (each way) is split evenly between the
@@ -188,6 +191,47 @@ type ResetResult struct {
 	Closed int `json:"closed"`
 }
 
+// SNIRouter: the node listens on Listen (":443" when empty) and hands each connection to
+// the inbound whose Names hold the ClientHello's SNI, with a PROXY v2 header; any other
+// name to Default ("": closed). The routed inbounds listen on loopback with PROXY protocol.
+type SNIRouter struct {
+	Listen  string     `json:"listen,omitempty"`
+	Routes  []SNIRoute `json:"routes"`
+	Default string     `json:"default,omitempty"`
+	// Stub: the names that get the node's front page instead ("" for no name).
+	Stub []string `json:"stub,omitempty"`
+	// ByKey: REALITY inbounds may share a name. The router hands a client to the one whose
+	// key made its ClientHello, as that inbound's REALITY checks it.
+	ByKey bool `json:"by_key,omitempty"`
+}
+
+type SNIRoute struct {
+	Inbound string   `json:"inbound"`
+	Names   []string `json:"names"`
+}
+
+// Routed says whether inbound name runs behind the router.
+func (r *SNIRouter) Routed(name string) bool {
+	if r == nil {
+		return false
+	}
+	if r.Default == name {
+		return true
+	}
+	for _, x := range r.Routes {
+		if x.Inbound == name {
+			return true
+		}
+	}
+	return false
+}
+
+// PortStatus is how a port the node holds for a feature of its own went (the SNI router on 443).
+type PortStatus struct {
+	OK    bool   `json:"ok"`
+	Error string `json:"error,omitempty"`
+}
+
 type Health struct {
 	Version   string           `json:"version"`
 	Core      string           `json:"core"`
@@ -205,6 +249,8 @@ type Health struct {
 	// Time is the node's clock as it answered: the panel holds it against its own and warns
 	// of a skew. Older nodes send none.
 	Time time.Time `json:"time,omitzero"`
+	// Router is how DesiredState.Router went; nil while there is none or the node is older.
+	Router *PortStatus `json:"sni_router,omitempty"`
 }
 
 // HostPorts are the ports something listens on at the node's server: TCP sockets in the
