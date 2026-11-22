@@ -463,18 +463,21 @@ func (m *Monitor) tryPublicPin(ctx context.Context, st *persistentState, cfg Ale
 	if st.PublicMessage == 0 || st.PublicPinned || st.PublicPinAttempted {
 		return
 	}
-	st.PublicPinAttempted = true
 	err := c.PinTo(ctx, cfg.PublicChannel, st.PublicMessage)
 	m.recordPublicPinResult(st, err)
 }
 
 func (m *Monitor) recordPublicPinResult(st *persistentState, err error) {
+	if st.PublicPinAttempted || st.PublicPinned {
+		return
+	}
+	st.PublicPinAttempted = true
 	if err == nil {
 		st.PublicPinned = true
 		return
 	}
-	if isChannelPermissionError(err) {
-		st.PublicPinned = false
+	if m.log != nil {
+		m.log.Warn("infrastructure alerts: pin public status failed; will not retry until channel changes", "channel", st.PublicTarget, "err", err)
 	}
 }
 
