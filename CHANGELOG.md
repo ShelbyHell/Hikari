@@ -3,6 +3,84 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4
+### en
+- **Shared port 443 and Multi-REALITY key routing**:
+  - Nodes can share TCP port 443 across multiple inbounds using an SNI router with PROXY protocol v2 support.
+  - Multiple REALITY protocols can share a single masking domain/SNI: the node inspects the ClientHello and routes the client to the inbound whose key matches its session ID, forwarding unknown traffic to the camouflage destination.
+  - Added node and protocol controls in the panel («Shared port 443» and «Through shared 443»); client subscriptions automatically receive port 443.
+- **Ready-made routing templates**:
+  - Added a curated catalog of routing templates in `Settings → Routing → YAML`:
+    - **«Blocked only (privWL)»**: routes only blocked/throttled Russian resources through VPN, passing direct traffic locally.
+    - **«All RU direct (Davoyan)»**: keeps Russian websites and subnets direct, sending international traffic through VPN.
+  - Interactive drawer allows viewing rules, toggling options, copying to clipboard, and applying directly into the template editor.
+- **Live device inspector & connection reset**:
+  - Added an active device inspector on user device pages (`GET /api/v1/users/{id}/online`) showing real-time online connections per node, source IPs, OS versions, hardware models, and client apps.
+  - Added a «Reset connections» action (`POST /api/v1/users/{id}/reset-connections` and `POST /v1/slots/reset` on nodes) that gracefully terminates active TCP/UDP sessions without revoking keys, prompting client apps to reconnect instantly.
+- **Telegram group topics & Discord webhook alerts**:
+  - Administrative alerts now support delivery to Telegram supergroups with topic threads (`group_chat_id` and `group_thread_id`).
+  - Added Discord webhook alert delivery with secret storage, markdown formatting, and test delivery checks.
+- **Admin authentication & OAuth enhancements**:
+  - **GitHub OAuth direct routing**: `/api/v1/auth/github/callback` and `/start` route directly on the panel domain without exposing secret admin paths, while maintaining domain isolation on `sub_domain` and `sni_domain`. Includes `redirect_uri` persistence and RFC 9207 `iss` support.
+  - **Telegram & GitHub OAuth sign-in**: administrators can sign in via Telegram bot QR/deep-link confirmation or GitHub OAuth 2.0.
+  - **Security login alerts**: instant alerts on every successful admin sign-in with client IP, User-Agent, timestamp, and a one-click session termination button (`tgkill`).
+  - **One-click account binding**: quick binding of Telegram and GitHub accounts directly from Security Settings.
+  - **Session method tracking**: active sessions display badges indicating authentication method and identity.
+  - **GitHub Organizations & Teams**: `allowed_orgs` allows granting panel access to members of specific GitHub organizations.
+- **Node cascade routing & editor redesign**:
+  - Added per-node cascade routing rules to redirect matching traffic through exit nodes before whole-protocol exits apply.
+  - Added full RULE-SET support (`RULE-SET,<name>` and `RULE-SET,<name>,no-resolve`) referencing built-in service lists, custom route lists, or direct HTTPS URLs with automatic rule provider generation.
+  - Added a CodeMirror JSON editor for cascade rules with syntax highlighting, line numbers, sample insertion, and interactive chips.
+  - Support for pasting plain mihomo/YAML rule lists directly into the cascade editor.
+  - Atomic bulk rule replacement API (`PUT /api/v1/nodes/{id}/cascade/rules`).
+- **IPv6 controls & diagnostics**:
+  - Individual per-node IPv6 toggle (`hikari node set <id> -ipv6=false`) that disables AAAA resolution and blocks direct IPv6 traffic to prevent connection stalls on hosts without IPv6 routing.
+  - Subscription client profile IPv6 toggle in `Settings → Routing → Fine-tuning` (disabled by default to prevent timeouts).
+  - Diagnostic IPv6 check (`hikari node check`) testing connectivity via fixed targets without DNS.
+- **Domains, TLS & infrastructure**:
+  - **Dedicated SNI domain (`sni_domain`)**: isolate panel admin, subscriptions, and traffic across three distinct domains.
+  - **Cloudflare Proxied support**: complete support for Cloudflare orange-cloud proxying on panel, subscription, SNI, and node domains with real client IP extraction via `CF-Connecting-IP`.
+  - **Seamless panel domain change/removal**: interactive confirmation dialog with automatic countdown and dual-certificate serving during ACME transitions to avoid self-signed TLS errors.
+  - **Core & dependencies**: updated Mihomo core to 1.19.34 and resolved Docker build compatibility with Node 25.
+### ru
+- **Общий порт 443 и Multi-REALITY по ключам**:
+  - Ноды могут делить порт 443 между несколькими протоколами через встроенный SNI-роутер с поддержкой PROXY protocol v2.
+  - Несколько протоколов REALITY могут маскироваться под один и тот же домен/SNI: нода разбирает ClientHello и направляет клиента именно в то подключение, чей ключ подошёл к Session ID, а неизвестных посетителей отправляет на сайт маскировки.
+  - В панели добавлены переключатели «Общий порт 443 (SNI-роутер)» для ноды и «Через общий 443» для протоколов; клиенты в подписках автоматически получают порт 443.
+- **Готовые шаблоны маршрутизации**:
+  - В раздел «Настройки → Маршрутизация → YAML» добавлен каталог проверенных шаблонов:
+    - **«privWL · только заблокированное»**: пускает через VPN только заблокированные и замедленные ресурсы и Telegram, остальной трафик идёт напрямую.
+    - **«Davoyan · Россия напрямую»**: российские домены и подсети идут напрямую, международный трафик — через VPN.
+  - Шторка каталога позволяет просматривать правила, переключать опции, копировать конфиг и загружать его прямо в редактор.
+- **Инспектор устройств онлайн и сброс соединений**:
+  - На страницу устройств пользователя добавлен инспектор активных сессий (`GET /api/v1/users/{id}/online`) с отображением онлайна по нодам, IP-адресам, версиям ОС, моделям и приложениям.
+  - Добавлена функция сброса соединений (`POST /api/v1/users/{id}/reset-connections` и `POST /v1/slots/reset` на ноде): мягко закрывает активные сессии без отзыва ключей, заставляя клиентские приложения переподключиться.
+- **Уведомления в топики Telegram-групп и Discord**:
+  - Оповещения администратора теперь можно отправлять в супергруппы Telegram с темами/форумами (`group_chat_id` и `group_thread_id`).
+  - Добавлена доставка алертов через Discord Webhooks с безопасным хранением URL, Markdown-форматированием и тестовой отправкой.
+- **Авторизация администратора и OAuth**:
+  - **Прямая маршрутизация GitHub OAuth**: запросы `/api/v1/auth/github/callback` и `/start` маршрутизируются напрямую без раскрытия секретного пути админки с сохранением изоляции доменов подписок и SNI. Точный `redirect_uri` сохраняется в OAuth-состоянии (RFC 9207 `iss`).
+  - **Вход через Telegram и GitHub OAuth**: вход по QR-коду / ссылке в официальном боте или через GitHub OAuth 2.0.
+  - **Уведомления о входе (Login Alerts)**: мгновенные сообщения о каждом входе с IP, User-Agent, временем и кнопкой мгновенного завершения сессии (`tgkill`).
+  - **Быстрая привязка аккаунтов**: кнопки привязки Telegram и GitHub в один клик в настройках безопасности.
+  - **Отображение способа входа**: бейджи метода авторизации в списке активных сессий.
+  - **Организации GitHub**: настройка `allowed_orgs` для доступа всех участников выбранных организаций.
+- **Каскад нод и редизайн редактора правил**:
+  - Правила каскада нод позволяют направлять часть трафика через другие ноды до срабатывания основного выхода протокола.
+  - Полная поддержка списков RULE-SET (`RULE-SET,<список>` и `RULE-SET,<список>,no-resolve`) со ссылками на встроенные сервисы, списки маршрутизации и HTTPS-ссылки.
+  - Полноценный JSON-редактор CodeMirror с подсветкой, номерами строк, чипами и кнопкой форматирования.
+  - Поддержка вставки обычных списков mihomo/YAML прямо в редактор каскада.
+  - Атомарное обновление всего набора правил ноды (`PUT /api/v1/nodes/{id}/cascade/rules`).
+- **Управление IPv6 и диагностика**:
+  - Индивидуальный переключатель IPv6 для каждой ноды (`hikari node set <id> -ipv6=false`): отключает AAAA-запросы и блокирует прямой IPv6-трафик, исключая таймауты на серверах без IPv6.
+  - Переключатель IPv6 в профилях подписок («Настройки → Маршрутизация → Тонкая настройка»).
+  - Диагностика IPv6 без зависимости от DNS в проверке нод и серверов.
+- **Домены, сертификаты и инфраструктура**:
+  - **Отдельный домен для SNI (`sni_domain`)**: разделение панели, подписок и маскировки трафика по трём независимым доменам.
+  - **Поддержка Cloudflare Proxied**: полная совместимость с проксированием Cloudflare на всех доменах с извлечением реального IP из `CF-Connecting-IP`.
+  - **Бесшовная смена и удаление домена панели**: подтверждение смены, обратный отсчёт и сохранение старого сертификата во время выпуска нового в ACME.
+  - **Ядро и окружение**: ядро Mihomo обновлено до 1.19.34, исправлена сборка Docker на Node 25.
+
 ## 0.5.1.4-rc.17
 ### en
 - **Shared port 443 for REALITY and TLS protocols**:
