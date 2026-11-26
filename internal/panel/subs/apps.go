@@ -138,25 +138,36 @@ var mihomoNewTypes = map[string]bool{"mieru": true, "sudoku": true, "trusttunnel
 // their core get a Gecko inbound.
 var geckoSince = Version{1, 19, 26}
 
+// mihomoMinimum is the required release for this request. Unknown cores get the
+// compatibility defaults except for the features that require a known version.
+func (a App) mihomoMinimum(n proto.Needs) Version {
+	known := a.Core.Known()
+	var need Version
+	if known || mihomoNewTypes[n.Type] {
+		need = mihomoSince[n.Type]
+	}
+	require := func(v Version) {
+		if v.AtLeast(need) {
+			need = v
+		}
+	}
+	if known && n.Transport == "xhttp" {
+		require(Version{1, 19, 22})
+	}
+	if known && n.Encryption {
+		require(Version{1, 19, 13})
+	}
+	if n.Gecko {
+		require(geckoSince)
+	}
+	return need
+}
+
 // Supports says whether the app can use an inbound.
 func (a App) Supports(n proto.Needs) bool {
 	switch a.Family {
 	case FamilyMihomo:
-		known := a.Core.Known()
-		if mihomoNewTypes[n.Type] && !known {
-			return false
-		}
-		if since, ok := mihomoSince[n.Type]; ok && known && !a.Core.AtLeast(since) {
-			return false
-		}
-		if known && (n.Transport == "xhttp" && !a.Core.AtLeast(Version{1, 19, 22}) || n.Encryption && !a.Core.AtLeast(Version{1, 19, 13})) {
-			return false
-		}
-		// An older core fails the whole profile on an obfs it does not know.
-		if n.Gecko && !(known && a.Core.AtLeast(geckoSince)) {
-			return false
-		}
-		return true
+		return a.Core.AtLeast(a.mihomoMinimum(n))
 	case FamilyXray: // no TUIC, AnyTLS or the mihomo-only types in Xray
 		if n.Gecko {
 			return false

@@ -353,7 +353,7 @@ func (h *Handler) serveProfile(w http.ResponseWriter, r *http.Request, u db.User
 // clashProfile is the Clash profile of prof: the admin's own (cfg.Template) when the app can
 // take it, the built-in one otherwise.
 func (h *Handler) clashProfile(prof Profile, cfg Config) ([]byte, error) {
-	if cfg.Template == "" || !prof.routable() {
+	if !prof.usesTemplate(cfg.Template) {
 		return Mihomo(prof, cfg.Groups.WithDefaults(cfg.Lang), cfg.Routing)
 	}
 	body, err := Template(prof, cfg.Template)
@@ -382,13 +382,32 @@ func forApp(ins []db.Inbound, app App, state string) []db.Inbound {
 	active := domain.CanConnect(state)
 	out := make([]db.Inbound, 0, len(ins))
 	for _, in := range ins {
-		t, err := parseTemplate(in.Config)
-		if err != nil || !app.Supports(proto.NeedsOf(t)) || proto.Shared(t.Type()) && !active {
-			continue
+		if reason, _ := appExclusion(in, app, active); reason == "" {
+			out = append(out, in)
 		}
-		out = append(out, in)
 	}
 	return out
+}
+
+func appExclusion(in db.Inbound, app App, active bool) (string, Version) {
+	t, err := parseTemplate(in.Config)
+	if err != nil {
+		return reasonInvalidConfig, Version{}
+	}
+	need := proto.NeedsOf(t)
+	if !app.Supports(need) {
+		if app.Family == FamilyMihomo {
+			if !app.Core.Known() {
+				return reasonCoreUnknown, app.mihomoMinimum(need)
+			}
+			return reasonCoreTooOld, app.mihomoMinimum(need)
+		}
+		return reasonUnsupportedApp, Version{}
+	}
+	if proto.Shared(t.Type()) && !active {
+		return reasonSharedNeedsAccess, Version{}
+	}
+	return "", Version{}
 }
 
 // slotFor is whose keys this request gets: its device's own with binding on, the user's
@@ -418,38 +437,71 @@ func (h *Handler) slotFor(r *http.Request, u db.User, cfg Config) (db.Slot, erro
 // profile lists what the user may use; slot is whose keys go in (zero for the page).
 // grants is what is left of the user's grants when the caller read it already; nil reads it.
 func (h *Handler) profile(ctx context.Context, u db.User, cfg Config, slot db.Slot, grants domain.GrantsLeft) (Profile, error) {
-	prof := Profile{Nodes: cfg.Nodes, Direct: cfg.Direct, Slot: slot, Fingerprint: cfg.Fingerprint}
-	all, err := h.st.Q.ListInbounds(ctx)
+	prof, ins, err := h.profileInputs(ctx, u, cfg, grants)
 	if err != nil {
 		return prof, err
 	}
-	allowed := domain.DecodeInbounds(u.Inbounds)
-	if grants == nil {
-		if grants, err = domain.UserGrantsLeft(ctx, h.st.Q, u.ID, h.now()); err != nil {
-			return prof, err
+	prof.Slot = slot
+	for _, in := range ins.all {
+		if ins.exclusion(in) == "" {
+			prof.Inbounds = append(prof.Inbounds, in)
 		}
 	}
-	// A traffic pool that ran out leaves the subscription; the node already turns it away.
-	spent, err := domain.ExhaustedPools(ctx, h.st.Q, u.ID, grants)
+	return prof, nil
+}
+
+type profileInbounds struct {
+	all          []db.Inbound
+	nodes        map[int64]bool
+	allowed      []int64
+	blockedPools map[int64]string
+}
+
+func (p profileInbounds) exclusion(in db.Inbound) string {
+	switch {
+	case !p.nodes[in.NodeID]:
+		return reasonNodeExcluded
+	case in.Enabled == 0:
+		return reasonInboundDisabled
+	case len(p.allowed) > 0 && !slices.Contains(p.allowed, in.ID):
+		return reasonNotAllowed
+	case in.PoolID.Valid:
+		return p.blockedPools[in.PoolID.Int64]
+	default:
+		return ""
+	}
+}
+
+// profileInputs reads the data shared by actual profiles and the read-only subscription check.
+// Keys for the user's slot, device binding and fetch accounting are not part of it.
+func (h *Handler) profileInputs(ctx context.Context, u db.User, cfg Config, grants domain.GrantsLeft) (Profile, profileInbounds, error) {
+	prof := Profile{Nodes: cfg.Nodes, Direct: cfg.Direct, Fingerprint: cfg.Fingerprint}
+	var ins profileInbounds
+	all, err := h.st.Q.ListInbounds(ctx)
 	if err != nil {
-		return prof, err
+		return prof, ins, err
+	}
+	if grants == nil {
+		if grants, err = domain.UserGrantsLeft(ctx, h.st.Q, u.ID, h.now()); err != nil {
+			return prof, ins, err
+		}
+	}
+	// An exhausted or excluded pool leaves the subscription; the node already turns it away.
+	blocked, err := domain.BlockedPools(ctx, h.st.Q, u.ID, grants)
+	if err != nil {
+		return prof, ins, err
 	}
 	nodes := map[int64]bool{}
 	for _, n := range cfg.Nodes {
 		nodes[n.ID] = true
 	}
-	for _, in := range all {
-		if in.Enabled == 0 || !nodes[in.NodeID] || (len(allowed) > 0 && !slices.Contains(allowed, in.ID)) || in.PoolID.Valid && spent[in.PoolID.Int64] {
-			continue
-		}
-		prof.Inbounds = append(prof.Inbounds, in)
-	}
+	ins = profileInbounds{all: all, nodes: nodes, allowed: domain.DecodeInbounds(u.Inbounds), blockedPools: blocked}
 	// The external subscriptions attached to the user's tariff ride along after the panel's
 	// own nodes; a server the core cannot parse was dropped when it was stored.
 	if u.TariffID.Valid {
 		ext, err := h.st.Q.ListExternalServersForTariff(ctx, u.TariffID.Int64)
 		if err != nil {
-			return prof, err
+			return prof, ins, err
 		}
 		for _, s := range ext {
 			var m map[string]any
@@ -459,7 +511,7 @@ func (h *Handler) profile(ctx context.Context, u db.User, cfg Config, slot db.Sl
 			prof.External = append(prof.External, ExternalServer{Group: s.GroupName, Name: s.Name, Link: s.Link, Mihomo: m})
 		}
 	}
-	return prof, nil
+	return prof, ins, nil
 }
 
 // userInfoHeaders: the traffic and term apps show. With traffic packages left the total
@@ -960,7 +1012,7 @@ func (h *Handler) sample(ctx context.Context) (Profile, Config, error) {
 	if err != nil {
 		return Profile{}, cfg, err
 	}
-	prof, err := h.profile(ctx, db.User{}, cfg, db.Slot{Name: "preview", Uuid: "00000000-0000-0000-0000-000000000000", Secret: "preview"}, domain.GrantsLeft{})
+	prof, err := h.profile(ctx, db.User{}, cfg, previewSlot, domain.GrantsLeft{})
 	if err != nil {
 		return Profile{}, cfg, err
 	}
@@ -970,6 +1022,8 @@ func (h *Handler) sample(ctx context.Context) (Profile, Config, error) {
 	prof.App = App{Family: FamilyMihomo, Core: previewCore}
 	return prof, cfg, nil
 }
+
+var previewSlot = db.Slot{Name: "preview", Uuid: "00000000-0000-0000-0000-000000000000", Secret: "preview"}
 
 // previewCore is the mihomo the nodes run (go.mod), the newest an app may have.
 var previewCore = Version{1, 19, 32}

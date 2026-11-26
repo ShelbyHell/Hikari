@@ -63,31 +63,40 @@ func Template(p Profile, src string) ([]byte, error) {
 	return marshalYAML(cfg)
 }
 
+func (p Profile) usesTemplate(src string) bool { return src != "" && p.routable() }
+
 // templateConfig is the profile Template renders.
 func templateConfig(p Profile, src string) (map[string]any, error) {
 	ps, err := build(p)
 	if err != nil {
 		return nil, err
 	}
+	cfg, _, err := templateConfigOf(p, src, ps)
+	return cfg, err
+}
+
+// templateConfigOf also reports which generated proxies remain after adding the template's own.
+func templateConfigOf(p Profile, src string, ps []proxy) (map[string]any, []proxy, error) {
 	if len(ps) == 0 {
-		return nil, ErrNoProxies
+		return nil, nil, ErrNoProxies
 	}
 	cfg, err := parseProfileTemplate(src)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	// Checked again for this user: their inbounds and app may leave a group the template
 	// names a member of empty, and mihomo refuses a profile with a missing member.
-	if err := fillTemplate(cfg, p, ps); err != nil {
-		return nil, err
+	kept, err := fillTemplate(cfg, p, ps)
+	if err != nil {
+		return nil, nil, err
 	}
 	if err := checkFilled(cfg, p); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return cfg, nil
+	return cfg, kept, nil
 }
 
-func fillTemplate(cfg map[string]any, p Profile, ps []proxy) error {
+func fillTemplate(cfg map[string]any, p Profile, ps []proxy) ([]proxy, error) {
 	own, _ := cfg["proxies"].([]any)
 	taken := map[string]bool{}
 	for _, x := range own {
@@ -110,7 +119,7 @@ func fillTemplate(cfg map[string]any, p Profile, ps []proxy) error {
 	for _, g := range groups {
 		if m, ok := g.(map[string]any); ok {
 			if err := fillGroup(m, p.Nodes, names, providers); err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
@@ -128,7 +137,7 @@ func fillTemplate(cfg map[string]any, p Profile, ps []proxy) error {
 		}
 	}
 	cfg["rules"] = out
-	return nil
+	return names, nil
 }
 
 // fillGroup puts the user's proxies the group asks for into it.
@@ -267,7 +276,7 @@ func CheckTemplate(p Profile, src string) error {
 	if err != nil {
 		return err
 	}
-	if err := fillTemplate(cfg, p, ps); err != nil {
+	if _, err := fillTemplate(cfg, p, ps); err != nil {
 		return err
 	}
 	return checkFilled(cfg, p)

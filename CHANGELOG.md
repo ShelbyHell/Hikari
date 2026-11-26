@@ -3,6 +3,18 @@
 Each release has a section in English and in Russian; the release workflow puts them in
 the signed manifest, and the panel shows the one in its language.
 
+## 0.5.1.4-rc.18
+### en
+- **Subscription delivery check for Happ and Clash**:
+  - Added a read-only check in the user's card showing which nodes and protocols the selected app will receive.
+  - Excluded connections explain the reason: unsupported protocol, mihomo version, disabled inbound, user access, exhausted pool, invalid config, and more.
+  - The check does not reveal subscription links or keys, bind a device, or record a subscription fetch.
+### ru
+- **Проверка состава подписки для Happ и Clash**:
+  - В карточке пользователя появилась проверка, показывающая, какие ноды и протоколы получит выбранное приложение.
+  - Для исключённых подключений указывается причина: неподдерживаемый протокол, версия mihomo, выключенный inbound, доступ пользователя, исчерпанный пул, ошибочная конфигурация и другие.
+  - Проверка не раскрывает ссылки и ключи подписки, не привязывает устройство и не записывает загрузку подписки.
+
 ## 0.5.1.4
 ### en
 - **Shared port 443 and Multi-REALITY key routing**:

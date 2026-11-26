@@ -162,11 +162,12 @@ type Profile struct {
 }
 
 type proxy struct {
-	name string
-	node int64
-	ext  string // the external subscription group, "" for the panel's own nodes
-	uri  string
-	yaml map[string]any
+	name    string
+	node    int64
+	inbound int64  // 0 for external servers, otherwise the panel's inbound ID
+	ext     string // the external subscription group, "" for the panel's own nodes
+	uri     string
+	yaml    map[string]any
 }
 
 // NodePrefix is what precedes proxy names of a node when a subscription has several:
@@ -223,7 +224,7 @@ func build(p Profile) ([]proxy, error) {
 				continue
 			}
 			used[name] = true
-			out = append(out, proxy{name: name, node: n.ID, uri: c.URI, yaml: c.Mihomo})
+			out = append(out, proxy{name: name, node: n.ID, inbound: in.ID, uri: c.URI, yaml: c.Mihomo})
 		}
 	}
 	// The external subscriptions of the tariff come after the panel's own, each in the

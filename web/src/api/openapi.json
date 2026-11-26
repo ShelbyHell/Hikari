@@ -8186,6 +8186,123 @@
         ],
         "type": "object"
       },
+      "SubscriptionCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "external_included": {
+            "description": "Сколько сохранённых внешних серверов из тарифа попадёт в профиль, отдельно от нод панели",
+            "format": "int64",
+            "type": "integer"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionCheckNode"
+            },
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "active",
+              "expiring",
+              "limited",
+              "expired",
+              "disabled"
+            ],
+            "type": "string"
+          },
+          "template_fallback": {
+            "description": "Пользователь получит встроенный профиль вместо своего шаблона Clash",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "state",
+          "nodes",
+          "external_included"
+        ],
+        "type": "object"
+      },
+      "SubscriptionCheckInbound": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "minimum_mihomo": {
+            "description": "Минимальная версия mihomo для этого подключения, если причина исключения — версия ядра",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "profile_name": {
+            "description": "Название подключения в приложении, если оно попало в профиль",
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "node_disabled",
+              "node_excluded",
+              "inbound_disabled",
+              "not_allowed",
+              "pool_excluded",
+              "pool_exhausted",
+              "invalid_config",
+              "unsupported_app",
+              "core_unknown",
+              "core_too_old",
+              "shared_needs_access",
+              "render_failed",
+              "no_share_link",
+              "template_name_conflict"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object"
+      },
+      "SubscriptionCheckNode": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "inbounds": {
+            "items": {
+              "$ref": "#/components/schemas/SubscriptionCheckInbound"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "description": "Почему нода не попала в профиль; не задано, если попало хотя бы одно её подключение",
+            "enum": [
+              "node_disabled",
+              "node_excluded",
+              "no_inbounds",
+              "no_matching_inbounds"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "inbounds"
+        ],
+        "type": "object"
+      },
       "System": {
         "additionalProperties": false,
         "properties": {
@@ -18709,6 +18826,81 @@
           }
         },
         "summary": "Сбросить трафик",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/subscription-check": {
+      "get": {
+        "operationId": "check-user-subscription",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "explode": false,
+            "in": "query",
+            "name": "app",
+            "required": true,
+            "schema": {
+              "enum": [
+                "happ",
+                "clash"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Для Clash: версия ядра, например 1.19.34. Без неё — приложение не сообщило версию",
+            "explode": false,
+            "in": "query",
+            "name": "mihomo_version",
+            "schema": {
+              "description": "Для Clash: версия ядра, например 1.19.34. Без неё — приложение не сообщило версию",
+              "maxLength": 15,
+              "pattern": "^v?[0-9]{1,4}[.][0-9]{1,4}[.][0-9]{1,4}$",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionCheck"
+                }
+              }
+            },
+            "description": "OK",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorModel"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "summary": "Проверить состав подписки для Happ или Clash, без выдачи ключей и привязки устройства",
         "tags": [
           "users"
         ]

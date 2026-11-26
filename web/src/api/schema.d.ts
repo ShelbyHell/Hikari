@@ -2601,6 +2601,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/{id}/subscription-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Проверить состав подписки для Happ или Clash, без выдачи ключей и привязки устройства */
+        get: operations["check-user-subscription"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/{id}/telegram": {
         parameters: {
             query?: never;
@@ -5638,6 +5655,41 @@ export interface components {
             /** @description Страница по умолчанию — к ней ведёт «Сбросить» */
             defaults: components["schemas"]["Page"];
             logo?: components["schemas"]["PageAsset"];
+        };
+        SubscriptionCheck: {
+            /**
+             * Format: int64
+             * @description Сколько сохранённых внешних серверов из тарифа попадёт в профиль, отдельно от нод панели
+             */
+            external_included: number;
+            nodes: components["schemas"]["SubscriptionCheckNode"][];
+            /** @enum {string} */
+            state: "active" | "expiring" | "limited" | "expired" | "disabled";
+            /** @description Пользователь получит встроенный профиль вместо своего шаблона Clash */
+            template_fallback?: boolean;
+        };
+        SubscriptionCheckInbound: {
+            /** Format: int64 */
+            id: number;
+            /** @description Минимальная версия mihomo для этого подключения, если причина исключения — версия ядра */
+            minimum_mihomo?: string;
+            name: string;
+            /** @description Название подключения в приложении, если оно попало в профиль */
+            profile_name?: string;
+            protocol?: string;
+            /** @enum {string} */
+            reason?: "node_disabled" | "node_excluded" | "inbound_disabled" | "not_allowed" | "pool_excluded" | "pool_exhausted" | "invalid_config" | "unsupported_app" | "core_unknown" | "core_too_old" | "shared_needs_access" | "render_failed" | "no_share_link" | "template_name_conflict";
+        };
+        SubscriptionCheckNode: {
+            /** Format: int64 */
+            id: number;
+            inbounds: components["schemas"]["SubscriptionCheckInbound"][];
+            name: string;
+            /**
+             * @description Почему нода не попала в профиль; не задано, если попало хотя бы одно её подключение
+             * @enum {string}
+             */
+            reason?: "node_disabled" | "node_excluded" | "no_inbounds" | "no_matching_inbounds";
         };
         System: {
             /** Format: double */
@@ -12728,6 +12780,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserView"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorModel"];
+                };
+            };
+        };
+    };
+    "check-user-subscription": {
+        parameters: {
+            query: {
+                app: "happ" | "clash";
+                /** @description Для Clash: версия ядра, например 1.19.34. Без неё — приложение не сообщило версию */
+                mihomo_version?: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubscriptionCheck"];
                 };
             };
             /** @description Error */

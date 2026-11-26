@@ -12,6 +12,7 @@ import { useCopy } from "../../../lib/copy";
 import { useDraft } from "../../../lib/draft";
 import { safeHref } from "../../../lib/url";
 import { Section } from "./section";
+import { SubscriptionCheck } from "./subscription-check";
 
 export function SubscriptionSection({ u, onReissue }: { u: User; onReissue: () => void }) {
   const copyText = useCopy();
@@ -48,6 +49,7 @@ export function SubscriptionSection({ u, onReissue }: { u: User; onReissue: () =
       </div>
       <HappLink id={u.id} token={u.sub_url} />
       {u.legacy ? <LegacyLink legacy={u.legacy} /> : null}
+      <SubscriptionCheck userID={u.id} />
     </Section>
   );
 }

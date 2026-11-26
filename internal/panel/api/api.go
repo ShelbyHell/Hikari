@@ -54,17 +54,17 @@ type Deps struct {
 	Log        *slog.Logger
 	Now        func() time.Time
 
-	Users     *domain.Users
-	Inbounds  *domain.Inbounds
-	Devices   *domain.Devices
-	Packages  *domain.Packages
-	Pool      *domain.Pool
-	Changes   domain.Changes
-	Online    func() map[string]nodeapi.Online
+	Users      *domain.Users
+	Inbounds   *domain.Inbounds
+	Devices    *domain.Devices
+	Packages   *domain.Packages
+	Pool       *domain.Pool
+	Changes    domain.Changes
+	Online     func() map[string]nodeapi.Online
 	NodeOnline func() map[int64]map[string]nodeapi.Online
 	ResetSlots func(ctx context.Context, nodeID int64, slots []string) []nodesync.ConnReset
-	Cert      func() acme.Status
-	RenewCert func()
+	Cert       func() acme.Status
+	RenewCert  func()
 	// RenewCertNow tries the panel's certificate now and waits up to wait for the outcome;
 	// done is false when the order still runs then. nil in development.
 	RenewCertNow func(ctx context.Context, wait time.Duration) (st acme.Status, done bool)
@@ -87,6 +87,8 @@ type Deps struct {
 	// RoutesPreview renders a Clash profile with routing in place of the saved one
 	// (subs.Handler.Preview); nil: no preview.
 	RoutesPreview func(ctx context.Context, req subs.PreviewRequest) ([]byte, error)
+	// CheckSubscription explains what a user's app gets without returning credentials.
+	CheckSubscription func(ctx context.Context, u db.User, app subs.App) (subs.SubscriptionCheck, error)
 	// CheckTemplate checks an own Clash profile (subs.Handler.CheckTemplate); nil: unchecked.
 	CheckTemplate func(ctx context.Context, src string) error
 	// HappLink is the Happ crypt link of a user's subscription (subs.Handler.HappLink); nil: none.

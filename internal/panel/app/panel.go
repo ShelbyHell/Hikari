@@ -319,20 +319,17 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 	}
 	deps.CheckTemplate = func(ctx context.Context, src string) error { return subHandler.CheckTemplate(ctx, src) }
 	deps.HappLink = func(ctx context.Context, u db.User) (string, error) { return subHandler.HappLink(ctx, u) }
-	apiHandler, _, err := api.New(deps)
-	if err != nil {
-		return nil, err
-	}
-	p.spa, err = server.NewSPA(o.Web, "index.html")
+	spa, err := server.NewSPA(o.Web, "index.html")
 	if err != nil {
 		return nil, fmt.Errorf("web bundle: %w", err)
 	}
+	p.spa = spa
 	var subPageHandler http.Handler
 	if sp, err := server.NewSPA(o.Web, "sub.html"); err == nil {
 		p.subPage, subPageHandler = sp, sp
 	}
 	pages := subpage.NewService(st.Q)
-	buildSubCfg := func(ctx context.Context) (subs.Config, error) {
+	buildSubCfg := func(ctx context.Context, includePins bool) (subs.Config, error) {
 		ep, err := set.Endpoint(ctx)
 		if err != nil {
 			return subs.Config{}, err
@@ -432,7 +429,7 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 				sn.SNIRouter = n.SniRouter != 0
 				cfg.Direct = append(cfg.Direct, n.PublicHost, n.Domain)
 			}
-			if o.TLS != nil {
+			if includePins && o.TLS != nil {
 				if c, err := o.TLS.Pick(n); err == nil {
 					sn.Endpoint.PinSHA256 = c.Pin
 				}
@@ -462,7 +459,9 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 		}
 		return g
 	}}
-	subCfg := func(ctx context.Context) (subs.Config, error) { return cache.get(ctx, buildSubCfg) }
+	subCfg := func(ctx context.Context) (subs.Config, error) {
+		return cache.get(ctx, func(ctx context.Context) (subs.Config, error) { return buildSubCfg(ctx, true) })
+	}
 	subHandler = subs.NewHandler(st, subCfg, subPageHandler, o.Now, deps.Devices, o.TrustProxy)
 	subHandler.SetLogger(o.Log)
 	subHandler.SetTelegram(p.Gateway)
@@ -470,6 +469,19 @@ func NewPanel(st *store.Store, o Options) (*Panel, error) {
 	subHandler.SetShop(p.Billing)
 	subHandler.SetPromo(promos)
 	subHandler.SetPages(pages)
+	deps.CheckSubscription = func(ctx context.Context, u db.User, app subs.App) (subs.SubscriptionCheck, error) {
+		// Certificate pins do not affect profile membership. In particular, the check
+		// must not create a self-signed certificate while looking up a node's pin.
+		cfg, err := buildSubCfg(ctx, false)
+		if err != nil {
+			return subs.SubscriptionCheck{}, err
+		}
+		return subHandler.CheckSubscription(ctx, u, app, cfg)
+	}
+	apiHandler, _, err := api.New(deps)
+	if err != nil {
+		return nil, err
+	}
 
 	adminMux := http.NewServeMux()
 	adminMux.Handle("/api/", apiHandler)

@@ -69,18 +69,38 @@ func PoolExhausted(p db.UserPool, grants int64) bool {
 	return TrafficLeft(p.TrafficLimit, p.UsedUp+p.UsedDown, grants) == 0
 }
 
-// ExhaustedPools are the user's pools that do not serve: nothing left, or left out of the
-// user's tariff, by pool id. left is UserGrantsLeft of the user, which the caller has read.
-func ExhaustedPools(ctx context.Context, q *db.Queries, userID int64, left GrantsLeft) (map[int64]bool, error) {
+const (
+	PoolBlockedPlan    = "pool_excluded"
+	PoolBlockedTraffic = "pool_exhausted"
+)
+
+// BlockedPools gives the reason a user's pool does not serve, by pool id. left is
+// UserGrantsLeft of the user, which the caller has read.
+func BlockedPools(ctx context.Context, q *db.Queries, userID int64, left GrantsLeft) (map[int64]string, error) {
 	ps, err := q.ListUserPools(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	out := map[int64]bool{}
+	out := map[int64]string{}
 	for _, p := range ps {
-		if p.Excluded || PoolExhausted(p, left.Pool(userID, p.PoolID)) {
-			out[p.PoolID] = true
+		if p.Excluded {
+			out[p.PoolID] = PoolBlockedPlan
+		} else if PoolExhausted(p, left.Pool(userID, p.PoolID)) {
+			out[p.PoolID] = PoolBlockedTraffic
 		}
+	}
+	return out, nil
+}
+
+// ExhaustedPools lists the user's blocked pools regardless of the reason.
+func ExhaustedPools(ctx context.Context, q *db.Queries, userID int64, left GrantsLeft) (map[int64]bool, error) {
+	blocked, err := BlockedPools(ctx, q, userID, left)
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[int64]bool, len(blocked))
+	for id := range blocked {
+		out[id] = true
 	}
 	return out, nil
 }
